@@ -1,0 +1,1 @@
+{'name': 'STRIPE_SECRET_KEY', 'valueFrom': {'secretKeyRef': {'key': 'latest', 'name': 'stripe-secret'}}};{'name': 'STRIPE_WEBHOOK_SECRET', 'valueFrom': {'secretKeyRef': {'key': 'latest', 'name': 'stripe-webhook-secret'}}}
