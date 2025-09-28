@@ -1,0 +1,68 @@
+{
+  "bindings": [
+    {
+      "members": [
+        "projectEditor:diagnostic-pro-prod",
+        "projectOwner:diagnostic-pro-prod"
+      ],
+      "role": "roles/storage.legacyBucketOwner"
+    },
+    {
+      "members": [
+        "projectViewer:diagnostic-pro-prod"
+      ],
+      "role": "roles/storage.legacyBucketReader"
+    },
+    {
+      "members": [
+        "projectEditor:diagnostic-pro-prod",
+        "projectOwner:diagnostic-pro-prod"
+      ],
+      "role": "roles/storage.legacyObjectOwner"
+    },
+    {
+      "members": [
+        "projectViewer:diagnostic-pro-prod"
+      ],
+      "role": "roles/storage.legacyObjectReader"
+    },
+    {
+      "members": [
+        "serviceAccount:298932670545-compute@developer.gserviceaccount.com"
+      ],
+      "role": "roles/storage.objectAdmin"
+    }
+  ],
+  "etag": "CAQ="
+}
+{
+  "bindings": [
+    {
+      "members": [
+        "projectEditor:diagnostic-pro-prod",
+        "projectOwner:diagnostic-pro-prod"
+      ],
+      "role": "roles/storage.legacyBucketOwner"
+    },
+    {
+      "members": [
+        "projectViewer:diagnostic-pro-prod"
+      ],
+      "role": "roles/storage.legacyBucketReader"
+    },
+    {
+      "members": [
+        "projectEditor:diagnostic-pro-prod",
+        "projectOwner:diagnostic-pro-prod"
+      ],
+      "role": "roles/storage.legacyObjectOwner"
+    },
+    {
+      "members": [
+        "projectViewer:diagnostic-pro-prod"
+      ],
+      "role": "roles/storage.legacyObjectReader"
+    }
+  ],
+  "etag": "CAI="
+}

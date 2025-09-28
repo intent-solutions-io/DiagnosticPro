@@ -1,0 +1,262 @@
+[
+  {
+    "insertId": "68d715d300063373436c91c1",
+    "labels": {
+      "instanceId": "0069c7a988ba0b4e599aeccbd43ef94d28ac61424aba3dccd87de48c7503f6d5f7beb78c1e0433ffa918554e808047f3aa21c199a5532f14ff3d5361310ac76e0e271d0091d3fa6df68a7f4664d0"
+    },
+    "logName": "projects/diagnostic-pro-prod/logs/run.googleapis.com%2Fstdout",
+    "receiveTimestamp": "2025-09-26T22:38:11.745843700Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "diagnosticpro-vertex-ai-backend",
+        "location": "us-central1",
+        "project_id": "diagnostic-pro-prod",
+        "revision_name": "diagnosticpro-vertex-ai-backend-00014-kpv",
+        "service_name": "diagnosticpro-vertex-ai-backend"
+      },
+      "type": "cloud_run_revision"
+    },
+    "textPayload": "📁 Storage: gs://diagnostic-pro-prod_diagnostic-reports",
+    "timestamp": "2025-09-26T22:38:11.406387Z"
+  },
+  {
+    "insertId": "68d6f42500092fe1f38f458b",
+    "labels": {
+      "instanceId": "0069c7a988ac07e83874ae5cf403c72379490e82b79e465bdc654a87e317fb8263ef6602276d8e4b14f89a69a434dab9fa236e1c07cbd4d9d7b8e9a73394b713359b428065fbd1d82e229d51286dab"
+    },
+    "logName": "projects/diagnostic-pro-prod/logs/run.googleapis.com%2Fstdout",
+    "receiveTimestamp": "2025-09-26T20:14:29.940012276Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "diagnosticpro-vertex-ai-backend",
+        "location": "us-central1",
+        "project_id": "diagnostic-pro-prod",
+        "revision_name": "diagnosticpro-vertex-ai-backend-00014-kpv",
+        "service_name": "diagnosticpro-vertex-ai-backend"
+      },
+      "type": "cloud_run_revision"
+    },
+    "textPayload": "📁 Storage: gs://diagnostic-pro-prod_diagnostic-reports",
+    "timestamp": "2025-09-26T20:14:29.602081Z"
+  },
+  {
+    "insertId": "68d6ec1b000af845ad4ab1e9",
+    "labels": {
+      "instanceId": "0069c7a9889fd037a3881b07287aa65edd02ff64c23094d06026edea53ba0d9de2f1087328ef962cefb0169d7a562eebc9dcd088283f1ca5fb263e67f3533f828334f7bf3934dfc7c32d91264a8d81"
+    },
+    "logName": "projects/diagnostic-pro-prod/logs/run.googleapis.com%2Fstdout",
+    "receiveTimestamp": "2025-09-26T19:40:12.056872710Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "diagnosticpro-vertex-ai-backend",
+        "location": "us-central1",
+        "project_id": "diagnostic-pro-prod",
+        "revision_name": "diagnosticpro-vertex-ai-backend-00013-q95",
+        "service_name": "diagnosticpro-vertex-ai-backend"
+      },
+      "type": "cloud_run_revision"
+    },
+    "textPayload": "📁 Storage: gs://diagnostic-pro-prod_diagnostic-reports",
+    "timestamp": "2025-09-26T19:40:11.718917Z"
+  },
+  {
+    "insertId": "68d6da6f000221baacc8d67c",
+    "labels": {
+      "instanceId": "0069c7a988db7bcd0dc7eca59a6939be94bf6f370ab194511646830e9dd20e5975cb697005a0be7520935df824a3fb6f409bc3f17735449cef2a28750aff1c08b587e956f110c72d01d5b69589d3bd"
+    },
+    "logName": "projects/diagnostic-pro-prod/logs/run.googleapis.com%2Fstdout",
+    "receiveTimestamp": "2025-09-26T18:24:47.477795717Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "diagnosticpro-vertex-ai-backend",
+        "location": "us-central1",
+        "project_id": "diagnostic-pro-prod",
+        "revision_name": "diagnosticpro-vertex-ai-backend-00012-njd",
+        "service_name": "diagnosticpro-vertex-ai-backend"
+      },
+      "type": "cloud_run_revision"
+    },
+    "textPayload": "📁 Storage: gs://diagnostic-pro-prod_diagnostic-reports",
+    "timestamp": "2025-09-26T18:24:47.139706Z"
+  },
+  {
+    "insertId": "68d6da6a000c6d981262dadd",
+    "labels": {
+      "instanceId": "0069c7a988a9e8f1eee2d345aea7a564367bb41fe319052dde155fe0823a091165d08482fb54b0af43717633ed8f14e4338c1b266a03c3b96548dccf7a1302b0a72b5d73dae30a35a7220f7ff267"
+    },
+    "logName": "projects/diagnostic-pro-prod/logs/run.googleapis.com%2Fstdout",
+    "receiveTimestamp": "2025-09-26T18:24:43.152424536Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "diagnosticpro-vertex-ai-backend",
+        "location": "us-central1",
+        "project_id": "diagnostic-pro-prod",
+        "revision_name": "diagnosticpro-vertex-ai-backend-00012-njd",
+        "service_name": "diagnosticpro-vertex-ai-backend"
+      },
+      "type": "cloud_run_revision"
+    },
+    "textPayload": "📁 Storage: gs://diagnostic-pro-prod_diagnostic-reports",
+    "timestamp": "2025-09-26T18:24:42.814488Z"
+  },
+  {
+    "insertId": "68d6d998000d3b36fdbc6bd0",
+    "labels": {
+      "instanceId": "0069c7a9883bc8b223c1e1cf23efdabbe88e2bb92e2a00b4da2751491fc1c87ff0e27ff0b6bb92e417146e7c6f259edbbd17fa6cc03f2851b0d19238da675fcd5d55d5004eec4a64e3e504ea6f33"
+    },
+    "logName": "projects/diagnostic-pro-prod/logs/run.googleapis.com%2Fstdout",
+    "receiveTimestamp": "2025-09-26T18:21:13.204284813Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "diagnosticpro-vertex-ai-backend",
+        "location": "us-central1",
+        "project_id": "diagnostic-pro-prod",
+        "revision_name": "diagnosticpro-vertex-ai-backend-00011-224",
+        "service_name": "diagnosticpro-vertex-ai-backend"
+      },
+      "type": "cloud_run_revision"
+    },
+    "textPayload": "📁 Storage: gs://diagnostic-pro-prod_diagnostic-reports",
+    "timestamp": "2025-09-26T18:21:12.867126Z"
+  },
+  {
+    "insertId": "68d6d98c000c4af84a403440",
+    "labels": {
+      "instanceId": "0069c7a98829191a3067ac2c167b02f8e04d570b8bcc3d5436af9d96e8e29e715e92e2bad8579c18e9281ae113a6def03f29149d4dcf38c89251b7325690f3779507a2efd5674b3f28f94aedf6e3"
+    },
+    "logName": "projects/diagnostic-pro-prod/logs/run.googleapis.com%2Fstdout",
+    "receiveTimestamp": "2025-09-26T18:21:01.143288578Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "diagnosticpro-vertex-ai-backend",
+        "location": "us-central1",
+        "project_id": "diagnostic-pro-prod",
+        "revision_name": "diagnosticpro-vertex-ai-backend-00011-224",
+        "service_name": "diagnosticpro-vertex-ai-backend"
+      },
+      "type": "cloud_run_revision"
+    },
+    "textPayload": "📁 Storage: gs://diagnostic-pro-prod_diagnostic-reports",
+    "timestamp": "2025-09-26T18:21:00.805624Z"
+  },
+  {
+    "insertId": "68d6d97d000b58418aefe1d8",
+    "labels": {
+      "instanceId": "0069c7a9882dbe929520feea6507b586375ff683a9978e77657974fca4ec28ba99b2385635490a665f4ee43780586d3e73a0c5f32346ca65f607e6fe2afda1d7670fad5d1efcd9310412da33fc99"
+    },
+    "logName": "projects/diagnostic-pro-prod/logs/run.googleapis.com%2Fstdout",
+    "receiveTimestamp": "2025-09-26T18:20:46.086792658Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "diagnosticpro-vertex-ai-backend",
+        "location": "us-central1",
+        "project_id": "diagnostic-pro-prod",
+        "revision_name": "diagnosticpro-vertex-ai-backend-00010-n9r",
+        "service_name": "diagnosticpro-vertex-ai-backend"
+      },
+      "type": "cloud_run_revision"
+    },
+    "textPayload": "📁 Storage: gs://diagnostic-pro-prod_diagnostic-reports",
+    "timestamp": "2025-09-26T18:20:45.743489Z"
+  },
+  {
+    "insertId": "68d6d8fd0009fbe5846e96c0",
+    "labels": {
+      "instanceId": "0069c7a9881b9cda8465a7f6aee67ea887d4d35d824242afd1b992cfbe1142efeacfaa8795ddd8abd8494ce5bdd361221d3571c9600063b8364c24ce3438c9b96dd4d7f26b6ca86bce1f74bf54f4"
+    },
+    "logName": "projects/diagnostic-pro-prod/logs/run.googleapis.com%2Fstdout",
+    "receiveTimestamp": "2025-09-26T18:18:37.992659213Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "diagnosticpro-vertex-ai-backend",
+        "location": "us-central1",
+        "project_id": "diagnostic-pro-prod",
+        "revision_name": "diagnosticpro-vertex-ai-backend-00009-jk7",
+        "service_name": "diagnosticpro-vertex-ai-backend"
+      },
+      "type": "cloud_run_revision"
+    },
+    "textPayload": "📁 Storage: gs://diagnostic-pro-prod_diagnostic-reports",
+    "timestamp": "2025-09-26T18:18:37.654309Z"
+  },
+  {
+    "insertId": "68d6aa8b0000659645f77632",
+    "labels": {
+      "instanceId": "0069c7a988225639c78844ff053b804b9c04cdeb3d46daa0afab8074b1884d3ed612f7b913ff95220e9e2b19ee6ded78290a1e869b18d345f031fe2ca2693359afb2149a3fc05008b928391ee88a"
+    },
+    "logName": "projects/diagnostic-pro-prod/logs/run.googleapis.com%2Fstdout",
+    "receiveTimestamp": "2025-09-26T15:00:27.366103829Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "diagnosticpro-vertex-ai-backend",
+        "location": "us-central1",
+        "project_id": "diagnostic-pro-prod",
+        "revision_name": "diagnosticpro-vertex-ai-backend-00009-jk7",
+        "service_name": "diagnosticpro-vertex-ai-backend"
+      },
+      "type": "cloud_run_revision"
+    },
+    "textPayload": "📁 Storage: gs://diagnostic-pro-prod_diagnostic-reports",
+    "timestamp": "2025-09-26T15:00:27.026006Z"
+  },
+  {
+    "insertId": "68d6a76a000841d444583e6f",
+    "labels": {
+      "instanceId": "0069c7a988a60f56123469f17fe54baaa95af874159763e0311ccd4199b249bc70ac8c7a7419f8b0ddd1b4ef0d48370554228c393d43cb7ef84842947af9a7ae401e08c1bce010c4030dfbbaf2c9"
+    },
+    "logName": "projects/diagnostic-pro-prod/logs/run.googleapis.com%2Fstdout",
+    "receiveTimestamp": "2025-09-26T14:47:06.879251557Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "diagnosticpro-vertex-ai-backend",
+        "location": "us-central1",
+        "project_id": "diagnostic-pro-prod",
+        "revision_name": "diagnosticpro-vertex-ai-backend-00008-xzw",
+        "service_name": "diagnosticpro-vertex-ai-backend"
+      },
+      "type": "cloud_run_revision"
+    },
+    "textPayload": "📁 Storage: gs://diagnostic-pro-prod_diagnostic-reports",
+    "timestamp": "2025-09-26T14:47:06.541140Z"
+  },
+  {
+    "insertId": "68d6a395000b1c79c7016371",
+    "labels": {
+      "instanceId": "0069c7a988f907c193500e80134465016f3401eb8415dd2cfc1c45829276d2cdfc0e98cb234f59e0cebee9eb6a331ae70fa0aff176966aa94d522681e17a49a9dbac878023e94e6f9f3a3072dc2d"
+    },
+    "logName": "projects/diagnostic-pro-prod/logs/run.googleapis.com%2Fstdout",
+    "receiveTimestamp": "2025-09-26T14:30:46.067386407Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "diagnosticpro-vertex-ai-backend",
+        "location": "us-central1",
+        "project_id": "diagnostic-pro-prod",
+        "revision_name": "diagnosticpro-vertex-ai-backend-00008-xzw",
+        "service_name": "diagnosticpro-vertex-ai-backend"
+      },
+      "type": "cloud_run_revision"
+    },
+    "textPayload": "📁 Storage: gs://diagnostic-pro-prod_diagnostic-reports",
+    "timestamp": "2025-09-26T14:30:45.728185Z"
+  },
+  {
+    "insertId": "68d67937000d2202ed824760",
+    "labels": {
+      "instanceId": "0069c7a98897ea88f958a3b4745f44bab4701b165d9d6d4ff4099a383536777753256e045725ccd17128d8145f66b07067e312d9b409a1223d1f5398440377f464356dd5d00f930b34a2b213e8443a"
+    },
+    "logName": "projects/diagnostic-pro-prod/logs/run.googleapis.com%2Fstdout",
+    "receiveTimestamp": "2025-09-26T11:30:00.200898624Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "diagnosticpro-vertex-ai-backend",
+        "location": "us-central1",
+        "project_id": "diagnostic-pro-prod",
+        "revision_name": "diagnosticpro-vertex-ai-backend-00007-9p7",
+        "service_name": "diagnosticpro-vertex-ai-backend"
+      },
+      "type": "cloud_run_revision"
+    },
+    "textPayload": "📁 Storage: gs://diagnostic-pro-prod_diagnostic-reports",
+    "timestamp": "2025-09-26T11:29:59.860674Z"
+  }
+]

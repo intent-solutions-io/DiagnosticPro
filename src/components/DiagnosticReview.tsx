@@ -9,19 +9,7 @@ import { db } from "@/config/firebase";
 import { useToast } from "@/components/ui/use-toast";
 import type { FormData } from "./DiagnosticForm";
 
-// Declare the custom element for TypeScript
-declare global {
-  // eslint-disable-next-line @typescript-eslint/no-namespace
-  namespace JSX {
-    interface IntrinsicElements {
-      "stripe-buy-button": {
-        "buy-button-id": string;
-        "publishable-key": string;
-        "client-reference-id"?: string;
-      };
-    }
-  }
-}
+// Stripe integration via Stripe Checkout only
 
 interface DiagnosticReviewProps {
   formData: FormData;
@@ -38,6 +26,23 @@ const DiagnosticReview = ({ formData, onEdit, onPaymentSuccess }: DiagnosticRevi
   const [saveError, setSaveError] = useState<string | null>(null);
   const { toast } = useToast();
   const paymentSectionRef = useRef<HTMLDivElement>(null);
+
+  // Set client-reference-id on Buy Button after it loads
+  useEffect(() => {
+    if (isDataSaved && submissionId) {
+      const setBuyButtonReference = () => {
+        const buyButton = document.querySelector('stripe-buy-button');
+        if (buyButton) {
+          buyButton.setAttribute('client-reference-id', submissionId);
+          console.log('Buy Button client-reference-id set:', submissionId);
+        } else {
+          // Retry if button not yet loaded
+          setTimeout(setBuyButtonReference, 100);
+        }
+      };
+      setBuyButtonReference();
+    }
+  }, [isDataSaved, submissionId]);
 
   // Handle payment success and trigger analysis
   const handlePaymentSuccess = async () => {
@@ -97,58 +102,106 @@ const DiagnosticReview = ({ formData, onEdit, onPaymentSuccess }: DiagnosticRevi
       try {
         setIsProcessing(true);
 
-        console.log("Starting diagnostic data save to Firestore...", {
-          hasFullName: !!formData.fullName,
-          hasEmail: !!formData.email,
-          equipmentType: formData.equipmentType,
-        });
-
         // Validate required fields before submission
         if (!formData.fullName || !formData.email || !formData.equipmentType) {
           throw new Error("Missing required fields: name, email, or equipment type");
         }
 
-        // Generate a unique submission ID
-        const submissionId = `diag_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        // Generate request ID for tracking
+        const reqId = crypto.randomUUID();
 
-        // Prepare data for Firestore
-        const submissionData = {
-          equipmentType: formData.equipmentType,
-          make: formData.make || '',
-          model: formData.model || '',
-          year: formData.year || '',
-          mileageHours: formData.mileageHours || '',
-          serialNumber: formData.serialNumber || '',
-          errorCodes: formData.errorCodes || '',
-          symptoms: formData.symptoms || [],
-          whenStarted: formData.whenStarted || '',
-          frequency: formData.frequency || '',
-          urgencyLevel: formData.urgencyLevel || "normal",
-          locationEnvironment: formData.locationEnvironment || '',
-          usagePattern: formData.usagePattern || '',
-          problemDescription: formData.problemDescription || '',
-          previousRepairs: formData.previousRepairs || '',
-          modifications: formData.modifications || '',
-          troubleshootingSteps: formData.troubleshootingSteps || '',
-          shopQuoteAmount: formData.shopQuoteAmount || '',
-          shopRecommendation: formData.shopRecommendation || '',
-          fullName: formData.fullName,
-          email: formData.email,
-          phone: formData.phone || '',
-          createdAt: new Date(),
-          paymentStatus: 'pending',
-          analysisStatus: 'pending'
+        // Build complete payload with ALL fields (per persistence rules)
+        const payload = {
+          equipmentType: formData.equipmentType ?? "",
+          make: formData.make ?? "",
+          model: formData.model ?? "",
+          year: formData.year ?? "",
+          mileageHours: formData.mileageHours ?? "",
+          serialNumber: formData.serialNumber ?? "",
+          errorCodes: formData.errorCodes ?? "",
+          // Backend expects symptoms as a string, not array
+          symptoms: Array.isArray(formData.symptoms) ? formData.symptoms.join(", ") : (formData.symptoms || ""),
+          whenStarted: formData.whenStarted ?? "",
+          frequency: formData.frequency ?? "",
+          urgencyLevel: formData.urgencyLevel ?? "normal",
+          locationEnvironment: formData.locationEnvironment ?? "",
+          usagePattern: formData.usagePattern ?? "",
+          problemDescription: formData.problemDescription ?? "",
+          previousRepairs: formData.previousRepairs ?? "",
+          modifications: formData.modifications ?? "",
+          troubleshootingSteps: formData.troubleshootingSteps ?? "",
+          shopQuoteAmount: formData.shopQuoteAmount ?? "",
+          shopRecommendation: formData.shopRecommendation ?? "",
+          fullName: formData.fullName ?? "",
+          email: formData.email ?? "",
+          phone: formData.phone ?? ""
         };
 
-        console.log("Saving data to Firestore...");
+        // Prepare full submission data
+        const submissionRequest = {
+          payload,
+          priceCents: 499,
+          status: 'pending',
+          reqId,
+          userAgent: navigator.userAgent,
+          clientIp: '' // Will be set by backend
+        };
 
-        // Save to Firestore diagnosticSubmissions collection
-        await setDoc(doc(db, 'diagnosticSubmissions', submissionId), submissionData);
+        console.log("Saving data via API Gateway...", {
+          phase: 'saveSubmission',
+          reqId,
+          payloadKeys: Object.keys(payload),
+          keyCount: Object.keys(payload).length
+        });
 
-        console.log("Data saved successfully to Firestore, submission ID:", submissionId);
+        // Call API Gateway endpoint
+        const apiGatewayUrl = import.meta.env.VITE_API_GATEWAY_URL || 'https://diagpro-gw-3tbssksx-3tbssksx.uc.gateway.dev';
+        const apiKey = import.meta.env.VITE_API_KEY || 'AIzaSyBgoJITYrqOcMx69HKa1_CzCkQNlVm66Co';
 
-        // Store the submission ID for payment processing
+        const response = await fetch(`${apiGatewayUrl}/saveSubmission`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': apiKey,
+            'x-dp-reqid': reqId
+          },
+          body: JSON.stringify(submissionRequest)
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('Save failed:', {
+            phase: 'saveSubmission',
+            status: 'error',
+            reqId,
+            httpCode: response.status,
+            error: errorText
+          });
+          throw new Error(`Failed to save data: ${response.status} ${errorText}`);
+        }
+
+        const result = await response.json();
+        const submissionId = result.submissionId;
+
+        console.log("Data saved successfully via API Gateway", {
+          phase: 'saveSubmission',
+          status: 'ok',
+          reqId,
+          submissionId,
+          payloadKeys: Object.keys(payload)
+        });
+
+        // Store debugging info in window for verification
+        (window as any).__dp_lastPayload = {
+          reqId,
+          submissionId,
+          payloadKeys: Object.keys(payload),
+          ts: new Date().toISOString()
+        };
+
+        // Store the submission ID and request ID for payment processing
         setSubmissionId(submissionId);
+        (window as any).__dp_reqId = reqId;
         setIsDataSaved(true);
         setSaveError(null);
 
@@ -358,35 +411,16 @@ const DiagnosticReview = ({ formData, onEdit, onPaymentSuccess }: DiagnosticRevi
                   </div>
                 ) : isDataSaved && submissionId ? (
                   <div className="space-y-4">
-                    {paymentInitiated ? (
-                      <div className="text-muted-foreground">
-                        <p className="font-medium">Payment in progress...</p>
-                        <p className="text-sm">Please complete your payment in the Stripe window.</p>
-                      </div>
-                    ) : (
-                      <div className="space-y-4">
-                        <div
-                          onClick={() => setPaymentInitiated(true)}
-                          className="inline-block"
-                        >
-                          <stripe-buy-button
-                            buy-button-id="buy_btn_1S5ZTNJfyCDmId8XKqA35yLv"
-                            publishable-key="pk_live_51RgbAkJfyCDmId8XfY0H7dLS8v2mjL6887WNfScroA9v6ggvcPbXSQUjrLkY2dVZh26QdbcS3nXegFKnf6C6RMEb00po2qC8Fg"
-                            client-reference-id={submissionId}
-                          />
-                        </div>
-                        <div className="text-center">
-                          <Button
-                            onClick={handlePaymentSuccess}
-                            variant="outline"
-                            size="sm"
-                            className="text-xs"
-                          >
-                            Manual Analysis Trigger (For Testing)
-                          </Button>
-                        </div>
-                      </div>
-                    )}
+                    <stripe-buy-button
+                      buy-button-id="buy_btn_1SC6LyJfyCDmId8XPHZozmzJ"
+                      publishable-key="pk_live_51RgbAkJfyCDmId8XfY0H7dLS8v2mjL6887WNfScroA9v6ggvcPbXSQUjrLkY2dVZh26QdbcS3nXegFKnf6C6RMEb00po2qC8Fg"
+                    >
+                    </stripe-buy-button>
+                    <div className="text-center space-y-2">
+                      <p className="text-xs text-muted-foreground">
+                        Submission ID: {submissionId || "Not generated"}
+                      </p>
+                    </div>
                   </div>
                 ) : (
                   <div className="text-muted-foreground">
