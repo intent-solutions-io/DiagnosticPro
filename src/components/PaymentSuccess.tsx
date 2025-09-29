@@ -42,44 +42,65 @@ const PaymentSuccess = () => {
   const fetchSubmissionIdFromSession = async (sessionId: string) => {
     const API_BASE = 'https://diagpro-gw-3tbssksx-3tbssksx.uc.gateway.dev';
     const API_KEY = 'AIzaSyBgoJITYrqOcMx69HKa1_CzCkQNlVm66Co';
+    const MAX_RETRIES = 3;
+    const RETRY_DELAY = 2000; // 2 seconds
 
     setStatus('checking');
 
-    try {
-      const response = await fetch(
-        `${API_BASE}/checkout/session?id=${encodeURIComponent(sessionId)}`,
-        {
-          method: 'GET',
-          headers: {
-            'x-api-key': API_KEY
+    for (let retryCount = 0; retryCount < MAX_RETRIES; retryCount++) {
+      try {
+        console.log(`🔍 Fetching session (attempt ${retryCount + 1}/${MAX_RETRIES}):`, sessionId);
+
+        const response = await fetch(
+          `${API_BASE}/checkout/session?id=${encodeURIComponent(sessionId)}`,
+          {
+            method: 'GET',
+            headers: {
+              'x-api-key': API_KEY
+            }
+          }
+        );
+
+        console.log('📡 Response status:', response.status);
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log('📦 Response data:', data);
+
+          // Accept either submissionId or client_reference_id
+          const submissionId = data.submissionId || data.client_reference_id;
+
+          if (submissionId) {
+            console.log('✅ Found submissionId:', submissionId);
+            setDiagnosticId(submissionId);
+            startAutoDownload(submissionId);
+            return;
           }
         }
-      );
 
-      if (!response.ok) {
-        throw new Error(`Failed to retrieve session: ${response.status}`);
+        // If no submission found or request failed, wait and retry
+        if (retryCount < MAX_RETRIES - 1) {
+          console.log(`⏳ Retrying in ${RETRY_DELAY / 1000} seconds...`);
+          await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
+          continue;
+        } else {
+          throw new Error('Session not ready after retries');
+        }
+
+      } catch (error) {
+        console.error(`❌ Attempt ${retryCount + 1} failed:`, error);
+
+        if (retryCount >= MAX_RETRIES - 1) {
+          setStatus('error');
+          setErrorMessage('Failed to retrieve checkout session details. Please refresh the page to try again.');
+          return;
+        }
+
+        // Wait before retrying
+        if (retryCount < MAX_RETRIES - 1) {
+          await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
+        }
       }
-
-      const data = await response.json();
-
-      // Accept either submissionId or client_reference_id
-      const submissionId = data.submissionId || data.client_reference_id;
-
-      if (!submissionId) {
-        setStatus('error');
-        setErrorMessage('No submission ID found in checkout session');
-        return;
-      }
-
-      setDiagnosticId(submissionId);
-
-      // Now start auto-download with the retrieved submissionId
-      startAutoDownload(submissionId);
-
-    } catch (error) {
-      console.error('Failed to fetch session:', error);
-      setStatus('error');
-      setErrorMessage('Failed to retrieve checkout session details');
     }
   };
 
