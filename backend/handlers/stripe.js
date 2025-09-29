@@ -98,7 +98,7 @@ module.exports = async (req, res) => {
         console.log('Triggering diagnostic analysis...');
         try {
           const analysisResponse = await axios.post(
-            `${process.env.API_URL || 'http://localhost:8080'}/api/analyze-diagnostic`,
+            `${process.env.API_URL || 'http://localhost:8080'}/analyzeDiagnostic`,
             {
               submissionId: order.submissionId,
               diagnosticData: submission
