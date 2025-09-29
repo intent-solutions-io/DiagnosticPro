@@ -1,0 +1,103 @@
+swagger: '2.0'
+info:
+  title: DiagnosticPro API
+  version: 1.0.3
+host: diagpro-gw-3tbssksx-3tbssksx.uc.gateway.dev
+schemes:
+  - https
+x-google-backend:
+  address: https://diagnosticpro-vertex-ai-backend-298932670545.us-central1.run.app
+  deadline: 60.0
+paths:
+  /checkout/session:
+    get:
+      operationId: getCheckoutSession
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: query
+          type: string
+          required: true
+      responses:
+        200:
+          description: Success
+    options:
+      operationId: checkoutSessionOptions
+      responses:
+        200:
+          description: CORS preflight
+  /createCheckoutSession:
+    post:
+      operationId: createCheckoutSession
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          schema:
+            type: object
+      responses:
+        200:
+          description: Success
+    options:
+      operationId: createCheckoutOptions
+      responses:
+        200:
+          description: CORS preflight
+  /saveSubmission:
+    post:
+      operationId: saveSubmission
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            properties:
+              equipmentType:
+                type: string
+              model:
+                type: string
+              symptoms:
+                type: string
+              contact:
+                type: object
+      responses:
+        200:
+          description: Submission saved successfully
+        400:
+          description: Invalid submission data
+    options:
+      operationId: saveSubmissionOptions
+      responses:
+        200:
+          description: CORS preflight
+  /webhook/stripe:
+    post:
+      operationId: stripeWebhook
+      x-google-backend:
+        address: https://diagnosticpro-vertex-ai-backend-298932670545.us-central1.run.app/stripeWebhookForward
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: stripe-signature
+          in: header
+          type: string
+          required: true
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+      responses:
+        200:
+          description: Webhook processed successfully
+        400:
+          description: Invalid webhook signature

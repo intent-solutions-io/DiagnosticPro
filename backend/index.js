@@ -224,6 +224,7 @@ app.post('/createCheckoutSession', async (req, res) => {
         quantity: 1
       }],
       mode: 'payment',
+      client_reference_id: submissionId,
       success_url: `https://diagnosticpro.io/success?submission_id=${submissionId}`,
       cancel_url: `https://diagnosticpro.io/cancel?submission_id=${submissionId}`,
       metadata: {
@@ -421,22 +422,44 @@ app.get('/checkout/session', async (req, res) => {
     // Retrieve session from Stripe
     const session = await stripeClient.checkout.sessions.retrieve(sessionId);
 
+    // Multiple fallback sources for submissionId
+    const submissionId = session.client_reference_id ||
+                        (session.metadata && session.metadata.submissionId) ||
+                        null;
+
     logStructured({
       phase,
       status: 'ok',
       reqId: req.reqId,
       sessionId: session.id,
-      clientReferenceId: session.client_reference_id
+      clientReferenceId: session.client_reference_id,
+      metadataSubmissionId: session.metadata?.submissionId,
+      resolvedSubmissionId: submissionId
     });
 
-    // Return only what we need (with submissionId alias for clarity)
-    const submissionId = session.client_reference_id || (session.metadata && session.metadata.submissionId) || null;
+    if (!submissionId) {
+      logStructured({
+        phase,
+        status: 'error',
+        reqId: req.reqId,
+        sessionId,
+        error: { code: 'NO_SUBMISSION_ID', message: 'No submission ID found in session' }
+      });
+      return res.status(400).json({
+        error: 'No submission ID associated with this session',
+        code: 'NO_SUBMISSION_ID'
+      });
+    }
 
+    // Return consistent response structure
     res.json({
       id: session.id,
       status: session.status,
-      submissionId,
-      client_reference_id: submissionId  // Alias for backward compatibility
+      payment_status: session.payment_status,
+      submissionId: submissionId,
+      client_reference_id: submissionId,  // Alias for backward compatibility
+      amount_total: session.amount_total,
+      customer_email: session.customer_details?.email
     });
 
   } catch (error) {
@@ -449,7 +472,8 @@ app.get('/checkout/session', async (req, res) => {
     });
     res.status(500).json({
       error: 'Failed to retrieve checkout session',
-      code: 'CHECKOUT_SESSION_ERROR'
+      code: 'CHECKOUT_SESSION_ERROR',
+      message: error.message
     });
   }
 });
@@ -939,9 +963,11 @@ async function processAnalysis(submissionId, payload, reqId) {
       processingStartedAt: new Date().toISOString()
     });
 
-    // Update analysis status to running
-    await firestore.collection('analysis').doc(submissionId).update({
+    // Create analysis record with running status
+    await firestore.collection('analysis').doc(submissionId).set({
       status: 'running',
+      submissionId: submissionId,
+      createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     });
 

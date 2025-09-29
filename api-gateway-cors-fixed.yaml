@@ -1,0 +1,236 @@
+swagger: '2.0'
+info:
+  title: DiagnosticPro API Gateway
+  description: API Gateway for DiagnosticPro with CORS support
+  version: 1.0.1
+host: diagpro-gw-3tbssksx-3tbssksx.uc.gateway.dev
+schemes:
+  - https
+produces:
+  - application/json
+securityDefinitions:
+  api_key:
+    type: "apiKey"
+    name: "x-api-key"
+    in: "header"
+
+# Global backend configuration
+x-google-backend:
+  address: https://diagnosticpro-vertex-ai-backend-298932670545.us-central1.run.app
+  deadline: 60.0
+  path_translation: APPEND_PATH_TO_ADDRESS
+
+paths:
+  # Health check
+  /healthz:
+    get:
+      summary: Health check
+      operationId: healthCheck
+      security:
+        - api_key: []
+      responses:
+        200:
+          description: Service is healthy
+    options:
+      summary: CORS preflight for health check
+      operationId: healthCheckOptions
+      responses:
+        204:
+          description: CORS preflight response
+          headers:
+            Access-Control-Allow-Origin:
+              type: string
+              default: "https://diagnosticpro.io"
+            Access-Control-Allow-Methods:
+              type: string
+              default: "GET, POST, OPTIONS"
+            Access-Control-Allow-Headers:
+              type: string
+              default: "Content-Type, x-api-key, Authorization"
+            Access-Control-Max-Age:
+              type: string
+              default: "86400"
+
+  # Session creation
+  /createCheckoutSession:
+    post:
+      summary: Create Stripe checkout session
+      operationId: createCheckoutSession
+      security:
+        - api_key: []
+      x-google-backend:
+        address: https://diagnosticpro-vertex-ai-backend-298932670545.us-central1.run.app
+        deadline: 30.0
+      responses:
+        200:
+          description: Session created successfully
+          headers:
+            Access-Control-Allow-Origin:
+              type: string
+              default: "https://diagnosticpro.io"
+        500:
+          description: Session creation failed
+          headers:
+            Access-Control-Allow-Origin:
+              type: string
+              default: "https://diagnosticpro.io"
+    options:
+      summary: CORS preflight for session creation
+      operationId: createCheckoutSessionOptions
+      responses:
+        204:
+          description: CORS preflight response
+          headers:
+            Access-Control-Allow-Origin:
+              type: string
+              default: "https://diagnosticpro.io"
+            Access-Control-Allow-Methods:
+              type: string
+              default: "GET, POST, OPTIONS"
+            Access-Control-Allow-Headers:
+              type: string
+              default: "Content-Type, x-api-key, Authorization"
+            Access-Control-Max-Age:
+              type: string
+              default: "86400"
+
+  # Session retrieval
+  /checkout/session:
+    get:
+      summary: Retrieve checkout session
+      operationId: getCheckoutSession
+      security:
+        - api_key: []
+      parameters:
+        - name: id
+          in: query
+          description: Session ID
+          required: true
+          type: string
+      x-google-backend:
+        address: https://diagnosticpro-vertex-ai-backend-298932670545.us-central1.run.app
+        deadline: 30.0
+      responses:
+        200:
+          description: Session retrieved successfully
+          headers:
+            Access-Control-Allow-Origin:
+              type: string
+              default: "https://diagnosticpro.io"
+        404:
+          description: Session not found
+          headers:
+            Access-Control-Allow-Origin:
+              type: string
+              default: "https://diagnosticpro.io"
+        500:
+          description: Session retrieval failed
+          headers:
+            Access-Control-Allow-Origin:
+              type: string
+              default: "https://diagnosticpro.io"
+    options:
+      summary: CORS preflight for session retrieval
+      operationId: getCheckoutSessionOptions
+      responses:
+        204:
+          description: CORS preflight response
+          headers:
+            Access-Control-Allow-Origin:
+              type: string
+              default: "https://diagnosticpro.io"
+            Access-Control-Allow-Methods:
+              type: string
+              default: "GET, POST, OPTIONS"
+            Access-Control-Allow-Headers:
+              type: string
+              default: "Content-Type, x-api-key, Authorization"
+            Access-Control-Max-Age:
+              type: string
+              default: "86400"
+
+  # Stripe webhook
+  /webhook/stripe:
+    post:
+      summary: Stripe webhook handler
+      operationId: stripeWebhook
+      security:
+        - api_key: []
+      x-google-backend:
+        address: https://diagnosticpro-vertex-ai-backend-298932670545.us-central1.run.app
+        deadline: 60.0
+      responses:
+        200:
+          description: Webhook processed successfully
+        400:
+          description: Invalid webhook payload
+        500:
+          description: Webhook processing failed
+    options:
+      summary: CORS preflight for webhook
+      operationId: stripeWebhookOptions
+      responses:
+        204:
+          description: CORS preflight response
+          headers:
+            Access-Control-Allow-Origin:
+              type: string
+              default: "https://diagnosticpro.io"
+            Access-Control-Allow-Methods:
+              type: string
+              default: "GET, POST, OPTIONS"
+            Access-Control-Allow-Headers:
+              type: string
+              default: "Content-Type, x-api-key, Authorization, stripe-signature"
+            Access-Control-Max-Age:
+              type: string
+              default: "86400"
+
+  # Save submission
+  /saveSubmission:
+    post:
+      summary: Save diagnostic submission
+      operationId: saveSubmission
+      security:
+        - api_key: []
+      x-google-backend:
+        address: https://diagnosticpro-vertex-ai-backend-298932670545.us-central1.run.app
+        deadline: 30.0
+      responses:
+        200:
+          description: Submission saved successfully
+          headers:
+            Access-Control-Allow-Origin:
+              type: string
+              default: "https://diagnosticpro.io"
+        400:
+          description: Invalid submission data
+          headers:
+            Access-Control-Allow-Origin:
+              type: string
+              default: "https://diagnosticpro.io"
+        500:
+          description: Submission save failed
+          headers:
+            Access-Control-Allow-Origin:
+              type: string
+              default: "https://diagnosticpro.io"
+    options:
+      summary: CORS preflight for save submission
+      operationId: saveSubmissionOptions
+      responses:
+        204:
+          description: CORS preflight response
+          headers:
+            Access-Control-Allow-Origin:
+              type: string
+              default: "https://diagnosticpro.io"
+            Access-Control-Allow-Methods:
+              type: string
+              default: "GET, POST, OPTIONS"
+            Access-Control-Allow-Headers:
+              type: string
+              default: "Content-Type, x-api-key, Authorization"
+            Access-Control-Max-Age:
+              type: string
+              default: "86400"
