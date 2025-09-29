@@ -101,3 +101,58 @@ paths:
           description: Webhook processed successfully
         400:
           description: Invalid webhook signature
+  /reports/status:
+    get:
+      operationId: getReportsStatus
+      produces:
+        - application/json
+      parameters:
+        - name: submissionId
+          in: query
+          type: string
+          required: true
+      responses:
+        200:
+          description: Report status
+        404:
+          description: Report not found
+    options:
+      operationId: reportsStatusOptions
+      responses:
+        200:
+          description: CORS preflight
+  /reports/signed-url:
+    get:
+      operationId: getReportsSignedUrl
+      produces:
+        - application/json
+      parameters:
+        - name: submissionId
+          in: query
+          type: string
+          required: true
+      responses:
+        200:
+          description: Signed URL for report download
+        404:
+          description: Report not found
+    options:
+      operationId: reportsSignedUrlOptions
+      responses:
+        200:
+          description: CORS preflight
+  /view/{submissionId}:
+    get:
+      operationId: viewReport
+      produces:
+        - application/pdf
+      parameters:
+        - name: submissionId
+          in: path
+          type: string
+          required: true
+      responses:
+        200:
+          description: PDF report
+        404:
+          description: Report not found
