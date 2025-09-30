@@ -72,14 +72,14 @@ Application is still operational with original structure.
 ## Rollback Commands
 
 Return to Phase 1:
-```bash
+\`\`\`bash
 git reset --hard SAVEPOINT-00-BASELINE
-```
+\`\`\`
 
 Return to Phase 2:
-```bash
+\`\`\`bash
 git reset --hard SAVEPOINT-01-STRUCTURE
-```
+\`\`\`
 
 ## Directory Count
 
