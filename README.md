@@ -1,19 +1,26 @@
-# DiagnosticPro
+# DiagnosticPro v1.0.0
 
-**Universal AI-powered equipment diagnostics — hosted service.**
+**Professional AI-powered equipment diagnostics with proprietary 14-section analysis framework.**
 
-From vehicles to heavy machinery to electronics, submit your issue and get a structured diagnostic report.
+✅ **LIVE AT [diagnosticpro.io](https://diagnosticpro.io)** — Production ready since September 2025
 
-## What it does
-- Intake equipment details and symptoms
-- AI analysis generates likely causes, tests, and cost ranges
-- Direct download report
+From vehicles to heavy machinery to electronics, get comprehensive diagnostic analysis with conversation coaching, shop interrogation strategies, and scam protection for just $4.99.
+
+## What you get
+- **Comprehensive 2000+ word diagnostic analysis** using proprietary 14-section framework
+- **Conversation scripts** for professional shop interactions
+- **Technical questions** to expose mechanic incompetence
+- **Ripoff detection** and scam protection strategies
+- **Negotiation tactics** and fair pricing analysis
+- **OEM parts strategy** with specific part numbers
+- **Professional PDF report** with instant download
 
 ## How it works
 1. Visit **[diagnosticpro.io](https://diagnosticpro.io)**
-2. Describe your problem
-3. Pay securely
-4. Download your report
+2. Complete detailed diagnostic form
+3. Secure payment ($4.99)
+4. AI analysis using Vertex AI Gemini 2.5 Flash
+5. Download comprehensive PDF report
 
 ## Visual workflow
 ```mermaid
