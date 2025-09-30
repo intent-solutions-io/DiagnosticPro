@@ -5,6 +5,7 @@ const { Storage } = require('@google-cloud/storage');
 const { GoogleAuth } = require('google-auth-library');
 const stripe = require('stripe');
 const crypto = require('crypto');
+const PDFDocument = require('pdfkit');
 
 // Structured logging function
 function logStructured(data) {
@@ -974,42 +975,29 @@ async function processAnalysis(submissionId, payload, reqId) {
     // Call Vertex AI Gemini
     const analysis = await callVertexAI(payload);
 
-    // Generate PDF report
-    const pdfContent = await generatePDFReport(submissionId, analysis, payload);
-
-    // Upload to Cloud Storage
-    const fileName = `reports/${submissionId}.pdf`;
-    const file = reportsBucket.file(fileName);
-
-    await file.save(pdfContent, {
-      metadata: {
-        contentType: 'application/pdf',
-        metadata: {
-          submissionId: submissionId,
-          createdAt: new Date().toISOString()
-        }
-      }
-    });
+    // Generate PDF report AND upload to Cloud Storage (all in one)
+    const reportData = await generatePDFReport(submissionId, analysis, payload);
 
     logStructured({
       phase: 'saveReport',
       status: 'ok',
       bucket: REPORT_BUCKET,
-      path: fileName,
+      path: reportData.fileName,
       submissionId,
-      size: pdfContent.length
+      size: reportData.buffer.length
     });
 
     // Update analysis to ready
     await firestore.collection('analysis').doc(submissionId).update({
       status: 'ready',
       updatedAt: new Date().toISOString(),
-      reportPath: fileName
+      reportPath: reportData.fileName
     });
 
-    // Update submission to ready
+    // Update submission to ready with report URL
     await firestore.collection('submissions').doc(submissionId).update({
       status: 'ready',
+      reportUrl: reportData.publicUrl,
       updatedAt: new Date().toISOString(),
       completedAt: new Date().toISOString()
     });
@@ -1116,217 +1104,122 @@ Provide analysis in this JSON format:
 
 // FUNCTION: Generate PDF report using pdfkit
 async function generatePDFReport(submissionId, analysis, payload) {
-  const PDFDocument = require('pdfkit');
+  console.log(`Generating PDF for: ${submissionId}`);
 
-  return new Promise((resolve, reject) => {
-    try {
-      const doc = new PDFDocument({
-        size: 'A4',
-        margin: 50
-      });
+  // This function will now buffer the PDF in memory
+  const generatePdfBuffer = () => {
+    return new Promise((resolve, reject) => {
+      try {
+        const doc = new PDFDocument({ size: 'LETTER', margins: { top: 72, bottom: 72, left: 72, right: 72 } });
+        const buffers = [];
 
-      // Buffer to collect PDF data
-      const buffers = [];
-      doc.on('data', buffers.push.bind(buffers));
-      doc.on('end', () => {
-        const pdfBuffer = Buffer.concat(buffers);
-        resolve(pdfBuffer);
-      });
+        doc.on('data', buffers.push.bind(buffers));
+        doc.on('end', () => {
+          const pdfData = Buffer.concat(buffers);
+          resolve(pdfData);
+        });
+        doc.on('error', reject);
 
-      // Header
-      doc.fontSize(18).font('Helvetica-Bold')
-         .text('DIAGNOSTICPRO UNIVERSAL EQUIPMENT DIAGNOSTIC REPORT', { align: 'center' });
+        // --- PDF Content ---
+        doc.fontSize(24).font('Helvetica-Bold').text('DiagnosticPro', { align: 'center' });
+        doc.fontSize(18).text('Vehicle Diagnostic Report', { align: 'center' });
+        doc.moveDown();
+        doc.fontSize(10).font('Helvetica').text(`Report ID: ${submissionId}`, { align: 'right' }).text(`Generated: ${new Date().toLocaleDateString()}`, { align: 'right' });
+        doc.moveDown();
 
-      doc.moveDown();
-      doc.fontSize(10).font('Helvetica')
-         .text('═'.repeat(80), { align: 'center' });
+        // Equipment Information
+        doc.fontSize(14).font('Helvetica-Bold').text('Vehicle Information');
+        doc.fontSize(11).font('Helvetica').text(`Make: ${payload.make || 'N/A'}`).text(`Model: ${payload.model || 'N/A'}`).text(`Year: ${payload.year || 'N/A'}`);
+        if (payload.equipmentType) doc.text(`Type: ${payload.equipmentType}`);
+        doc.moveDown();
 
-      // Report metadata
-      doc.moveDown();
-      doc.fontSize(12).font('Helvetica-Bold')
-         .text(`Submission ID: ${submissionId}`)
-         .text(`Date: ${new Date().toLocaleDateString()}`)
-         .text(`Price: $4.99 USD`)
-         .text(`Report Generated: ${new Date().toLocaleString()}`);
+        doc.fontSize(14).font('Helvetica-Bold').text('Reported Symptoms');
+        doc.fontSize(11).font('Helvetica').text(payload.symptoms || 'No symptoms reported');
+        doc.moveDown();
 
-      doc.moveDown();
+        // Analysis content
+        doc.fontSize(14).font('Helvetica-Bold').text('Diagnostic Analysis');
 
-      // Equipment Information - DYNAMIC FIELD RENDERING
-      doc.fontSize(14).font('Helvetica-Bold')
-         .text('EQUIPMENT INFORMATION', { underline: true });
-      doc.moveDown(0.5);
-
-      // Render all payload fields dynamically
-      const fieldOrder = ['equipmentType', 'make', 'model', 'year', 'symptoms', 'notes'];
-      const fieldLabels = {
-        equipmentType: 'Equipment Type',
-        make: 'Make',
-        model: 'Model',
-        year: 'Year',
-        symptoms: 'Symptoms/Issues',
-        notes: 'Additional Notes'
-      };
-
-      // Render ordered fields first
-      fieldOrder.forEach(field => {
-        if (payload[field] && payload[field].toString().trim()) {
-          const label = fieldLabels[field] || field.charAt(0).toUpperCase() + field.slice(1);
-          doc.fontSize(11).font('Helvetica')
-             .text(`${label}: ${payload[field]}`);
+        if (analysis.summary) {
+          doc.fontSize(11).font('Helvetica').text(`Summary: ${analysis.summary}`, { align: 'justify', lineGap: 2 });
+          doc.moveDown();
         }
-      });
 
-      // Render any additional fields not in the ordered list
-      Object.keys(payload).forEach(field => {
-        if (!fieldOrder.includes(field) && payload[field] &&
-            payload[field].toString().trim() &&
-            typeof payload[field] !== 'object') {
-          const label = field.charAt(0).toUpperCase() + field.slice(1);
-          doc.fontSize(11).font('Helvetica')
-             .text(`${label}: ${payload[field]}`);
+        if (analysis.confidence) {
+          doc.text(`Confidence Level: ${Math.round(analysis.confidence * 100)}%`);
+          doc.moveDown();
         }
-      });
 
-      doc.moveDown();
-
-      // Analysis Summary
-      doc.fontSize(14).font('Helvetica-Bold')
-         .text('DIAGNOSTIC ANALYSIS', { underline: true });
-      doc.moveDown(0.5);
-
-      doc.fontSize(11).font('Helvetica')
-         .text(`Summary: ${analysis.summary || 'Analysis completed successfully'}`);
-
-      if (analysis.confidence) {
-        doc.text(`Confidence Level: ${Math.round(analysis.confidence * 100)}%`);
-      }
-
-      doc.moveDown();
-
-      // Root Causes
-      if (analysis.root_causes && analysis.root_causes.length > 0) {
-        doc.fontSize(12).font('Helvetica-Bold')
-           .text('ROOT CAUSES');
-        doc.moveDown(0.5);
-
-        analysis.root_causes.forEach((cause, index) => {
-          doc.fontSize(11).font('Helvetica')
-             .text(`${index + 1}. ${cause}`);
-        });
-        doc.moveDown();
-      }
-
-      // Red Flags (Safety Concerns)
-      if (analysis.red_flags && analysis.red_flags.length > 0) {
-        doc.fontSize(12).font('Helvetica-Bold').fillColor('red')
-           .text('⚠ SAFETY CONCERNS');
-        doc.fillColor('black').moveDown(0.5);
-
-        analysis.red_flags.forEach((flag, index) => {
-          doc.fontSize(11).font('Helvetica')
-             .text(`${index + 1}. ${flag}`);
-        });
-        doc.moveDown();
-      }
-
-      // Recommendations
-      if (analysis.recommendations && analysis.recommendations.length > 0) {
-        doc.fontSize(12).font('Helvetica-Bold')
-           .text('RECOMMENDED ACTIONS');
-        doc.moveDown(0.5);
-
-        analysis.recommendations.forEach((rec, index) => {
-          doc.fontSize(11).font('Helvetica')
-             .text(`${index + 1}. ${rec}`);
-        });
-        doc.moveDown();
-      }
-
-      // Cost Estimates
-      if (analysis.cost_ranges && analysis.cost_ranges.length > 0) {
-        doc.fontSize(12).font('Helvetica-Bold')
-           .text('ESTIMATED REPAIR COSTS');
-        doc.moveDown(0.5);
-
-        analysis.cost_ranges.forEach(cost => {
-          doc.fontSize(11).font('Helvetica')
-             .text(`${cost.repair}: $${cost.min} - $${cost.max}`);
-        });
-        doc.moveDown();
-      }
-
-      // Parts and Tools
-      if (analysis.parts_needed && analysis.parts_needed.length > 0) {
-        doc.fontSize(12).font('Helvetica-Bold')
-           .text('PARTS NEEDED');
-        doc.moveDown(0.5);
-
-        analysis.parts_needed.forEach((part, index) => {
-          doc.fontSize(11).font('Helvetica')
-             .text(`• ${part}`);
-        });
-        doc.moveDown();
-      }
-
-      if (analysis.tools_required && analysis.tools_required.length > 0) {
-        doc.fontSize(12).font('Helvetica-Bold')
-           .text('TOOLS REQUIRED');
-        doc.moveDown(0.5);
-
-        analysis.tools_required.forEach((tool, index) => {
-          doc.fontSize(11).font('Helvetica')
-             .text(`• ${tool}`);
-        });
-        doc.moveDown();
-      }
-
-      // Labor Estimate and Difficulty
-      if (analysis.labor_estimate || analysis.difficulty) {
-        doc.fontSize(12).font('Helvetica-Bold')
-           .text('WORK DETAILS');
-        doc.moveDown(0.5);
-
-        if (analysis.labor_estimate) {
-          doc.fontSize(11).font('Helvetica')
-             .text(`Estimated Labor: ${analysis.labor_estimate}`);
+        // Root Causes
+        if (analysis.root_causes && analysis.root_causes.length > 0) {
+          doc.fontSize(12).font('Helvetica-Bold').text('ROOT CAUSES');
+          analysis.root_causes.forEach((cause, index) => {
+            doc.fontSize(11).font('Helvetica').text(`${index + 1}. ${cause}`);
+          });
+          doc.moveDown();
         }
-        if (analysis.difficulty) {
-          doc.text(`Difficulty Level: ${analysis.difficulty}`);
+
+        // Recommendations
+        if (analysis.recommendations && analysis.recommendations.length > 0) {
+          doc.fontSize(12).font('Helvetica-Bold').text('RECOMMENDATIONS');
+          analysis.recommendations.forEach((rec, index) => {
+            doc.fontSize(11).font('Helvetica').text(`${index + 1}. ${rec}`);
+          });
+          doc.moveDown();
         }
-        doc.moveDown();
+
+        // Cost Estimates
+        if (analysis.cost_ranges && analysis.cost_ranges.length > 0) {
+          doc.fontSize(12).font('Helvetica-Bold').text('ESTIMATED COSTS');
+          analysis.cost_ranges.forEach(cost => {
+            doc.fontSize(11).font('Helvetica').text(`${cost.repair}: $${cost.min} - $${cost.max}`);
+          });
+          doc.moveDown();
+        }
+
+        doc.fontSize(9).font('Helvetica-Oblique').text('This report is generated using advanced AI analysis and should be verified by a certified mechanic.', 72, doc.page.height - 100, { align: 'center' });
+        // --- End of PDF Content ---
+
+        doc.end();
+      } catch (error) {
+        reject(error);
       }
+    });
+  };
 
-      // Questions for Customer
-      if (analysis.questions && analysis.questions.length > 0) {
-        doc.fontSize(12).font('Helvetica-Bold')
-           .text('FOLLOW-UP QUESTIONS');
-        doc.moveDown(0.5);
+  try {
+    // 1. Generate the PDF into a buffer
+    const pdfBuffer = await generatePdfBuffer();
+    console.log(`PDF buffered successfully for: ${submissionId}`);
 
-        analysis.questions.forEach((question, index) => {
-          doc.fontSize(11).font('Helvetica')
-             .text(`${index + 1}. ${question}`);
-        });
-        doc.moveDown();
+    // 2. Upload the buffer to Cloud Storage
+    const fileName = `reports/${submissionId}.pdf`;
+    const file = reportsBucket.file(fileName);
+
+    await file.save(pdfBuffer, {
+      metadata: {
+        contentType: 'application/pdf',
+        metadata: {
+          submissionId: submissionId
+        }
       }
+    });
+    console.log(`PDF uploaded to Cloud Storage: ${fileName}`);
 
-      // Footer
-      doc.moveDown();
-      doc.fontSize(10).font('Helvetica')
-         .text('─'.repeat(80), { align: 'center' });
+    // 3. Make file public and update database
+    await file.makePublic();
+    const publicUrl = `https://storage.googleapis.com/${REPORT_BUCKET}/${fileName}`;
 
-      doc.moveDown();
-      doc.fontSize(9).font('Helvetica')
-         .text('Generated by DiagnosticPro AI System', { align: 'center' })
-         .text(`Report ID: ${submissionId}`, { align: 'center' })
-         .text('© 2025 Intent Solutions Inc. All rights reserved.', { align: 'center' });
+    return {
+      buffer: pdfBuffer,
+      publicUrl: publicUrl,
+      fileName: fileName
+    };
 
-      // Finalize the PDF
-      doc.end();
-
-    } catch (error) {
-      reject(error);
-    }
-  });
+  } catch (error) {
+    console.error(`PDF generation or upload failed for ${submissionId}:`, error);
+    throw error;
+  }
 }
 
 // Error handling middleware
