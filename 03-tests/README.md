@@ -12,6 +12,4 @@ All test suites for the application.
 ## Running Tests
 ```bash
 npm test
-npm run test:integration
-npm run test:e2e
 ```
