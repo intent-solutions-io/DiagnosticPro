@@ -45,3 +45,6 @@ ui-debug.log
 **/config/firebase.ts
 **/secrets.json
 **/service-account.json
+
+# Exclude diagnostic-platform directory (separate project)
+diagnostic-platform/
