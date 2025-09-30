@@ -6,6 +6,7 @@ const { GoogleAuth } = require('google-auth-library');
 const stripe = require('stripe');
 const crypto = require('crypto');
 const PDFDocument = require('pdfkit');
+const { generateDiagnosticProPDF } = require('./reportPdf.js');
 
 // Structured logging function
 function logStructured(data) {
@@ -1083,28 +1084,28 @@ CUSTOMER DATA PROVIDED:
 
 Provide your analysis using the following EXACT 14-section structure. Each section must be comprehensive and detailed (target 2000-2500 words total):
 
-🎯 1. PRIMARY DIAGNOSIS
+1. PRIMARY DIAGNOSIS
 - Root cause with confidence percentage
 - Reference specific error codes if provided
 - Component failure analysis
 - Age/mileage considerations
 
-🔍 2. DIFFERENTIAL DIAGNOSIS
+2. DIFFERENTIAL DIAGNOSIS
 - Alternative causes ranked by likelihood
 - Why each cause is ruled in or out
 - Equipment-specific failure patterns
 
-✅ 3. DIAGNOSTIC VERIFICATION
+3. DIAGNOSTIC VERIFICATION
 - Exact tests the shop MUST perform
 - Tools needed and expected readings
 - Cost estimates for testing procedures
 
-❓ 4. SHOP INTERROGATION
+4. SHOP INTERROGATION
 - 5 technical questions to expose incompetence
 - Specific data they must show you
 - Red flag responses to watch for
 
-🗣️ 5. CONVERSATION SCRIPTING
+5. CONVERSATION SCRIPTING
 - Opening: How to present yourself as informed (not confrontational)
 - Phrasing: Frame questions as "curiosity" not accusations
 - Example dialogue: Word-for-word scripts for each question
@@ -1114,48 +1115,48 @@ Provide your analysis using the following EXACT 14-section structure. Each secti
 - NEVER say: "My AI report says..." or "I got a second opinion online"
 - ALWAYS say: "I've done some research and want to understand..."
 
-💸 6. COST BREAKDOWN
+6. COST BREAKDOWN
 - Fair parts pricing analysis
 - Labor hour estimates
 - Total price range
 - Overcharge identification markers
 
-🚩 7. RIPOFF DETECTION
+7. RIPOFF DETECTION
 - Parts cannon indicators
 - Diagnostic shortcuts to watch for
 - Price gouging red flags
 
-⚖️ 8. AUTHORIZATION GUIDE
+8. AUTHORIZATION GUIDE
 - What to approve immediately
 - What to reject outright
 - When to get a second opinion
 
-🔧 9. TECHNICAL EDUCATION
+9. TECHNICAL EDUCATION
 - System operation explanation
 - Failure mechanism details
 - Prevention tips for future
 
-📦 10. OEM PARTS STRATEGY
+10. OEM PARTS STRATEGY
 - Specific part numbers when possible
 - Why OEM is critical for this repair
 - Pricing sources and alternatives
 
-💬 11. NEGOTIATION TACTICS
+11. NEGOTIATION TACTICS
 - Price comparison strategies
 - Labor justification questions
 - Walk-away points and leverage
 
-🔬 12. LIKELY CAUSES (RANKED)
+12. LIKELY CAUSES (RANKED)
 - Primary cause: X% confidence with reasoning
 - Secondary cause: X% confidence with reasoning
 - Tertiary cause: X% confidence with reasoning
 
-📊 13. RECOMMENDATIONS
+13. RECOMMENDATIONS
 - Immediate actions required
 - Future maintenance schedule
 - Warning signs to monitor
 
-🔗 14. SOURCE VERIFICATION
+14. SOURCE VERIFICATION
 - 2-3 authoritative links confirming diagnosis (OEM TSBs, NHTSA, repair forums)
 - Specific manufacturer technical service bulletins if applicable
 - Independent verification sources (not sponsored content)
@@ -1189,96 +1190,57 @@ Return your response as a comprehensive diagnostic report following this structu
   };
 }
 
-// FUNCTION: Generate PDF report using pdfkit
+// FUNCTION: Generate PDF report using new clean PDF generator
 async function generatePDFReport(submissionId, analysis, payload) {
-  console.log(`Generating PDF for: ${submissionId}`);
+  console.log(`Generating PDF for: ${submissionId} using new clean PDF generator`);
 
-  // This function will now buffer the PDF in memory
+  // This function will now buffer the PDF in memory using the new generator
   const generatePdfBuffer = () => {
     return new Promise((resolve, reject) => {
       try {
-        const doc = new PDFDocument({ size: 'LETTER', margins: { top: 72, bottom: 72, left: 72, right: 72 } });
-        const buffers = [];
+        const tempPath = `/tmp/report_${submissionId}.pdf`;
 
-        doc.on('data', buffers.push.bind(buffers));
-        doc.on('end', () => {
-          const pdfData = Buffer.concat(buffers);
+        // Transform payload to match new generator's expected format
+        const submission = {
+          id: submissionId,
+          make: payload.make,
+          model: payload.model,
+          year: payload.year,
+          equipment_type: payload.equipmentType,
+          serial_number: payload.serialNumber,
+          mileage_hours: payload.mileageHours,
+          full_name: payload.fullName || 'Anonymous',
+          email: payload.email || 'Not provided',
+          phone: payload.phone || 'Not provided',
+          problem_description: payload.problemDescription,
+          symptoms: Array.isArray(payload.symptoms) ? payload.symptoms : (payload.symptoms ? [payload.symptoms] : []),
+          error_codes: Array.isArray(payload.errorCodes) ? payload.errorCodes : (payload.errorCodes ? [payload.errorCodes] : []),
+          when_started: payload.whenStarted,
+          frequency: payload.frequency,
+          urgency_level: payload.urgencyLevel,
+          location_environment: payload.locationEnvironment,
+          usage_pattern: payload.usagePattern,
+          previous_repairs: payload.previousRepairs,
+          modifications: payload.modifications,
+          troubleshooting_steps: payload.troubleshootingSteps,
+          shop_quote_amount: payload.shopQuoteAmount,
+          shop_recommendation: payload.shopRecommendation
+        };
+
+        // Use the new clean PDF generator
+        const stream = generateDiagnosticProPDF(submission, analysis, tempPath);
+
+        stream.on('finish', () => {
+          // Read the generated file and return as buffer
+          const fs = require('fs');
+          const pdfData = fs.readFileSync(tempPath);
+          // Clean up temp file
+          fs.unlinkSync(tempPath);
           resolve(pdfData);
         });
-        doc.on('error', reject);
 
-        // --- PDF Content ---
-        doc.fontSize(24).font('Helvetica-Bold').text('DiagnosticPro', { align: 'center' });
-        doc.fontSize(18).text('Vehicle Diagnostic Report', { align: 'center' });
-        doc.moveDown();
-        doc.fontSize(10).font('Helvetica').text(`Report ID: ${submissionId}`, { align: 'right' }).text(`Generated: ${new Date().toLocaleDateString()}`, { align: 'right' });
-        doc.moveDown();
+        stream.on('error', reject);
 
-        // Equipment Information
-        doc.fontSize(14).font('Helvetica-Bold').text('Vehicle Information');
-        doc.fontSize(11).font('Helvetica').text(`Make: ${payload.make || 'N/A'}`).text(`Model: ${payload.model || 'N/A'}`).text(`Year: ${payload.year || 'N/A'}`);
-        if (payload.equipmentType) doc.text(`Type: ${payload.equipmentType}`);
-        doc.moveDown();
-
-        doc.fontSize(14).font('Helvetica-Bold').text('Reported Symptoms');
-        doc.fontSize(11).font('Helvetica').text(payload.symptoms || 'No symptoms reported');
-        doc.moveDown();
-
-        // Comprehensive AI Analysis Section
-        doc.fontSize(14).font('Helvetica-Bold').text('COMPREHENSIVE AI DIAGNOSTIC ANALYSIS');
-        doc.moveDown();
-
-        if (analysis.fullAnalysis) {
-          // Split the full analysis into manageable chunks for PDF formatting
-          const analysisText = analysis.fullAnalysis;
-          const lines = analysisText.split('\n');
-
-          lines.forEach(line => {
-            if (line.trim() === '') {
-              doc.moveDown(0.5);
-            } else if (line.includes('🎯') || line.includes('🔍') || line.includes('✅') ||
-                      line.includes('❓') || line.includes('🗣️') || line.includes('💸') ||
-                      line.includes('🚩') || line.includes('⚖️') || line.includes('🔧') ||
-                      line.includes('📦') || line.includes('💬') || line.includes('🔬') ||
-                      line.includes('📊') || line.includes('🔗')) {
-              // Section headers with emojis
-              doc.moveDown();
-              doc.fontSize(12).font('Helvetica-Bold').text(line, { lineGap: 3 });
-              doc.moveDown(0.3);
-            } else if (line.startsWith('-') || line.startsWith('•')) {
-              // Bullet points
-              doc.fontSize(10).font('Helvetica').text(line, {
-                indent: 20,
-                lineGap: 1.5,
-                align: 'justify'
-              });
-            } else if (line.trim().length > 0) {
-              // Regular text
-              doc.fontSize(10).font('Helvetica').text(line, {
-                lineGap: 1.5,
-                align: 'justify'
-              });
-            }
-          });
-        } else {
-          // Fallback for old format
-          doc.fontSize(11).font('Helvetica').text('Analysis data processing...', { align: 'justify' });
-
-          if (analysis.summary) {
-            doc.moveDown();
-            doc.text(`Summary: ${analysis.summary}`);
-          }
-
-          if (analysis.confidence) {
-            doc.moveDown();
-            doc.text(`Confidence Level: ${Math.round(analysis.confidence * 100)}%`);
-          }
-        }
-
-        doc.fontSize(9).font('Helvetica-Oblique').text('This report is generated using advanced AI analysis and should be verified by a certified mechanic.', 72, doc.page.height - 100, { align: 'center' });
-        // --- End of PDF Content ---
-
-        doc.end();
       } catch (error) {
         reject(error);
       }
