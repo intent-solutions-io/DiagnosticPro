@@ -134,7 +134,7 @@ app.post('/saveSubmission', async (req, res) => {
     };
 
     // Save to Firestore
-    await firestore.collection('submissions').doc(submissionId).set(submissionData);
+    await firestore.collection('diagnosticSubmissions').doc(submissionId).set(submissionData);
 
     // Success logging
     logStructured({
@@ -182,7 +182,7 @@ app.post('/createCheckoutSession', async (req, res) => {
     }
 
     // Verify submission exists and status is valid
-    const submissionRef = await firestore.collection('submissions').doc(submissionId).get();
+    const submissionRef = await firestore.collection('diagnosticSubmissions').doc(submissionId).get();
     if (!submissionRef.exists) {
       logStructured({
         phase,
@@ -271,7 +271,7 @@ app.post('/analysisStatus', async (req, res) => {
   try {
     const { submissionId } = req.body;
 
-    const submissionRef = await firestore.collection('submissions').doc(submissionId).get();
+    const submissionRef = await firestore.collection('diagnosticSubmissions').doc(submissionId).get();
     if (!submissionRef.exists) {
       return res.status(404).json({ error: 'Submission not found' });
     }
@@ -292,7 +292,7 @@ app.post('/analyzeDiagnostic', async (req, res) => {
   try {
     const { submissionId } = req.body;
 
-    const submissionRef = await firestore.collection('submissions').doc(submissionId);
+    const submissionRef = await firestore.collection('diagnosticSubmissions').doc(submissionId);
     const submissionDoc = await submissionRef.get();
 
     if (!submissionDoc.exists) {
@@ -328,7 +328,7 @@ app.get('/view/:submissionId', async (req, res) => {
     }
 
     // Check if submission exists and is ready
-    const submissionRef = await firestore.collection('submissions').doc(submissionId).get();
+    const submissionRef = await firestore.collection('diagnosticSubmissions').doc(submissionId).get();
     if (!submissionRef.exists) {
       return res.status(404).json({ error: 'Submission not found' });
     }
@@ -491,7 +491,7 @@ app.get('/reports/signed-url', async (req, res) => {
     }
 
     // Check if submission exists and is ready
-    const submissionRef = await firestore.collection('submissions').doc(submissionId).get();
+    const submissionRef = await firestore.collection('diagnosticSubmissions').doc(submissionId).get();
     if (!submissionRef.exists) {
       return res.status(404).json({ error: 'Submission not found' });
     }
@@ -610,7 +610,7 @@ app.get('/reports/status', async (req, res) => {
     }
 
     // Check submission status in Firestore
-    const submissionRef = await firestore.collection('submissions').doc(submissionId).get();
+    const submissionRef = await firestore.collection('diagnosticSubmissions').doc(submissionId).get();
     if (submissionRef.exists) {
       const submissionData = submissionRef.data();
       logStructured({
@@ -669,7 +669,7 @@ app.post('/reports/ensure', async (req, res) => {
     }
 
     // Get submission data for reprocessing
-    const submissionRef = firestore.collection('submissions').doc(submissionId);
+    const submissionRef = firestore.collection('diagnosticSubmissions').doc(submissionId);
     const submissionDoc = await submissionRef.get();
 
     if (!submissionDoc.exists) {
@@ -740,7 +740,7 @@ app.post('/getDownloadUrl', async (req, res) => {
     }
 
     // Check if submission exists and is ready
-    const submissionRef = await firestore.collection('submissions').doc(submissionId).get();
+    const submissionRef = await firestore.collection('diagnosticSubmissions').doc(submissionId).get();
     if (!submissionRef.exists) {
       return res.status(404).json({ error: 'Submission not found' });
     }
@@ -879,7 +879,7 @@ app.post('/stripeWebhookForward', async (req, res) => {
       }
 
       // Update submission to paid
-      const submissionRef = firestore.collection('submissions').doc(submissionId);
+      const submissionRef = firestore.collection('diagnosticSubmissions').doc(submissionId);
       await submissionRef.update({
         status: 'paid',
         updatedAt: new Date().toISOString(),
@@ -959,7 +959,7 @@ async function processAnalysis(submissionId, payload, reqId) {
     });
 
     // Update submission status to processing
-    await firestore.collection('submissions').doc(submissionId).update({
+    await firestore.collection('diagnosticSubmissions').doc(submissionId).update({
       status: 'processing',
       updatedAt: new Date().toISOString(),
       processingStartedAt: new Date().toISOString()
@@ -996,7 +996,7 @@ async function processAnalysis(submissionId, payload, reqId) {
     });
 
     // Update submission to ready with report URL
-    await firestore.collection('submissions').doc(submissionId).update({
+    await firestore.collection('diagnosticSubmissions').doc(submissionId).update({
       status: 'ready',
       reportUrl: reportData.publicUrl,
       updatedAt: new Date().toISOString(),
@@ -1029,7 +1029,7 @@ async function processAnalysis(submissionId, payload, reqId) {
     });
 
     // Update submission to failed
-    await firestore.collection('submissions').doc(submissionId).update({
+    await firestore.collection('diagnosticSubmissions').doc(submissionId).update({
       status: 'failed',
       updatedAt: new Date().toISOString(),
       lastError: error.message,
