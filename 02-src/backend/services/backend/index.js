@@ -363,7 +363,7 @@ app.get('/view/:submissionId', async (req, res) => {
       version: 'v4',
       action: 'read',
       expires: Date.now() + 15 * 60 * 1000, // 15 minutes
-      contentType: 'application/pdf'
+      // No contentType for read URLs
     });
 
     logStructured({
@@ -527,7 +527,7 @@ app.get('/reports/signed-url', async (req, res) => {
       action: 'read',
       expires: Date.now() + 15 * 60 * 1000,
       responseDisposition: `attachment; filename="${submissionId}.pdf"`,
-      contentType: 'application/pdf'
+      // No contentType for read URLs
     });
 
     const [viewUrl] = await file.getSignedUrl({
@@ -535,7 +535,7 @@ app.get('/reports/signed-url', async (req, res) => {
       action: 'read',
       expires: Date.now() + 15 * 60 * 1000,
       responseDisposition: `inline; filename="${submissionId}.pdf"`,
-      contentType: 'application/pdf'
+      // No contentType for read URLs
     });
 
     logStructured({
@@ -783,7 +783,7 @@ app.post('/getDownloadUrl', async (req, res) => {
       action: 'read',
       expires: Date.now() + 15 * 60 * 1000,
       responseDisposition: `attachment; filename="${submissionId}.pdf"`,
-      contentType: 'application/pdf'
+      // No contentType for read URLs
     });
 
     const [viewUrl] = await file.getSignedUrl({
@@ -791,7 +791,7 @@ app.post('/getDownloadUrl', async (req, res) => {
       action: 'read',
       expires: Date.now() + 15 * 60 * 1000,
       responseDisposition: `inline; filename="${submissionId}.pdf"`,
-      contentType: 'application/pdf'
+      // No contentType for read URLs
     });
 
     logStructured({
@@ -1014,8 +1014,8 @@ async function processAnalysis(submissionId, payload, reqId) {
       status: 'ok',
       reqId,
       submissionId,
-      reportPath: fileName,
-      reportSize: pdfContent.length
+      reportPath: reportData.fileName,
+      reportSize: reportData.buffer.length
     });
 
   } catch (error) {
@@ -1206,9 +1206,14 @@ async function generatePDFReport(submissionId, analysis, payload) {
     });
     console.log(`PDF uploaded to Cloud Storage: ${fileName}`);
 
-    // 3. Make file public and update database
-    await file.makePublic();
-    const publicUrl = `https://storage.googleapis.com/${REPORT_BUCKET}/${fileName}`;
+    // 3. Generate signed URL for file access (compatible with uniform bucket-level access)
+    const [signedUrl] = await file.getSignedUrl({
+      version: 'v4',
+      action: 'read',
+      expires: Date.now() + 7 * 24 * 60 * 60 * 1000, // 7 days
+      // No contentType for read URLs to avoid header mismatch
+    });
+    const publicUrl = signedUrl;
 
     return {
       buffer: pdfBuffer,
