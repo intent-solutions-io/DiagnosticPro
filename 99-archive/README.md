@@ -1,12 +1,13 @@
 # Archive
 
-Deprecated and legacy files.
+Archived items preserved for reference.
 
 ## Structure
 
-- `deprecated/` - Recently deprecated files
-- `legacy/` - Old system files
+- `deprecated/` - Deprecated but preserved code
+- `legacy/` - Legacy reference materials
 
-## Policy
+## Note
 
-Files moved here are no longer actively maintained.
+diagnostic-platform directory (if present) should be excluded from Git
+but preserved locally for reference.

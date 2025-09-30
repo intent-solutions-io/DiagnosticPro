@@ -1,9 +1,13 @@
 # Scripts
 
-Automation scripts for build, deploy, and maintenance.
+Automation scripts for build, deployment, and maintenance.
 
 ## Structure
 
-- `build/` - Build automation scripts
-- `deploy/` - Deployment scripts (Firebase, Cloud Run)
-- `maintenance/` - Database maintenance, cleanup scripts
+- `build/` - Build scripts (development, production, Docker)
+- `deploy/` - Deployment scripts (staging, production)
+- `maintenance/` - Maintenance scripts (backup, cleanup, audit)
+
+## Usage
+
+All scripts should be executable and documented.

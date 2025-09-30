@@ -4,6 +4,6 @@ Static assets and configuration files.
 
 ## Structure
 
-- `images/` - Images, icons, logos
-- `data/` - Static data files (JSON, CSV)
-- `configs/` - Configuration files
+- `images/` - Image resources (icons, screenshots, branding)
+- `data/` - Data files (samples, reference data)
+- `configs/` - Environment-specific configuration files
