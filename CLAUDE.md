@@ -2,39 +2,57 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## DiagnosticPro AI Platform
+## DiagnosticPro AI Platform v1.0.0
 
-✅ **MIGRATION COMPLETED** - Successfully migrated from Supabase to Firebase/Firestore with Google Cloud integration
+✅ **PRODUCTION RELEASE COMPLETE** - DiagnosticPro AI diagnostic platform successfully launched with proprietary 14-section analysis framework
 
-A professional equipment diagnostic platform leveraging AI to provide comprehensive diagnostic analysis for vehicles, machinery, and equipment. Customers submit diagnostic forms, make $29.99 payments via Stripe, and receive detailed PDF reports via email.
+A professional equipment diagnostic platform leveraging proprietary AI analysis to provide comprehensive diagnostic reports for vehicles, machinery, and equipment. Customers submit diagnostic forms, make $4.99 payments via Stripe, and receive detailed 2000+ word PDF reports with conversation coaching and shop interrogation strategies.
 
-## Current Production Stack (LIVE)
+## Current Production Stack (LIVE v1.0.0)
 
 ### **Frontend**
-- Hosting: Firebase Hosting (`diagnostic-pro-prod.web.app` → `diagnosticpro.io`)
+- Hosting: Firebase Hosting (`diagnosticpro.io`)
 - Framework: React 18 + TypeScript + Vite
 - UI: shadcn/ui + Tailwind CSS
-- Status: ✅ DEPLOYED & WORKING
+- Status: ✅ PRODUCTION READY
 
-### **Database & Backend**
+### **Backend**
+- Platform: Google Cloud Run (`diagnosticpro-vertex-ai-backend`)
 - Database: Firestore (3 collections: diagnosticSubmissions, orders, emailLogs)
-- Cloud Functions: Firebase Functions v2 (Node.js 20, us-east1 region)
-- AI: Vertex AI Gemini 2.5 Flash
-- Payment: Stripe with webhook integration
-- Storage: Firebase Cloud Storage
-- Status: 🔧 FUNCTIONS PENDING DEPLOYMENT
+- AI: Vertex AI Gemini 2.5 Flash with proprietary 14-section framework
+- Payment: Stripe with webhook integration ($4.99 per diagnostic)
+- Storage: Cloud Storage with signed URL access
+- Status: ✅ FULLY OPERATIONAL
 
 ### **Architecture**
-- **Firebase Project**: `diagnostic-pro-prod`
-- **Domain**: `diagnosticpro.io` (primary), `diagnostic-pro-prod.web.app` (fallback)
-- **Region**: `us-east1` (functions), global (hosting)
+- **GCP Project**: `diagnostic-pro-prod`
+- **Domain**: `diagnosticpro.io` (primary production domain)
+- **Backend**: Cloud Run (us-central1)
+- **AI Engine**: Vertex AI Gemini 2.5 Flash
 
-## Core Workflow (Current)
+## Core Workflow (Production v1.0.0)
 1. Customer submits diagnostic form → **Firestore** (`diagnosticSubmissions` collection)
-2. Payment processed via Stripe → **Firestore** (`orders` collection)
-3. Webhook triggers AI analysis → **Vertex AI Gemini**
-4. PDF report generated → **Cloud Storage**
-5. Email sent with report → **Firestore** (`emailLogs` collection)
+2. Payment processed via Stripe ($4.99) → **Firestore** (`orders` collection)
+3. Webhook triggers proprietary 14-section AI analysis → **Vertex AI Gemini 2.5 Flash**
+4. Comprehensive 2000+ word PDF report generated → **Cloud Storage** with signed URLs
+5. Customer downloads report with conversation coaching and shop interrogation strategies
+
+## Proprietary AI Framework (v1.3)
+### 14-Section Diagnostic Analysis:
+🎯 1. **PRIMARY DIAGNOSIS** - Root cause with confidence percentage
+🔍 2. **DIFFERENTIAL DIAGNOSIS** - Alternative causes ranked by likelihood
+✅ 3. **DIAGNOSTIC VERIFICATION** - Exact tests shops must perform
+❓ 4. **SHOP INTERROGATION** - 5 technical questions to expose incompetence
+🗣️ 5. **CONVERSATION SCRIPTING** - Word-for-word customer coaching
+💸 6. **COST BREAKDOWN** - Fair pricing vs overcharge identification
+🚩 7. **RIPOFF DETECTION** - Scam identification and protection
+⚖️ 8. **AUTHORIZATION GUIDE** - Approve/reject/second opinion recommendations
+🔧 9. **TECHNICAL EDUCATION** - System operation and failure mechanisms
+📦 10. **OEM PARTS STRATEGY** - Specific part numbers and sourcing
+💬 11. **NEGOTIATION TACTICS** - Professional negotiation strategies
+🔬 12. **LIKELY CAUSES** - Ranked confidence percentages
+📊 13. **RECOMMENDATIONS** - Immediate actions and maintenance
+🔗 14. **SOURCE VERIFICATION** - Authoritative links and TSB references
 
 ## Commands
 
