@@ -5,7 +5,7 @@ Automation scripts for audit→chore→release pipeline.
 ## Structure
 
 - `audit/` - Audit phase scripts
-- `chore/` - Fix/chore phase scripts
+- `chore/` - Fix/chore phase scripts  
 - `release/` - Release phase scripts
 
 ## Usage
