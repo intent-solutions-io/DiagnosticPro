@@ -42,8 +42,8 @@ Bob created comprehensive master directory structure:
 
 ## Rollback Commands
 
-- **Phase 1**: \`git reset --hard SAVEPOINT-00-BASELINE\`
-- **Phase 2**: \`git reset --hard SAVEPOINT-01-STRUCTURE\`
+- **Phase 1**: `git reset --hard SAVEPOINT-00-BASELINE`
+- **Phase 2**: `git reset --hard SAVEPOINT-01-STRUCTURE`
 
 ## File Status
 
