@@ -1,12 +1,12 @@
 # Releases
 
-Release management and versioning.
+Release artifacts and version history.
 
 ## Structure
 
-- `current/` - Current release artifacts
+- `current/` - Current production release
 - `archive/` - Historical releases
 
-## Usage
+## Versioning
 
-Track releases, changelogs, and deployment artifacts.
+Follow semantic versioning (MAJOR.MINOR.PATCH).
