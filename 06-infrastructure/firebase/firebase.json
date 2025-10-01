@@ -1,7 +1,8 @@
 {
-  "hosting": {
-    "site": "diagnostic-pro-prod",
-    "public": "dist",
+  "hosting": [
+    {
+      "site": "diagnostic-pro-prod",
+      "public": "dist",
     "ignore": [
       "firebase.json",
       "**/.*",
@@ -33,7 +34,18 @@
         "destination": "/index.html"
       }
     ]
-  },
+    },
+    {
+      "site": "diagnosticpro-redirect",
+      "redirects": [
+        {
+          "source": "/**",
+          "destination": "https://diagnosticpro.io/**",
+          "type": 301
+        }
+      ]
+    }
+  ],
   "functions": [
     {
       "source": "functions",

@@ -54,19 +54,19 @@ function generateDiagnosticProPDF(submission, analysis = {}, filePath = "/tmp/re
       doc.font("IBMMono").fontSize(9).fillColor("gray")
         .text("DiagnosticPro — Proprietary AI Diagnostic Report", 54, 30, { align: "center" });
 
-      // footer page number
-      const pageNum = i + 1;
-      doc.font("IBMMono").fontSize(9).fillColor("gray")
-        .text(`Page ${pageNum}`, 54, doc.page.height - 40, { align: "right" });
-
-      // footer short disclaimer
+      // footer disclaimer (top line)
       doc.font("IBMMono").fontSize(7).fillColor("gray")
         .text(
           "Disclaimer: AI-generated for informational purposes only. Not a substitute for licensed professional repair advice.",
           54,
-          doc.page.height - 40,
+          doc.page.height - 50,
           { width: doc.page.width - 108, align: "left" }
         );
+
+      // footer page number (bottom line)
+      const pageNum = i + 1;
+      doc.font("IBMMono").fontSize(9).fillColor("gray")
+        .text(`Page ${pageNum}`, 54, doc.page.height - 30, { align: "right" });
     }
   };
 
@@ -117,20 +117,24 @@ function generateDiagnosticProPDF(submission, analysis = {}, filePath = "/tmp/re
 
   // 1. PRIMARY DIAGNOSIS
   h2("1. PRIMARY DIAGNOSIS");
-  if (analysis.primaryDiagnosis) p(analysis.primaryDiagnosis);
-  else bullets([
-    "Root cause with confidence percentage.",
-    "Reference specific error codes if provided.",
-    "Component failure analysis.",
-    "Age/mileage considerations."
-  ]);
+  if (analysis.primaryDiagnosis) {
+    p(analysis.primaryDiagnosis);
+  } else {
+    bullets([
+      "Root cause with confidence percentage.",
+      "Reference specific error codes if provided.",
+      "Component failure analysis.",
+      "Age/mileage considerations."
+    ]);
+  }
 
   // 2. DIFFERENTIAL DIAGNOSIS
   h2("2. DIFFERENTIAL DIAGNOSIS");
-  {
-    const arr = ensureArray(analysis.differentialDiagnosis);
-    if (arr.length) bullets(arr);
-    else bullets([
+  const diffDiag = ensureArray(analysis.differentialDiagnosis);
+  if (diffDiag.length) {
+    bullets(diffDiag);
+  } else {
+    bullets([
       "Alternative causes ranked by likelihood.",
       "Why each cause is ruled in or out.",
       "Equipment-specific failure patterns."
@@ -143,12 +147,13 @@ function generateDiagnosticProPDF(submission, analysis = {}, filePath = "/tmp/re
     p(analysis.diagnosticVerification);
   } else if (analysis.diagnosticVerification) {
     const dv = analysis.diagnosticVerification;
-    p(dv.text);
-    bullets([
+    if (dv.text) p(dv.text);
+    const verificationItems = [
       ...(dv.tools ? dv.tools.map(x => `Tools: ${x}`) : []),
       ...(dv.expectedReadings ? dv.expectedReadings.map(x => `Expected: ${x}`) : []),
       ...(dv.costs ? dv.costs.map(x => `Cost: ${x}`) : [])
-    ]);
+    ];
+    if (verificationItems.length) bullets(verificationItems);
   } else {
     bullets([
       "Exact tests the shop MUST perform.",
@@ -159,10 +164,11 @@ function generateDiagnosticProPDF(submission, analysis = {}, filePath = "/tmp/re
 
   // 4. SHOP INTERROGATION
   h2("4. SHOP INTERROGATION");
-  {
-    const arr = ensureArray(analysis.shopInterrogation);
-    if (arr.length) bullets(arr);
-    else bullets([
+  const shopQuestions = ensureArray(analysis.shopInterrogation);
+  if (shopQuestions.length) {
+    bullets(shopQuestions);
+  } else {
+    bullets([
       "5 technical questions to expose incompetence.",
       "Specific data they must show you.",
       "Red flag responses to watch for."
@@ -324,8 +330,8 @@ function generateDiagnosticProPDF(submission, analysis = {}, filePath = "/tmp/re
       `Mileage/Hours: ${submission?.mileage_hours ?? "N/A"}`,
       `Serial Number: ${submission?.serial_number ?? "N/A"}`,
       `Problem: ${submission?.problem_description ?? "N/A"}`,
-      `Symptoms: ${submission?.symptoms?.join(", ") || "N/A"}`,
-      `Error Codes: ${submission?.error_codes?.join(", ") || "N/A"}`,
+      `Symptoms: ${Array.isArray(submission?.symptoms) ? submission.symptoms.join(", ") : (submission?.symptoms || "N/A")}`,
+      `Error Codes: ${Array.isArray(submission?.error_codes) ? submission.error_codes.join(", ") : (submission?.error_codes || "N/A")}`,
       `When Started: ${submission?.when_started ?? "N/A"}`,
       `Frequency: ${submission?.frequency ?? "N/A"}`,
       `Urgency Level: ${submission?.urgency_level ?? "N/A"}`,
