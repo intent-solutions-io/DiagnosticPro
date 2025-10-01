@@ -1,3 +1,90 @@
+# Release v1.1.0
+
+**Release Date**: 2025-09-30
+**Release Type**: Minor Release - PDF Enhancements & Infrastructure
+
+## 🎯 Summary
+
+This release includes major PDF format improvements, comprehensive infrastructure enhancements, and security upgrades that significantly improve the DiagnosticPro platform.
+
+## 📄 NEW: Enhanced PDF Report Format
+
+### ✨ Visual Improvements
+- **Emoji Section Headers**: Each of the 14 sections now has distinctive emoji headers for better readability
+- **IBM Plex Mono Font**: Professional monospaced font for technical content and code sections
+- **Improved Layout**: Better spacing, typography, and visual hierarchy
+- **Section Organization**: Clearer separation between diagnostic sections
+
+### 🎯 Updated 14-Section Framework
+- 🎯 **PRIMARY DIAGNOSIS** - Root cause with confidence percentage
+- 🔍 **DIFFERENTIAL DIAGNOSIS** - Alternative causes ranked by likelihood
+- ✅ **DIAGNOSTIC VERIFICATION** - Exact tests shops must perform
+- ❓ **SHOP INTERROGATION** - 5 technical questions to expose incompetence
+- 🗣️ **CONVERSATION SCRIPTING** - Word-for-word customer coaching
+- 💸 **COST BREAKDOWN** - Fair pricing vs overcharge identification
+- 🚩 **RIPOFF DETECTION** - Scam identification and protection
+- ⚖️ **AUTHORIZATION GUIDE** - Approve/reject/second opinion recommendations
+- 🔧 **TECHNICAL EDUCATION** - System operation and failure mechanisms
+- 📦 **OEM PARTS STRATEGY** - Specific part numbers and sourcing
+- 💬 **NEGOTIATION TACTICS** - Professional negotiation strategies
+- 🔬 **LIKELY CAUSES** - Ranked confidence percentages
+- 📊 **RECOMMENDATIONS** - Immediate actions and maintenance
+- 🔗 **SOURCE VERIFICATION** - Authoritative links and TSB references
+
+### 🛠️ Backend PDF Improvements
+- **Error Handling**: Enhanced error handling in `reportPdf.js`
+- **Module Support**: Added `.mjs` ES module compatibility
+- **Font Management**: Improved font loading and fallback systems
+- **Performance**: Optimized PDF generation speed and memory usage
+
+## 🔒 Security & Infrastructure
+
+### ✅ Repository Governance
+- **CODEOWNERS**: Added comprehensive code review governance
+- **Security Policy**: Added `SECURITY.md` with vulnerability reporting
+- **Branch Protection**: Maintained security controls on main branch
+
+### 🛠️ CI/CD Pipeline
+- **GitHub Actions**: Implemented automated testing workflow
+- **Quality Gates**: Code quality and security scanning
+- **Development Standards**: Standardized development procedures
+
+### 📚 Documentation Enhancements
+- **Contributing Guide**: Comprehensive `CONTRIBUTING.md`
+- **DevOps Setup**: Added deployment and maintenance procedures
+- **Market Analysis**: Business opportunity documentation
+
+## 🔧 Technical Improvements
+
+### 🚀 Development Tools
+- **Setup Scripts**: Automated bootstrap and verification scripts
+- **Firebase Config**: Enhanced hosting and performance settings
+- **Module Compatibility**: Better ES6+ and CommonJS support
+
+### 📱 Infrastructure Updates
+- **Cloud Run**: Improved backend configuration
+- **Firebase**: Enhanced hosting and storage settings
+- **API Gateway**: Maintained secure public endpoints
+
+## 🔄 Migration & Compatibility
+
+- ✅ All PDF reports now use enhanced format automatically
+- ✅ Backwards compatible - no breaking changes
+- ✅ Existing customer data preserved
+- ✅ All 14 diagnostic sections maintained
+
+## 📊 Release Metrics
+
+| Improvement Type | Count |
+|-----------------|-------|
+| PDF Format Enhancements | 8 |
+| Infrastructure Additions | 11 |
+| Security Improvements | 4 |
+| Documentation Updates | 6 |
+| Backend Optimizations | 3 |
+
+---
+
 # Release v1.0.0
 
 **Release Date**: 2025-09-30
