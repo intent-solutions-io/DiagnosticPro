@@ -1,0 +1,33 @@
+# DiagnosticPro Code Owners
+
+# Default owners for everything
+* @jeremylongshore
+
+# Documentation
+*.md @jeremylongshore
+/01-docs/ @jeremylongshore
+/deployment-docs/ @jeremylongshore
+
+# Frontend (React/TypeScript)
+/02-src/frontend/ @jeremylongshore
+
+# Backend (Node.js/Firebase)
+/02-src/backend/ @jeremylongshore
+/functions/ @jeremylongshore
+
+# Infrastructure and CI/CD
+/.github/ @jeremylongshore
+/06-infrastructure/ @jeremylongshore
+/.github/workflows/ @jeremylongshore
+
+# Configuration files
+firebase.json @jeremylongshore
+package.json @jeremylongshore
+tsconfig.json @jeremylongshore
+
+# Scripts and tooling
+/scripts/ @jeremylongshore
+/05-scripts/ @jeremylongshore
+
+# Features and templates
+/08-features/ @jeremylongshore
