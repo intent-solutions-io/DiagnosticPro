@@ -1,7 +1,7 @@
-# Release v1.1.0
+# Release v1.0.1
 
 **Release Date**: 2025-09-30
-**Release Type**: Minor Release - PDF Enhancements & Infrastructure
+**Release Type**: Patch Release - PDF Enhancements & Infrastructure
 
 ## 🎯 Summary
 
