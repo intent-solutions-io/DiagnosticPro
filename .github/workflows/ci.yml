@@ -21,11 +21,11 @@ jobs:
           fi
       - uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
           cache: 'npm'
           cache-dependency-path: ./02-src/frontend/package-lock.json
       - name: Install dependencies
-        run: npm ci
+        run: npm install
       - name: Run tests
         run: npm test -- --passWithNoTests
       - name: Build frontend
@@ -46,11 +46,11 @@ jobs:
           fi
       - uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
           cache: 'npm'
           cache-dependency-path: ./02-src/backend/services/backend/package-lock.json
       - name: Install dependencies
-        run: npm ci
+        run: npm install
       - name: Verify PDF generator
         run: node -e "try { const {generateDiagnosticProPDF} = require('./reportPdf.js'); console.log('PDF generator loaded successfully'); } catch(e) { console.log('PDF generator check skipped:', e.message); }"
 
