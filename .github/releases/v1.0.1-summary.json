@@ -1,7 +1,7 @@
 {
-  "version": "1.1.0",
+  "version": "1.0.1",
   "release_date": "2025-09-30",
-  "release_type": "minor",
+  "release_type": "patch",
   "github_release": "https://github.com/jeremylongshore/DiagnosticPro/releases/tag/v1.1.0",
   "pull_request": "https://github.com/jeremylongshore/DiagnosticPro/pull/1",
   "improvements": {
