@@ -62,6 +62,7 @@ if [ -d "backend" ] || [ -d "02-src/backend" ] || [ -d "working-docs/backend" ];
 # Google Cloud
 GOOGLE_CLOUD_PROJECT=diagnostic-pro-prod
 GOOGLE_APPLICATION_CREDENTIALS=/path/to/service-account.json
+REPORT_BUCKET=diagnostic-pro-prod-reports-us-central1
 
 # Stripe
 STRIPE_SECRET_KEY=$(gh secret get STRIPE_SECRET_KEY 2>/dev/null || echo "sk_test_xxxxx")

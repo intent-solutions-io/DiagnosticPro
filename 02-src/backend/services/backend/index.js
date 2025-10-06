@@ -7,6 +7,7 @@ const stripe = require('stripe');
 const crypto = require('crypto');
 const PDFDocument = require('pdfkit');
 const { generateDiagnosticProPDF } = require('./reportPdf.js');
+const { loadAllSecrets } = require('./secrets.js');
 
 // Structured logging function
 function logStructured(data) {
@@ -52,17 +53,46 @@ function validateSubmissionPayload(payload) {
 const app = express();
 const PORT = process.env.PORT || 8080;
 
-// Validate required environment variables
-const REPORT_BUCKET = process.env.REPORT_BUCKET;
-if (!REPORT_BUCKET) {
-  throw new Error('REPORT_BUCKET environment variable is required');
-}
+// Global variables for services (initialized after secrets are loaded)
+let firestore;
+let storage;
+let reportsBucket;
+let stripeClient;
+let REPORT_BUCKET;
+let STRIPE_WEBHOOK_SECRET;
 
-// Initialize services
-const firestore = new Firestore();
-const storage = new Storage();
-const reportsBucket = storage.bucket(REPORT_BUCKET);
-const stripeClient = stripe(process.env.STRIPE_SECRET_KEY);
+// Initialize services with secrets from Secret Manager
+async function initializeServices() {
+  try {
+    // Load secrets from Google Secret Manager
+    const secrets = await loadAllSecrets();
+
+    // Set global variables
+    REPORT_BUCKET = secrets.REPORT_BUCKET;
+    STRIPE_WEBHOOK_SECRET = secrets.STRIPE_WEBHOOK_SECRET;
+
+    // Initialize services
+    firestore = new Firestore();
+    storage = new Storage();
+    reportsBucket = storage.bucket(REPORT_BUCKET);
+    stripeClient = stripe(secrets.STRIPE_SECRET_KEY);
+
+    logStructured({
+      level: 'info',
+      message: 'Services initialized successfully',
+      bucket: REPORT_BUCKET
+    });
+
+    return true;
+  } catch (error) {
+    logStructured({
+      level: 'error',
+      message: 'Failed to initialize services',
+      error: error.message
+    });
+    throw error;
+  }
+}
 
 // Middleware
 app.use(cors({
@@ -1296,20 +1326,37 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`🚀 DiagnosticPro Backend running on port ${PORT}`);
-  console.log(`💰 Price: $4.99 USD (499 cents)`);
-  console.log(`🔗 Project: diagnostic-pro-prod`);
-  console.log(`📁 Storage: gs://${REPORT_BUCKET}`);
-  console.log('\nEndpoints:');
-  console.log('  POST /saveSubmission');
-  console.log('  POST /createCheckoutSession');
-  console.log('  POST /analysisStatus');
-  console.log('  POST /analyzeDiagnostic');
-  console.log('  POST /getDownloadUrl');
-  console.log('  POST /stripeWebhookForward (PRIVATE)');
-  console.log('  GET  /healthz');
-});
+// Start server with async initialization
+async function startServer() {
+  try {
+    // Initialize services (load secrets from Secret Manager)
+    await initializeServices();
+
+    // Start Express server
+    app.listen(PORT, () => {
+      console.log(`🚀 DiagnosticPro Backend running on port ${PORT}`);
+      console.log(`💰 Price: $4.99 USD (499 cents)`);
+      console.log(`🔗 Project: diagnostic-pro-prod`);
+      console.log(`📁 Storage: gs://${REPORT_BUCKET}`);
+      console.log('🔐 Secrets loaded from Google Secret Manager');
+      console.log('\nEndpoints:');
+      console.log('  POST /saveSubmission');
+      console.log('  POST /createCheckoutSession');
+      console.log('  POST /analysisStatus');
+      console.log('  POST /analyzeDiagnostic');
+      console.log('  POST /getDownloadUrl');
+      console.log('  POST /stripeWebhookForward (PRIVATE)');
+      console.log('  GET  /healthz');
+    });
+  } catch (error) {
+    console.error('❌ Failed to start server:', error);
+    process.exit(1);
+  }
+}
+
+// Start the server if running directly (not imported)
+if (require.main === module) {
+  startServer();
+}
 
 module.exports = app;
