@@ -8,25 +8,26 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 0 0% 99%;
-    --foreground: 215 25% 15%;
+    /* Midnight Blue Theme - High Contrast Professional */
+    --background: 222 47% 11%;    /* #0F172A - Deep midnight blue */
+    --foreground: 210 40% 98%;     /* #F1F5F9 - Off-white text */
 
-    --card: 0 0% 100%;
-    --card-foreground: 215 25% 15%;
+    --card: 217 33% 17%;           /* #1E293B - Slate blue cards */
+    --card-foreground: 210 40% 98%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 215 25% 15%;
+    --popover: 217 33% 17%;
+    --popover-foreground: 210 40% 98%;
 
-    --primary: 210 100% 45%;
+    --primary: 199 89% 48%;        /* #0EA5E9 - Bright sky blue (CTA) */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 20% 95%;
-    --secondary-foreground: 215 25% 15%;
+    --secondary: 215 25% 27%;      /* #334155 - Medium slate */
+    --secondary-foreground: 210 40% 98%;
 
-    --muted: 210 15% 96%;
-    --muted-foreground: 215 15% 45%;
+    --muted: 215 25% 27%;
+    --muted-foreground: 215 16% 47%; /* #64748B - Muted slate gray */
 
-    --accent: 142 76% 36%;
+    --accent: 199 89% 48%;         /* Sky blue accent */
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
@@ -38,28 +39,28 @@ All colors MUST be HSL.
     --success: 142 76% 36%;
     --success-foreground: 0 0% 100%;
 
-    --border: 210 20% 90%;
-    --input: 210 20% 90%;
-    --ring: 210 100% 45%;
+    --border: 215 25% 27%;         /* Slate borders */
+    --input: 215 25% 27%;
+    --ring: 199 89% 48%;           /* Sky blue focus ring */
 
-    --radius: 0.75rem;
+    --radius: 0.5rem;
 
-    /* Custom design tokens for repair diagnostic app */
-    --trust-blue: 210 100% 45%;
-    --savings-green: 142 76% 36%;
-    --ripoff-red: 0 84% 60%;
-    --expert-gold: 45 100% 51%;
-    --neutral-slate: 215 15% 45%;
+    /* Custom design tokens - Midnight Blue Professional */
+    --trust-blue: 199 89% 48%;     /* #0EA5E9 - Sky blue for trust/AI */
+    --savings-green: 142 76% 36%;  /* Keep green for savings */
+    --ripoff-red: 0 84% 60%;       /* Keep red for warnings */
+    --expert-gold: 45 100% 51%;    /* Keep gold for premium */
+    --neutral-slate: 215 16% 47%;  /* Muted slate */
 
-    /* Gradients */
-    --gradient-trust: linear-gradient(135deg, hsl(210 100% 45%), hsl(210 100% 55%));
+    /* Gradients - Midnight Blue Theme */
+    --gradient-trust: linear-gradient(135deg, hsl(199 89% 48%), hsl(186 100% 56%));
     --gradient-success: linear-gradient(135deg, hsl(142 76% 36%), hsl(142 76% 46%));
-    --gradient-hero: linear-gradient(135deg, hsl(210 100% 45%), hsl(142 76% 36%));
+    --gradient-hero: linear-gradient(135deg, hsl(222 47% 11%), hsl(217 33% 17%));
 
-    /* Shadows */
-    --shadow-trust: 0 10px 30px -10px hsl(210 100% 45% / 0.3);
+    /* Shadows - Blue Glow */
+    --shadow-trust: 0 10px 30px -10px hsl(199 89% 48% / 0.3);
     --shadow-success: 0 10px 30px -10px hsl(142 76% 36% / 0.3);
-    --shadow-card: 0 4px 20px -4px hsl(215 25% 15% / 0.1);
+    --shadow-card: 0 4px 20px -4px hsl(222 47% 11% / 0.5);
 
     /* Animations */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);

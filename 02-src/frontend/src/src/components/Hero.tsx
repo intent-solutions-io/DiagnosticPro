@@ -35,33 +35,30 @@ const Hero = () => {
 
           {/* Main Headline */}
           <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-4">
-            Stop Expensive Guessing
+            AI-Powered Equipment Diagnostics
             <span className="block text-transparent bg-gradient-to-r from-trust to-savings bg-clip-text">
-              Pro Power, Your Control
+              14-Point Comprehensive Analysis
             </span>
-            The New Standard
           </h1>
 
           {/* Subheadline */}
           <p className="text-lg md:text-xl text-muted-foreground mb-6 max-w-3xl mx-auto leading-relaxed">
-            Before you pay for repairs, know what's actually wrong. Pro level diagnostics now in
-            your hands, empowering you to set expectations with professional power and customer
-            control.
+            Get detailed AI diagnostic analysis based on your equipment symptoms. Our system analyzes your input across 14 key areas to help you understand what might be wrong and inform your repair decisions.
           </p>
 
           {/* Value Props */}
           <div className="flex flex-wrap justify-center gap-4 mb-8 text-sm">
-            <div className="flex items-center text-savings">
+            <div className="flex items-center text-trust">
               <CheckCircle className="h-4 w-4 mr-2" />
-              Root Cause Detection
+              14-Point AI Analysis
             </div>
-            <div className="flex items-center text-savings">
+            <div className="flex items-center text-trust">
               <CheckCircle className="h-4 w-4 mr-2" />
-              Quote Verification
+              Data-Driven Insights
             </div>
-            <div className="flex items-center text-savings">
+            <div className="flex items-center text-trust">
               <CheckCircle className="h-4 w-4 mr-2" />
-              AI-Powered Intelligence
+              Comprehensive Report
             </div>
           </div>
 
@@ -88,20 +85,20 @@ const Hero = () => {
           {/* Social Proof */}
           <div className="pt-6 border-t border-border/50">
             <p className="text-sm text-muted-foreground mb-3">
-              Trusted by repair shops nationwide • Used by professionals daily
+              AI-powered analysis • Based on your provided information
             </p>
             <div className="flex flex-wrap justify-center gap-6 text-xs text-muted-foreground">
               <div className="text-center">
-                <div className="text-lg font-bold text-savings">Pro-Grade</div>
-                <div>Shop-quality diagnostics</div>
+                <div className="text-lg font-bold text-trust">14 Points</div>
+                <div>Comprehensive coverage</div>
               </div>
               <div className="text-center">
-                <div className="text-lg font-bold text-trust">Universal</div>
-                <div>All equipment types</div>
+                <div className="text-lg font-bold text-trust">AI Analysis</div>
+                <div>Data-driven insights</div>
               </div>
               <div className="text-center">
                 <div className="text-lg font-bold text-primary">$4.99</div>
-                <div>Direct access</div>
+                <div>Instant report</div>
               </div>
             </div>
           </div>
