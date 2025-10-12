@@ -8,59 +8,59 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* HUSTLE Zinc Monochrome Theme - Professional Minimalist */
-    --background: 24 24 27; /* #18181B - zinc-900 */
-    --foreground: 250 250 250; /* #FAFAFA - zinc-50 */
+    /* HUSTLE App Light Theme - Professional Clean */
+    --background: 0 0% 100%; /* #FFFFFF - White */
+    --foreground: 240 10% 3.9%; /* #0A0A0B - Dark text */
 
-    --card: 39 39 42; /* #27272A - zinc-800 */
-    --card-foreground: 250 250 250;
+    --card: 0 0% 100%; /* #FFFFFF - White cards */
+    --card-foreground: 240 10% 3.9%;
 
-    --popover: 39 39 42;
-    --popover-foreground: 250 250 250;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
 
-    --primary: 228 228 231; /* #E4E4E7 - zinc-200 (Primary CTA) */
-    --primary-foreground: 24 24 27;
+    --primary: 240 5.9% 10%; /* #18181B - Dark primary */
+    --primary-foreground: 0 0% 98%;
 
-    --secondary: 39 39 42; /* zinc-800 */
-    --secondary-foreground: 250 250 250;
+    --secondary: 240 4.8% 95.9%; /* #F4F4F5 - Light gray */
+    --secondary-foreground: 240 5.9% 10%;
 
-    --muted: 39 39 42;
-    --muted-foreground: 161 161 170; /* #A1A1AA - zinc-400 */
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%; /* #737373 - Medium gray */
 
-    --accent: 228 228 231; /* zinc-200 accent */
-    --accent-foreground: 24 24 27;
+    --accent: 240 4.8% 95.9%; /* Light gray accent */
+    --accent-foreground: 240 5.9% 10%;
 
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
 
-    --warning: 251 146 60; /* Orange instead of harsh red */
+    --warning: 35 100% 50%; /* Orange warning */
     --warning-foreground: 0 0% 100%;
 
     --success: 142 76% 36%;
     --success-foreground: 0 0% 100%;
 
-    --border: 63 63 70; /* #3F3F46 - zinc-700 */
-    --input: 39 39 42;
-    --ring: 161 161 170; /* zinc-400 focus ring */
+    --border: 240 5.9% 90%; /* #E5E5E5 - Light border */
+    --input: 240 5.9% 90%;
+    --ring: 240 5.9% 10%; /* Dark focus ring */
 
     --radius: 0.5rem;
 
-    /* Custom design tokens - Zinc Monochrome Professional */
-    --trust-blue: 228 228 231; /* #E4E4E7 - zinc-200 for trust/AI */
-    --savings-green: 134 239 172; /* Keep green for savings - #86EFAC */
-    --ripoff-red: 251 146 60; /* Soften to orange - #FB923C */
-    --expert-gold: 250 250 250; /* zinc-50 for premium */
-    --neutral-slate: 161 161 170; /* zinc-400 */
+    /* Custom design tokens - Light Professional */
+    --trust-blue: 199 89% 48%; /* #0EA5E9 - Sky blue for trust/AI */
+    --savings-green: 142 76% 36%; /* Keep green for savings */
+    --ripoff-red: 0 84% 60%; /* Red for warnings */
+    --expert-gold: 45 100% 51%; /* Gold for premium */
+    --neutral-slate: 240 3.8% 46.1%; /* Medium gray */
 
-    /* Gradients - Zinc Monochrome Theme */
-    --gradient-trust: linear-gradient(135deg, hsl(228 228 231), hsl(250 250 250));
+    /* Gradients - Light Theme */
+    --gradient-trust: linear-gradient(135deg, hsl(199 89% 48%), hsl(186 100% 56%));
     --gradient-success: linear-gradient(135deg, hsl(142 76% 36%), hsl(142 76% 46%));
-    --gradient-hero: linear-gradient(135deg, hsl(24 24 27), hsl(9 9 11));
+    --gradient-hero: linear-gradient(135deg, hsl(0 0% 100%), hsl(240 4.8% 95.9%));
 
-    /* Shadows - Subtle Gray */
-    --shadow-trust: 0 10px 30px -10px hsl(228 228 231 / 0.2);
+    /* Shadows - Light Theme */
+    --shadow-trust: 0 10px 30px -10px hsl(199 89% 48% / 0.3);
     --shadow-success: 0 10px 30px -10px hsl(142 76% 36% / 0.3);
-    --shadow-card: 0 4px 20px -4px hsl(24 24 27 / 0.5);
+    --shadow-card: 0 4px 20px -4px hsl(0 0% 0% / 0.1);
 
     /* Animations */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
