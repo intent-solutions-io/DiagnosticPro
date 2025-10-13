@@ -206,13 +206,13 @@ const DiagnosticForm = ({ onFormSubmit }: DiagnosticFormProps) => {
                       <div
                         key={type.value}
                         onClick={() => handleInputChange("equipmentType", type.value)}
-                        className={`p-4 border rounded-lg cursor-pointer transition-all hover:bg-primary/5 ${
+                        className={`p-4 border rounded-lg cursor-pointer transition-all hover:bg-primary/5 flex flex-col items-center justify-center ${
                           equipmentType === type.value
                             ? "border-primary bg-primary/10"
                             : "border-border"
                         }`}
                       >
-                        <Icon className="h-6 w-6 mx-auto mb-2" />
+                        <Icon className="h-6 w-6 mb-2" />
                         <p className="text-sm font-medium text-center">{type.label}</p>
                       </div>
                     );
