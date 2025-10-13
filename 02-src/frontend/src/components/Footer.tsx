@@ -51,20 +51,27 @@ const Footer = () => {
                     </a>
                   </div>
                   <div className="mt-2 space-y-1 text-xs text-muted-foreground">
-                    <div>jeremylongshore.com</div>
-                    <div>linkedin.com/in/jeremylongshore</div>
+                    <div>jeremy@intentsolutions.io</div>
                     <div>
                       <a
-                        href="https://www.upwork.com/freelancers/jeremylongshore"
+                        href="https://github.com/jeremylongshore"
                         className="hover:text-foreground transition-colors"
                       >
-                        upwork.com/freelancers/jeremylongshore
+                        github.com/jeremylongshore
+                      </a>
+                    </div>
+                    <div>
+                      <a
+                        href="https://startaitools.com"
+                        className="hover:text-foreground transition-colors"
+                      >
+                        startaitools.com
                       </a>
                     </div>
                   </div>
                 </div>
 
-                <p className="text-xs text-muted-foreground">Created by Intent Solutions Inc</p>
+                <p className="text-xs text-muted-foreground">created by intent solutions io</p>
               </div>
             </div>
 
@@ -213,7 +220,7 @@ const Footer = () => {
             {/* Copyright and Features */}
             <div className="flex flex-col md:flex-row justify-between items-center">
               <div className="text-sm text-muted-foreground mb-4 md:mb-0">
-                © 2025 DiagnosticPro by Intent Solutions. All rights reserved.
+                © 2025 DiagnosticPro by intent solutions io. All rights reserved.
               </div>
               <div className="flex items-center space-x-4 text-sm text-muted-foreground">
                 <span>AI-Powered</span>

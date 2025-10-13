@@ -4,427 +4,542 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## DiagnosticPro AI Platform v1.0.0
 
-✅ **PRODUCTION RELEASE COMPLETE** - DiagnosticPro AI diagnostic platform successfully launched with proprietary 14-section analysis framework
+✅ **PRODUCTION RELEASE** - Professional equipment diagnostic platform with proprietary 14-section AI analysis framework.
 
-A professional equipment diagnostic platform leveraging proprietary AI analysis to provide comprehensive diagnostic reports for vehicles, machinery, and equipment. Customers submit diagnostic forms, make $4.99 payments via Stripe, and receive detailed 2000+ word PDF reports with conversation coaching and shop interrogation strategies.
+Customer-facing diagnostic service providing comprehensive 2000+ word PDF reports for vehicles, machinery, and equipment. $4.99 per diagnostic with Stripe payments, AI-powered analysis via Vertex AI Gemini 2.5 Flash, and instant PDF delivery.
 
-## Current Production Stack (LIVE v1.0.0)
+## Architecture Overview
 
-### **Frontend**
-- Hosting: Firebase Hosting (`diagnosticpro.io`)
-- Framework: React 18 + TypeScript + Vite
-- UI: shadcn/ui + Tailwind CSS
-- Status: ✅ PRODUCTION READY
+**Dual-Project Structure:**
+- **Frontend**: React 18 + TypeScript + Vite → `02-src/frontend/`
+- **Backend**: Node.js Express API → `02-src/backend/services/backend/`
 
-### **Backend**
-- Platform: Google Cloud Run (`diagnosticpro-vertex-ai-backend`)
-- Database: Firestore (3 collections: diagnosticSubmissions, orders, emailLogs)
-- AI: Vertex AI Gemini 2.5 Flash with proprietary 14-section framework
-- Payment: Stripe with webhook integration ($4.99 per diagnostic)
-- Storage: Cloud Storage with signed URL access
-- Status: ✅ FULLY OPERATIONAL
-
-### **Architecture**
-- **GCP Project**: `diagnostic-pro-prod`
-- **Domain**: `diagnosticpro.io` (primary production domain)
-- **Backend**: Cloud Run (us-central1)
+**Production Environment:**
+- **Frontend Hosting**: Firebase Hosting (`diagnosticpro.io`)
+- **Backend Platform**: Google Cloud Run (`diagnosticpro-vertex-ai-backend`)
+- **Database**: Firestore (3 collections: diagnosticSubmissions, orders, emailLogs)
 - **AI Engine**: Vertex AI Gemini 2.5 Flash
+- **Storage**: Cloud Storage with signed URLs
+- **Payments**: Stripe webhooks ($4.99)
+- **GCP Project**: `diagnostic-pro-prod`
 
-## Core Workflow (Production v1.0.0)
-1. Customer submits diagnostic form → **Firestore** (`diagnosticSubmissions` collection)
-2. Payment processed via Stripe ($4.99) → **Firestore** (`orders` collection)
-3. Webhook triggers proprietary 14-section AI analysis → **Vertex AI Gemini 2.5 Flash**
-4. Comprehensive 2000+ word PDF report generated → **Cloud Storage** with signed URLs
-5. Customer downloads report with conversation coaching and shop interrogation strategies
+## Core Business Flow
 
-## Proprietary AI Framework (v1.3)
-### 14-Section Diagnostic Analysis:
-🎯 1. **PRIMARY DIAGNOSIS** - Root cause with confidence percentage
-🔍 2. **DIFFERENTIAL DIAGNOSIS** - Alternative causes ranked by likelihood
-✅ 3. **DIAGNOSTIC VERIFICATION** - Exact tests shops must perform
-❓ 4. **SHOP INTERROGATION** - 5 technical questions to expose incompetence
-🗣️ 5. **CONVERSATION SCRIPTING** - Word-for-word customer coaching
-💸 6. **COST BREAKDOWN** - Fair pricing vs overcharge identification
-🚩 7. **RIPOFF DETECTION** - Scam identification and protection
-⚖️ 8. **AUTHORIZATION GUIDE** - Approve/reject/second opinion recommendations
-🔧 9. **TECHNICAL EDUCATION** - System operation and failure mechanisms
-📦 10. **OEM PARTS STRATEGY** - Specific part numbers and sourcing
-💬 11. **NEGOTIATION TACTICS** - Professional negotiation strategies
-🔬 12. **LIKELY CAUSES** - Ranked confidence percentages
-📊 13. **RECOMMENDATIONS** - Immediate actions and maintenance
-🔗 14. **SOURCE VERIFICATION** - Authoritative links and TSB references
+```
+Customer Form → Firestore (diagnosticSubmissions)
+     ↓
+Stripe Payment ($4.99) → Firestore (orders)
+     ↓
+Webhook → Cloud Run Backend
+     ↓
+Vertex AI Gemini 2.5 Flash (14-section analysis)
+     ↓
+PDF Generation → Cloud Storage (signed URL)
+     ↓
+Customer Download (2000+ word report)
+```
 
-## Commands
+## Proprietary 14-Section AI Framework
 
-### Development
+🎯 **PRIMARY DIAGNOSIS** - Root cause with confidence percentage
+🔍 **DIFFERENTIAL DIAGNOSIS** - Alternative causes ranked by likelihood
+✅ **DIAGNOSTIC VERIFICATION** - Exact tests shops must perform
+❓ **SHOP INTERROGATION** - 5 technical questions to expose incompetence
+🗣️ **CONVERSATION SCRIPTING** - Word-for-word customer coaching
+💸 **COST BREAKDOWN** - Fair pricing vs overcharge identification
+🚩 **RIPOFF DETECTION** - Scam identification and protection
+⚖️ **AUTHORIZATION GUIDE** - Approve/reject/second opinion recommendations
+🔧 **TECHNICAL EDUCATION** - System operation and failure mechanisms
+📦 **OEM PARTS STRATEGY** - Specific part numbers and sourcing
+💬 **NEGOTIATION TACTICS** - Professional negotiation strategies
+🔬 **LIKELY CAUSES** - Ranked confidence percentages
+📊 **RECOMMENDATIONS** - Immediate actions and maintenance
+🔗 **SOURCE VERIFICATION** - Authoritative links and TSB references
+
+## Quick Commands
+
+### Frontend Development (React + TypeScript + Vite)
+
 ```bash
-# Start development server
-npm run dev
-make dev
+# Navigate to frontend
+cd 02-src/frontend
 
-# Install dependencies and hooks
+# Install and setup
+npm install                     # Install dependencies
+make install                    # Install with git hooks
+
+# Development
+npm run dev                     # Start Vite dev server (http://localhost:8080)
+make dev                        # Alternative via Makefile
+
+# Testing & Quality
+npm test                        # Run Jest tests
+npm run test:watch             # Watch mode
+npm run test:coverage          # Coverage report
+npm run lint                   # ESLint
+npx tsc --noEmit              # Type checking
+npx prettier --write "src/**/*.{ts,tsx,js,jsx,json,css,md}"  # Format
+make full-check                # Run ALL checks (required before commits)
+make safe-commit               # Safety checks + commit instructions
+
+# Build
+npm run build                  # Production build
+npm run build:dev              # Development build
+npm run preview                # Preview production build
+```
+
+### Backend API (Cloud Run Service)
+
+```bash
+# Navigate to backend
+cd 02-src/backend/services/backend
+
+# Install dependencies
 npm install
-make install
 
-# Run all safety checks (REQUIRED before commits)
-make safe-commit
+# Development
+npm run dev                    # Nodemon with hot reload
+npm start                      # Production mode
+
+# Testing
+npm test                       # Run tests
+
+# Environment setup
+cp .env.example .env          # Copy template
+# Edit .env with Secret Manager values
+
+# Deploy to Cloud Run
+gcloud run deploy diagnosticpro-vertex-ai-backend \
+  --source . \
+  --region us-central1 \
+  --project diagnostic-pro-prod \
+  --allow-unauthenticated
+
+# View logs
+gcloud logging read "resource.type=\"cloud_run_revision\" \
+  AND resource.labels.service_name=\"diagnosticpro-vertex-ai-backend\"" \
+  --project diagnostic-pro-prod --limit 50
 ```
 
-### Testing & Quality
+### Firebase Deployment (Production)
+
 ```bash
-# Run tests
-npm test
-npm run test:watch
-npm run test:coverage
+# Navigate to Firebase infrastructure
+cd 06-infrastructure/firebase
 
-# Type checking
-npx tsc --noEmit
+# Deploy frontend to diagnosticpro.io
+firebase deploy --only hosting:diagnostic-pro-prod
 
-# Linting
-npm run lint
+# Deploy Firestore rules
+firebase deploy --only firestore
 
-# Formatting
-npx prettier --write "src/**/*.{ts,tsx,js,jsx,json,css,md}"
-npx prettier --check "src/**/*.{ts,tsx,js,jsx,json,css,md}"
+# Deploy storage rules
+firebase deploy --only storage
 
-# All checks at once
-make full-check
+# Deploy everything
+firebase deploy
+
+# Local development with emulators
+firebase emulators:start
+
+# View function logs
+firebase functions:log
+
+# Deploy database indexes
+firebase firestore:indexes
 ```
 
-### Build & Deploy
+### Git Workflow (STRICTLY ENFORCED)
+
 ```bash
-# Production build
-npm run build
-
-# Development build
-npm run build:dev
-
-# Preview production build
-npm run preview
-```
-
-### Firebase/Google Cloud Commands
-```bash
-# Firebase deployment (PRODUCTION)
-firebase deploy --only hosting              # Deploy React app
-firebase deploy --only functions           # Deploy Cloud Functions
-firebase deploy --only firestore          # Deploy database rules
-firebase deploy                           # Deploy everything
-
-# Development & Testing
-npm run dev                               # Local development
-npm run build                            # Production build
-npm run preview                          # Test production build
-
-# Firestore operations
-firebase firestore:indexes               # Deploy database indexes
-firebase emulators:start                # Start local emulators
-
-# Cloud Functions logs & monitoring
-firebase functions:log                   # View function logs
-gcloud functions logs read --limit 50   # Alternative log viewing
-
-# Vertex AI monitoring
-gcloud ai endpoints list                 # List AI endpoints
-```
-
-### Environment Configuration
-```bash
-# Firebase Configuration (Production - LIVE)
-VITE_FIREBASE_PROJECT_ID="diagnostic-pro-prod"
-VITE_FIREBASE_API_KEY="AIzaSyBmuntVKosh_EGz5yxQLlIoNXlxwYE6tMg"
-VITE_FIREBASE_AUTH_DOMAIN="diagnostic-pro-prod.firebaseapp.com"
-VITE_FIREBASE_STORAGE_BUCKET="diagnostic-pro-prod.firebasestorage.app"
-
-# API Configuration (Currently disabled until Cloud Functions deploy)
-VITE_API_BASE=""
-VITE_DISABLE_API="true"
-```
-
-### Git Workflow (ENFORCED)
-```bash
-# Create feature branch
-git checkout -b feature/name
+# ALWAYS create feature branches
+git checkout -b feature/description
 make create-branch
 
-# Before ANY commit
-make safe-commit
+# Before ANY commit - REQUIRED
+cd 02-src/frontend && make safe-commit
+
+# Commit after checks pass
+git add .
+git commit -m "type(scope): description"
+
+# Push to feature branch
+git push origin feature/description
 
 # NEVER commit directly to main
 # NEVER use --no-verify flag
+# Pre-commit hooks enforce this
 ```
 
-## Architecture
+## Project Structure
 
-### Directory Structure
 ```
-fix-it-detective-ai/
-├── src/
-│   ├── components/           # React components (shadcn/ui)
-│   │   ├── ui/              # Base UI components
-│   │   └── __tests__/       # Component tests
-│   ├── pages/               # Route components
-│   ├── config/              # Configuration files
-│   │   └── email.config.ts  # Email service configuration
-│   ├── utils/               # Utility functions
-│   │   └── emailService.ts  # Nodemailer implementation
-│   ├── integrations/        # External service integrations
-│   │   └── supabase/        # Database client & types
-│   ├── hooks/               # Custom React hooks
-│   ├── lib/                 # Shared utilities
-│   └── data/                # Static data (manufacturers)
-├── supabase/
-│   ├── functions/           # Edge Functions (Deno)
-│   │   ├── analyze-diagnostic/     # GPT-4 analysis engine
-│   │   ├── send-diagnostic-email/  # Email delivery
-│   │   ├── generate-report-pdf/    # PDF generation
-│   │   ├── stripe-webhook/         # Payment processing
-│   │   ├── manual-send-email/      # Manual email trigger
-│   │   ├── test-email/            # Email testing
-│   │   └── send-slack-notification/ # System alerts
-│   ├── migrations/          # Database schema
-│   └── config.toml          # Supabase configuration
-├── public/                  # Static assets
-└── dist/                    # Build output
+DiagnosticPro/
+├── 01-docs/                    # Documentation with Makefile
+├── 02-src/
+│   ├── frontend/               # React 18 + TypeScript + Vite
+│   │   ├── src/
+│   │   │   ├── components/    # React components (shadcn/ui)
+│   │   │   │   ├── ui/       # Base UI components (Radix UI)
+│   │   │   │   └── __tests__/ # Component tests (Jest + RTL)
+│   │   │   ├── pages/        # Route components
+│   │   │   ├── services/     # API clients (Firestore, Cloud Storage)
+│   │   │   ├── config/       # Configuration (Firebase, feature flags)
+│   │   │   ├── utils/        # Utilities and helpers
+│   │   │   ├── integrations/ # Firebase integration layer
+│   │   │   ├── hooks/        # Custom React hooks
+│   │   │   ├── lib/          # Shared utilities (cn, utils)
+│   │   │   └── data/         # Static data (manufacturers list)
+│   │   ├── package.json      # Frontend dependencies
+│   │   └── vite.config.ts    # Vite configuration
+│   └── backend/
+│       └── services/
+│           └── backend/       # Cloud Run API (Node.js Express)
+│               ├── index.js   # Main Express server
+│               ├── reportPdf.js # PDF generation (PDFKit + IBM Plex Mono)
+│               ├── secrets.js # Secret Manager integration
+│               ├── handlers/  # Request handlers
+│               ├── templates/ # PDF templates
+│               └── fonts/     # IBM Plex Mono fonts
+├── 03-tests/                  # Integration tests
+├── 04-assets/                 # Static assets and images
+├── 05-scripts/                # Deployment and utility scripts
+├── 06-infrastructure/
+│   └── firebase/
+│       ├── firebase.json      # Firebase configuration
+│       ├── firestore.rules   # Database security rules
+│       └── storage.rules     # Storage security rules
+├── 07-releases/               # Release notes and versioning
+├── 08-features/               # Feature research and planning
+├── functions/                 # Firebase Cloud Functions (future)
+├── cloudbuild.yaml           # Google Cloud Build CI/CD
+└── CLAUDE.md                 # This file
 ```
 
-### Tech Stack
-- **Frontend**: React 18 + TypeScript + Vite
-- **UI**: shadcn/ui + Radix UI + Tailwind CSS
-- **Backend**: Supabase (PostgreSQL + Edge Functions)
-- **AI**: OpenAI GPT-4 API
-- **Payments**: Stripe
-- **Email**: Nodemailer (Gmail SMTP)
-- **Testing**: Jest + React Testing Library
-- **Deployment**: Lovable/Vercel
+## Technology Stack
 
-### Key Integrations
-- **Supabase Project**: jjxvrxehmawuyxltrvql
-- **Database**: PostgreSQL with Row Level Security
-- **Edge Functions**: 8 functions for core business logic
-- **Stripe**: Payment processing and webhooks
-- **OpenAI**: GPT-4 for diagnostic analysis
-- **Gmail SMTP**: Email delivery service
+### Frontend
+- **Framework**: React 18 + TypeScript 5.5
+- **Build Tool**: Vite 5.4
+- **UI Library**: shadcn/ui (Radix UI primitives)
+- **Styling**: Tailwind CSS 3.4
+- **State Management**: React Query (@tanstack/react-query)
+- **Forms**: React Hook Form + Zod validation
+- **Testing**: Jest 30 + React Testing Library 16
+- **Database Client**: Firebase SDK (@google-cloud/firestore)
+
+### Backend
+- **Runtime**: Node.js 20 (LTS)
+- **Framework**: Express 4.18
+- **Database**: Firestore (@google-cloud/firestore)
+- **Storage**: Cloud Storage (@google-cloud/storage)
+- **AI**: Vertex AI SDK (@google-cloud/vertexai)
+- **Payments**: Stripe SDK
+- **PDF Generation**: PDFKit with IBM Plex Mono fonts
+- **Secrets**: Secret Manager (@google-cloud/secret-manager)
+- **Authentication**: google-auth-library
+
+### Infrastructure
+- **Hosting**: Firebase Hosting
+- **Backend**: Cloud Run (containerized Node.js)
+- **Database**: Firestore (NoSQL document store)
+- **Storage**: Cloud Storage (PDF reports)
+- **AI**: Vertex AI (Gemini 2.5 Flash)
+- **CDN**: Firebase Hosting CDN (global)
+- **CI/CD**: Cloud Build + GitHub workflows
+
+## Key API Endpoints (Cloud Run Backend)
+
+```
+GET  /healthz              # Health check
+POST /saveSubmission       # Save diagnostic form to Firestore
+POST /createPaymentIntent  # Create Stripe payment intent
+POST /webhook/stripe       # Process Stripe payment webhooks
+GET  /submission/:id       # Retrieve submission by ID
+POST /analyzeWithVertexAI  # Trigger Vertex AI analysis
+GET  /report/:id           # Get signed URL for PDF report
+```
 
 ## Environment Variables
 
-### Required for Development
+### Frontend (02-src/frontend/.env)
 ```bash
-# Supabase
-VITE_SUPABASE_URL=https://jjxvrxehmawuyxltrvql.supabase.co
-VITE_SUPABASE_PUBLISHABLE_KEY=your-anon-key
-SUPABASE_SERVICE_ROLE_KEY=your-service-key
+# Firebase Configuration (Production)
+VITE_FIREBASE_PROJECT_ID=diagnostic-pro-prod
+VITE_FIREBASE_API_KEY=AIzaSyBmuntVKosh_EGz5yxQLlIoNXlxwYE6tMg
+VITE_FIREBASE_AUTH_DOMAIN=diagnostic-pro-prod.firebaseapp.com
+VITE_FIREBASE_STORAGE_BUCKET=diagnostic-pro-prod.firebasestorage.app
 
-# OpenAI
-OPENAI_API_KEY=your-openai-key
-
-# Stripe
-STRIPE_SECRET_KEY=your-stripe-secret
-STRIPE_WEBHOOK_SECRET=your-webhook-secret
-
-# Email (Gmail SMTP)
-GMAIL_APP_PASSWORD=your-app-password
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
+# API Configuration (Cloud Run backend)
+VITE_API_BASE=https://diagnosticpro-vertex-ai-backend-xxxxx.run.app
+VITE_DISABLE_API=false  # Set to true to disable API calls
 ```
 
-## AI Analysis System
+### Backend (02-src/backend/services/backend/.env)
+```bash
+# Google Cloud Project
+GOOGLE_CLOUD_PROJECT=diagnostic-pro-prod
 
-### GPT-4 Prompt Structure
-The analyze-diagnostic function uses a comprehensive 12-section format:
-1. Initial Assessment
-2. Diagnostic Tests (with specific values: PSI, voltage, resistance)
-3. Test Results Analysis
-4. Component-Specific Checks
-5. Root Cause Analysis
-6. Repair Recommendations
-7. Priority & Safety Assessment
-8. Cost Estimates ($29.99 tier analysis)
-9. Preventive Maintenance
-10. Technical Specifications
-11. Parts & Tools Required
-12. Professional vs DIY Assessment
+# Secret Manager Secrets (loaded at runtime)
+STRIPE_SECRET_KEY=<from-secret-manager>
+STRIPE_WEBHOOK_SECRET=<from-secret-manager>
+REPORT_BUCKET=<from-secret-manager>
 
-### Supported Equipment Types
-- Vehicles (cars, trucks, motorcycles)
-- Machinery (construction, agricultural)
-- Industrial equipment
-- Electronics and appliances
+# Firestore
+FIRESTORE_PROJECT_ID=diagnostic-pro-prod
 
-## Database Schema (Migration Status)
+# Vertex AI
+VERTEX_AI_PROJECT=diagnostic-pro-prod
+VERTEX_AI_REGION=us-central1
+VERTEX_AI_MODEL=gemini-2.5-flash-002
+```
 
-### Current Supabase Tables (Being Migrated)
-- `diagnostic_submissions`: Customer form data (25+ fields)
-- `orders`: Payment and processing status  
-- `email_logs`: Email delivery tracking
+## Database Schema (Firestore)
 
-### Target Firestore Collections (Friday Migration)
-- `diagnosticSubmissions`: Customer form data (snake_case → camelCase)
-- `orders`: Payment tracking with Stripe integration
-- `emailLogs`: Email delivery tracking and status
+### Collection: diagnosticSubmissions
+```typescript
+{
+  id: string;                    // Auto-generated document ID
+  equipmentType: string;         // "Vehicle", "Machinery", etc.
+  manufacturer: string;          // Equipment manufacturer
+  model: string;                 // Model name/number
+  year?: string;                 // Manufacturing year (optional)
+  symptoms: string;              // Customer-described symptoms
+  additionalInfo?: string;       // Optional additional details
+  contact: {
+    email: string;
+    name: string;
+  };
+  analysisStatus: string;        // "pending" | "processing" | "completed" | "failed"
+  createdAt: Timestamp;          // Firestore timestamp
+  updatedAt: Timestamp;
+  orderId?: string;              // Reference to orders collection
+  reportUrl?: string;            // Cloud Storage signed URL
+}
+```
 
-### Migration Notes
-- **No data migration needed** - Supabase contains only test data
-- **Field conversions**: analysis_status → analysisStatus, created_at → createdAt
-- **Anonymous submissions**: userId can be null in diagnosticSubmissions
-- **Document references**: orderId ↔ submissionId relationships
+### Collection: orders
+```typescript
+{
+  id: string;                    // Stripe payment intent ID
+  submissionId: string;          // Reference to diagnosticSubmissions
+  amount: number;                // Amount in cents (499)
+  currency: string;              // "usd"
+  status: string;                // "pending" | "succeeded" | "failed"
+  stripePaymentIntentId: string; // Stripe payment intent ID
+  customerEmail: string;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+```
 
-### Security (Post-Migration)
-- Firestore security rules (replacing Supabase RLS)
-- Firebase Auth service account access
-- Customer PII protection maintained
-- Google Cloud IAM management
-
-## Development Guidelines
-
-### Git Workflow Rules (ENFORCED)
-1. **NEVER** commit directly to main branch
-2. **ALWAYS** create feature branches
-3. **MUST** run `make safe-commit` before any commit
-4. Pre-commit hooks prevent direct main commits
-5. All checks must pass: lint, type-check, format, tests
-
-### Code Quality Standards
-- TypeScript strict mode enabled
-- No `any` types without justification
-- Jest tests for critical functionality
-- Prettier formatting enforced
-- ESLint rules strictly followed
-- Component tests using React Testing Library
-
-### Critical Safety Checks
-The Makefile enforces these checks before any commit:
-- ESLint (code quality)
-- TypeScript (type safety)
-- Prettier (formatting)
-- Jest (tests)
+### Collection: emailLogs
+```typescript
+{
+  id: string;
+  submissionId: string;          // Reference to diagnosticSubmissions
+  recipientEmail: string;
+  subject: string;
+  status: string;                // "sent" | "failed" | "pending"
+  errorMessage?: string;
+  sentAt?: Timestamp;
+  createdAt: Timestamp;
+}
+```
 
 ## Testing Strategy
 
-### Test Files Location
-- Component tests: `src/components/__tests__/`
-- Utility tests: `src/utils/__tests__/`
-- Setup: `src/setupTests.ts`
-
-### Current Test Coverage
-- Button component tests
-- DiagnosticForm component tests
-- Hero component tests
-- Validation utility tests
-
-### Test Commands
+### Frontend Tests (Jest + React Testing Library)
 ```bash
-# Run all tests
-npm test
+# Test files location
+02-src/frontend/src/components/__tests__/Button.test.tsx
+02-src/frontend/src/components/__tests__/DiagnosticForm.test.tsx
+02-src/frontend/src/components/__tests__/Hero.test.tsx
+02-src/frontend/src/utils/__tests__/validation.test.ts
 
-# Watch mode for development
-npm run test:watch
-
-# Coverage report
-npm run test:coverage
-
-# Run single test file
-npm test Button.test.tsx
+# Run tests
+cd 02-src/frontend
+npm test                    # All tests
+npm run test:watch         # Watch mode
+npm run test:coverage      # Coverage report
+npm test Button.test.tsx   # Single file
 ```
 
-## Email Service
-
-### Implementation
-- Located in: `src/utils/emailService.ts`
-- Uses Nodemailer with Gmail SMTP
-- Configuration in: `src/config/email.config.ts`
-- Sends from: reports@diagnosticpro.io
-
-### Email Flow
-1. Customer completes payment
-2. Stripe webhook triggers analysis
-3. analyze-diagnostic generates report
-4. send-diagnostic-email delivers PDF report
-5. Email logged to email_logs table
-
-## Migration Status - COMPLETED ✅
-
-### Migration Results (September 23, 2025)
-1. **✅ Frontend Migration**: Successfully deployed to Firebase Hosting
-   - React app now hosted on Firebase (`diagnosticpro.io`)
-   - All static assets and routing working correctly
-
-2. **✅ Database Migration**: Firestore fully integrated
-   - Created comprehensive Firestore service layer
-   - Migrated all 3 collection schemas (diagnosticSubmissions, orders, emailLogs)
-   - Updated all API services to use Firestore directly
-
-3. **✅ Configuration Migration**: Firebase environment setup
-   - All environment variables configured for Firebase
-   - Firestore rules deployed and active
-   - Authentication and storage initialized
-
-4. **🔧 Cloud Functions**: Pending deployment resolution
-   - Functions built successfully locally
-   - Deployment blocked by Cloud Build issues (unrelated to code)
-   - Temporary workaround: API disabled until functions deploy
-   - All function code ready for deployment
-
-### Migration Benefits Achieved
-1. **Performance**: Direct Firestore integration eliminates API latency
-2. **Scalability**: Firebase autoscaling handles traffic spikes
-3. **Integration**: Native Google Cloud integration for Vertex AI
-4. **Cost**: More predictable pricing model
-5. **Reliability**: Google Cloud SLA and uptime guarantees
-
-### Current Status
-- **Frontend**: 100% migrated and deployed ✅
-- **Database**: 100% migrated to Firestore ✅
-- **API Layer**: 100% updated for Firebase ✅
-- **Cloud Functions**: Code ready, deployment pending 🔧
-- **DNS**: diagnosticpro.io pointing to Firebase ✅
-
-### Next Steps
-1. Resolve Cloud Functions deployment (infrastructure issue)
-2. Enable API integration once functions are deployed
-3. Test complete end-to-end workflow
-4. Monitor and optimize performance
-
-## Performance Targets
-- End-to-end Success Rate: >95%
-- Email Delivery Rate: >98%
-- Response Time: <10 minutes
-- Customer Satisfaction: >4.5/5
-
-## Debugging & Monitoring
-
-### Log Access (Post-Migration)
+### Backend Tests (Jest)
 ```bash
-# Google Cloud Function logs
-gcloud functions logs read analyze-diagnostic --limit 50
+cd 02-src/backend/services/backend
+npm test
+```
 
-# Firestore operations
+## Development Guidelines
+
+### Code Quality Enforcement
+- **TypeScript**: Strict mode enabled, no `any` types without justification
+- **ESLint**: Enforced via pre-commit hooks
+- **Prettier**: Auto-formatting on save
+- **Jest**: Minimum test coverage for critical paths
+- **Git Hooks**: Pre-commit prevents direct main commits
+
+### Required Checks Before Commit
+```bash
+cd 02-src/frontend
+make safe-commit  # Runs: lint + type-check + format-check + tests
+```
+
+The Makefile enforces these checks:
+1. **ESLint** - Code quality and best practices
+2. **TypeScript** - Type safety verification
+3. **Prettier** - Code formatting consistency
+4. **Jest** - All tests must pass
+
+### Branch Protection Rules
+1. **NEVER** commit directly to `main` branch
+2. **ALWAYS** create feature branches: `feature/description`
+3. **MUST** pass all checks via `make safe-commit`
+4. Pre-commit hooks prevent invalid commits
+5. All PRs require passing CI checks
+
+## PDF Report Generation
+
+### Implementation Details
+- **Library**: PDFKit
+- **Font**: IBM Plex Mono (Regular + Bold)
+- **Location**: `02-src/backend/services/backend/reportPdf.js`
+- **Format**: Letter size (8.5" x 11"), 54pt margins
+- **Features**: Headers/footers on every page, buffered page rendering
+- **Output**: 2000+ words across 14 structured sections
+
+### Font Requirements
+```bash
+# Fonts location
+02-src/backend/services/backend/fonts/
+├── IBMPlexMono-Regular.ttf
+└── IBMPlexMono-Bold.ttf
+```
+
+## Monitoring & Debugging
+
+### Cloud Run Backend Logs
+```bash
+# View recent logs
+gcloud logging read "resource.type=\"cloud_run_revision\" \
+  AND resource.labels.service_name=\"diagnosticpro-vertex-ai-backend\"" \
+  --project diagnostic-pro-prod --limit 50
+
+# Tail logs in real-time
+gcloud logging tail "resource.type=\"cloud_run_revision\" \
+  AND resource.labels.service_name=\"diagnosticpro-vertex-ai-backend\"" \
+  --project diagnostic-pro-prod
+
+# Health check
+curl https://diagnosticpro-vertex-ai-backend-xxxxx.run.app/healthz
+```
+
+### Firestore Operations
+```bash
+# Query data
+gcloud firestore collections list --project diagnostic-pro-prod
+
+# View indexes
 firebase firestore:indexes
 
-# BigQuery analytics
-bq query --use_legacy_sql=false "SELECT * FROM diagnostic_reports LIMIT 10"
-
-# Email delivery status  
-# Check emailLogs Firestore collection
+# Export data
+gcloud firestore export gs://backup-bucket/ --project diagnostic-pro-prod
 ```
 
-### Legacy Log Access (Until Friday)
+### Vertex AI Monitoring
 ```bash
-# ⚠️ Supabase functions (being shut down)
-supabase functions logs analyze-diagnostic --follow
+# List AI endpoints
+gcloud ai endpoints list --project diagnostic-pro-prod --region us-central1
+
+# View AI model predictions
+gcloud ai model-monitoring-jobs list --project diagnostic-pro-prod
 ```
 
-### Migration Considerations
-- Cloud Function timeout: 540s (vs Supabase 10min limit)
-- Vertex AI API rate limits (replacing OpenAI)
-- Firestore security rules (replacing Supabase RLS)
-- BigQuery integration for AI report analytics
+## Performance Targets
+
+- **End-to-end Success Rate**: >95%
+- **Email Delivery Rate**: >98%
+- **Response Time**: <10 minutes (form submission to PDF delivery)
+- **Frontend Load Time**: <2 seconds (diagnosticpro.io)
+- **API Latency**: <500ms (Cloud Run)
+- **Firestore Queries**: <100ms
+- **Vertex AI Analysis**: <30 seconds
+- **Customer Satisfaction**: >4.5/5
+
+## CI/CD Pipeline
+
+### GitHub Actions (.github/workflows/ci.yml)
+- **Trigger**: Push to feature branches or main
+- **Steps**: Install → Lint → Type Check → Test → Build
+- **Status**: Required passing for PR merge
+
+### Cloud Build (cloudbuild.yaml)
+```yaml
+Steps:
+1. Install frontend dependencies (02-src/frontend)
+2. Build production bundle (npm run build)
+3. Copy dist/ to Firebase deployment directory
+4. Deploy to Firebase Hosting (diagnosticpro.io)
+```
+
+### Manual Deployment
+```bash
+# Frontend deployment
+cd 02-src/frontend
+npm run build
+cd ../../06-infrastructure/firebase
+firebase deploy --only hosting:diagnostic-pro-prod
+
+# Backend deployment
+cd 02-src/backend/services/backend
+gcloud run deploy diagnosticpro-vertex-ai-backend \
+  --source . \
+  --region us-central1 \
+  --project diagnostic-pro-prod
+```
+
+## Security Considerations
+
+### Firestore Security Rules
+- Anonymous read: DENIED
+- Authenticated write: User-specific only
+- Service account: Full access (backend API)
+- Public read: DENIED on all collections
+
+### Cloud Storage Security
+- Reports bucket: Private by default
+- Signed URLs: 1-hour expiration
+- CORS: Restricted to diagnosticpro.io
+- Public access: DISABLED
+
+### API Security
+- CORS: Whitelisted domains only
+- Rate limiting: Implemented via Cloud Run
+- Webhook verification: Stripe signature validation
+- Environment variables: Secret Manager only
+
+### Payment Security
+- PCI compliance: Stripe handles card data
+- Webhook secrets: Stored in Secret Manager
+- Amount validation: Server-side only
+- No client-side price manipulation
 
 ## Project Context
 
-This is part of the DiagnosticPro platform ecosystem with related projects:
-- `schema/`: BigQuery schemas (266 tables)
-- `scraper/`: Data collection systems
-- `rss_feeds/`: Content curation (226 feeds)
+Part of the larger DiagnosticPro platform ecosystem:
+- **Parent Directory**: `/home/jeremy/projects/diagnostic-platform/`
+- **Related Projects**:
+  - `bigq and scrapers/schema/` - BigQuery schemas (266 tables)
+  - `bigq and scrapers/scraper/` - Data collection systems
+  - `bigq and scrapers/rss_feeds/` - RSS feed curation (226 feeds)
 
-The fix-it-detective-ai project serves as the customer-facing diagnostic service, integrating with the broader platform's data and analytics infrastructure.
+This customer-facing service integrates with the broader platform's data analytics infrastructure for market research and product improvement.
+
+## Support & Documentation
+
+- **Production URL**: https://diagnosticpro.io
+- **Support Email**: support@diagnosticpro.io
+- **Developer Onboarding**: `/DEVELOPER-ONBOARDING.md`
+- **Release Notes**: `/07-releases/`
+- **Feature Planning**: `/08-features/`

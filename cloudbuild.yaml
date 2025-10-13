@@ -1,0 +1,22 @@
+steps:
+  # Build frontend
+  - name: 'node:20'
+    dir: '02-src/frontend'
+    entrypoint: npm
+    args: ['install']
+
+  - name: 'node:20'
+    dir: '02-src/frontend'
+    entrypoint: npm
+    args: ['run', 'build']
+
+  # Copy build to deployment directory
+  - name: 'gcr.io/cloud-builders/gsutil'
+    args: ['cp', '-r', '02-src/frontend/dist/*', '06-infrastructure/firebase/dist/']
+
+  # Deploy to Firebase
+  - name: 'gcr.io/$PROJECT_ID/firebase'
+    dir: '06-infrastructure/firebase'
+    args: ['deploy', '--only', 'hosting:diagnostic-pro-prod']
+
+timeout: 1200s

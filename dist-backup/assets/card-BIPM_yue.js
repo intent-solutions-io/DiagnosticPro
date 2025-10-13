@@ -1,0 +1,11 @@
+import{c as d,j as t,a as s,b as n,r as o}from"./index-Cb9AmbZ7.js";/**
+ * @license lucide-react v0.462.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */const u=d("CircleCheckBig",[["path",{d:"M21.801 10A10 10 0 1 1 17 3.335",key:"yps3ct"}],["path",{d:"m9 11 3 3L22 4",key:"1pflzl"}]]);/**
+ * @license lucide-react v0.462.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */const y=d("Clock",[["circle",{cx:"12",cy:"12",r:"10",key:"1mglay"}],["polyline",{points:"12 6 12 12 16 14",key:"68esgv"}]]),c=n("inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",{variants:{variant:{default:"border-transparent bg-primary text-primary-foreground hover:bg-primary/80",secondary:"border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",destructive:"border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",outline:"text-foreground"}},defaultVariants:{variant:"default"}});function C({className:e,variant:r,...a}){return t.jsx("div",{className:s(c({variant:r}),e),...a})}const i=o.forwardRef(({className:e,...r},a)=>t.jsx("div",{ref:a,className:s("rounded-lg border bg-card text-card-foreground shadow-sm",e),...r}));i.displayName="Card";const l=o.forwardRef(({className:e,...r},a)=>t.jsx("div",{ref:a,className:s("flex flex-col space-y-1.5 p-6",e),...r}));l.displayName="CardHeader";const f=o.forwardRef(({className:e,...r},a)=>t.jsx("h3",{ref:a,className:s("text-2xl font-semibold leading-none tracking-tight",e),...r}));f.displayName="CardTitle";const p=o.forwardRef(({className:e,...r},a)=>t.jsx("p",{ref:a,className:s("text-sm text-muted-foreground",e),...r}));p.displayName="CardDescription";const m=o.forwardRef(({className:e,...r},a)=>t.jsx("div",{ref:a,className:s("p-6 pt-0",e),...r}));m.displayName="CardContent";const x=o.forwardRef(({className:e,...r},a)=>t.jsx("div",{ref:a,className:s("flex items-center p-6 pt-0",e),...r}));x.displayName="CardFooter";export{C as B,i as C,m as a,y as b,u as c,l as d,f as e};
