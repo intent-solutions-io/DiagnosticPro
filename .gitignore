@@ -48,3 +48,7 @@ ui-debug.log
 
 # Exclude diagnostic-platform directory (separate project)
 diagnostic-platform/
+
+# Backup directories
+*-backup/
+dist-backup/
