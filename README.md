@@ -40,3 +40,14 @@ flowchart LR
 ## Links
 - Website: https://diagnosticpro.io
 - Support: support@diagnosticpro.io
+
+## Current Status
+
+✅ **Production**: v1.0.0 fully operational at https://diagnosticpro.io
+⏸️ **In Development**: Photo upload system (on branch `feature/photo-upload-identity-system`)
+
+### Recent Changes (2025-10-14)
+- **Infrastructure Deployed**: GCS buckets, Pub/Sub topics, BigQuery tables added (unused, $0 cost)
+- **Code Development**: Complete photo upload system (~5,000 lines) on feature branch
+- **Status**: Rolled back - payment flow needs design before deployment
+- **See**: `01-docs/067-log-photo-upload-rollback.md` for details

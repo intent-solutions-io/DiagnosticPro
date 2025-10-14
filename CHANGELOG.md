@@ -1,3 +1,86 @@
+# [Unreleased] - Photo Upload System (Feature Branch)
+
+**Branch**: `feature/photo-upload-identity-system`
+**Status**: ⏸️ PAUSED - Infrastructure deployed, code rolled back
+**Date**: 2025-10-14
+
+## ⚠️ ROLLBACK SUMMARY
+
+This release was developed (~5,000 lines of code) but **ROLLED BACK** due to undefined payment flow. All code preserved on feature branch. Infrastructure deployed to production but unused (costs $0).
+
+### Infrastructure DEPLOYED (ACTIVE but unused)
+- ✅ **GCS Buckets**: `gs://diagnostic-pro-prod-uploads`, `gs://dp-derived` with CORS
+- ✅ **Pub/Sub**: Topics `dp-upload-events`, `dp-analysis`, `dp-analysis-dlq` + subscriptions
+- ✅ **BigQuery**: 7 new tables in `diagnostic-pro-prod.diagnosticpro_prod`:
+  - `customer_identity` - Deterministic SHA256-based customer IDs
+  - `vehicle_identity` - VIN normalization and vehicle tracking
+  - `submissions` - Enhanced diagnostics with identity graph
+  - `assets` - Photo/document uploads (receipt, workorder, equipment)
+  - `analyses` - Gemini Vision API results with JSON extraction
+  - `symptoms` - Structured ML training data
+  - `equipment_nft` - Future blockchain integration
+
+### Backend Code (NOT DEPLOYED - on branch)
+- ❌ `/upload-url` endpoint - Signed URL generation for direct GCS uploads
+- ❌ Enhanced `/saveSubmission` - Identity tracking (customerId, vehicleId)
+- ❌ `utils/identity.js` - Deterministic ID generation (SHA256 hashing)
+- ❌ Cloud Functions:
+  - `storage-handler` - Image normalization (JPEG, EXIF strip, resize, thumbnail)
+  - `analysis-worker` - Gemini Vision API integration
+
+### Frontend Code (NOT DEPLOYED - on branch)
+- ❌ `PhotoUpload.tsx` - React component with camera capture + compression
+- ❌ `photo-upload-vanilla.js` - Framework-free vanilla JS alternative
+- ❌ Client-side compression: 2MB limit, 4096px max dimension
+
+### Documentation Added
+- `061-ref-opeyemi-devops-system-analysis.md` - DevOps architecture
+- `062-ref-complete-implementation-guide.md` - Full specifications
+- `063-log-implementation-ready-handoff.md` - Handoff docs
+- `064-log-missing-code-implementation-complete.md` - Code completion
+- `065-rpt-ultrathink-verification-report.md` - Verification (corrected)
+- `066-anl-subagent-deployment-strategy.md` - Agent mapping (23/79)
+- `067-log-photo-upload-rollback.md` - Complete rollback documentation
+- `068-sum-deployment-status.md` - Quick status summary
+
+### Security Features Implemented (not deployed)
+- Magic byte validation (file-type library, not extensions)
+- 15MB file size limit, 4096px max dimension
+- EXIF metadata stripping for privacy
+- Signed URLs with 10-minute expiry (PUT-only)
+- Public Access Prevention on all GCS buckets
+- CORS restricted to diagnosticpro.io + localhost
+
+### Rollback Details
+- **Date**: 2025-10-14T15:25:00Z
+- **Rolled Back From**: Cloud Run revision `00043-rb8`
+- **Rolled Back To**: Cloud Run revision `00041-pxk` (stable)
+- **Reason**: Payment flow undefined - when/how do customers pay for photos?
+- **Customer Impact**: NONE - website functioning normally
+- **Data Loss**: NONE - no production data affected
+
+### Pending Decisions (BLOCKER)
+1. **Payment Model**: Pay before upload? After upload? Tiered pricing? Free enhancement?
+2. **Pricing**: Keep $4.99 or increase to $9.99/$14.99 with photos?
+3. **UI/UX**: When does photo upload appear in customer flow?
+4. **AI Costs**: Does Gemini Vision justify price increase?
+
+### Total Code Written
+- 27 files changed
+- 10,524 insertions
+- ~5,000 lines of production code
+- ~5,500 lines of documentation
+
+### To Resume This Feature
+```bash
+git checkout feature/photo-upload-identity-system
+# Review 067-log-photo-upload-rollback.md
+# Decide payment model
+# Deploy to dev/staging first
+```
+
+---
+
 # Release v1.1.0
 
 **Release Date**: 2025-09-30
