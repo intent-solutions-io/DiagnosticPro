@@ -8,6 +8,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 A professional equipment diagnostic platform leveraging proprietary AI analysis to provide comprehensive diagnostic reports for vehicles, machinery, and equipment. Customers submit diagnostic forms, make $4.99 payments via Stripe, and receive detailed 2000+ word PDF reports with conversation coaching and shop interrogation strategies.
 
+⚠️ **RECENT ROLLBACK (2025-10-14)**: Photo upload system (~5,000 lines) developed but rolled back due to undefined payment flow. All code preserved on branch `feature/photo-upload-identity-system`. Infrastructure deployed (GCS, Pub/Sub, BigQuery) but unused ($0 cost). Production fully operational. See `01-docs/067-log-photo-upload-rollback.md` for complete details.
+
 ## Current Production Stack (LIVE v1.0.0)
 
 ### **Frontend**
