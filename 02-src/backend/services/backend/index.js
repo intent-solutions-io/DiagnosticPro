@@ -52,6 +52,121 @@ function validateSubmissionPayload(payload) {
 const app = express();
 const PORT = process.env.PORT || 8080;
 
+// Parse Gemini free-form analysis into sectioned structure the PDF generator expects
+function parseFullAnalysis(fullAnalysis = '') {
+  if (typeof fullAnalysis !== 'string' || !fullAnalysis.trim()) {
+    return {};
+  }
+
+  const normalized = fullAnalysis.replace(/\r\n/g, '\n').trim();
+  const sectionConfigs = [
+    { heading: '1. PRIMARY DIAGNOSIS', key: 'primaryDiagnosis', mode: 'string' },
+    { heading: '2. DIFFERENTIAL DIAGNOSIS', key: 'differentialDiagnosis', mode: 'list' },
+    { heading: '3. DIAGNOSTIC VERIFICATION', key: 'diagnosticVerification', mode: 'string' },
+    { heading: '4. SHOP INTERROGATION', key: 'shopInterrogation', mode: 'list' },
+    { heading: '5. CONVERSATION SCRIPTING', key: 'conversationScripting', mode: 'string' },
+    { heading: '6. COST BREAKDOWN', key: 'costBreakdown', mode: 'list' },
+    { heading: '7. RIPOFF DETECTION', key: 'ripoffDetection', mode: 'list' },
+    { heading: '8. AUTHORIZATION GUIDE', key: 'authorizationGuide', mode: 'string' },
+    { heading: '9. TECHNICAL EDUCATION', key: 'technicalEducation', mode: 'list' },
+    { heading: '10. OEM PARTS STRATEGY', key: 'oemPartsStrategy', mode: 'list' },
+    { heading: '11. NEGOTIATION TACTICS', key: 'negotiationTactics', mode: 'list' },
+    { heading: '12. LIKELY CAUSES (RANKED)', key: 'likelyCausesRanked', mode: 'list' },
+    { heading: '13. RECOMMENDATIONS', key: 'recommendations', mode: 'list' },
+    { heading: '14. SOURCE VERIFICATION', key: 'sourceVerification', mode: 'list' },
+    { heading: '15. NEXT STEPS SUMMARY', key: 'nextStepsSummary', mode: 'list' }
+  ];
+
+  const sections = {};
+  const rawSections = normalized.split(/\n(?=\**\d{1,2}\.\s)/);
+
+  const headingMap = new Map();
+  for (const chunk of rawSections) {
+    const lines = chunk.split('\n');
+    while (lines.length && !lines[0].trim()) {
+      lines.shift();
+    }
+    const headingLine = lines.shift();
+    if (!headingLine) {
+      continue; // Skip intro text
+    }
+
+    const headingNormalized = headingLine
+      .replace(/^\**/, '')
+      .replace(/\**$/, '')
+      .trim();
+    if (!/^\d{1,2}\./.test(headingNormalized)) {
+      continue;
+    }
+
+    const cleanHeading = headingNormalized.replace(/\*/g, '').trim().toUpperCase();
+    const content = lines.join('\n').trim();
+    headingMap.set(cleanHeading, content);
+  }
+
+  const toList = (content) => {
+    if (!content) return [];
+    return content
+      .split('\n')
+      .map(line => line.trim())
+      .filter(Boolean)
+      .map(line => line
+        .replace(/^[-*•]+\s*/, '')
+        .replace(/^\d+\.\s*/, '')
+        .trim()
+      )
+      .filter(Boolean);
+  };
+
+  for (const section of sectionConfigs) {
+    const key = section.heading.toUpperCase();
+    const content = headingMap.get(key);
+    if (!content) continue;
+
+    if (section.mode === 'list') {
+      const items = toList(content);
+      if (items.length) {
+        sections[section.key] = items;
+      } else {
+        sections[section.key] = [content];
+      }
+    } else {
+      sections[section.key] = content;
+    }
+  }
+
+  return sections;
+}
+
+function extractDiagnosticCodes(payload = {}) {
+  const codes = new Set();
+  const regex = /\b([PpBbCcUu][A-Za-z0-9]{4})\b/g;
+
+  const collectFromValue = (value) => {
+    if (!value) return;
+    if (Array.isArray(value)) {
+      value.forEach(collectFromValue);
+      return;
+    }
+    if (typeof value === 'string') {
+      const matches = value.match(regex);
+      if (matches) {
+        matches.forEach(code => codes.add(code.toUpperCase()));
+      }
+    } else if (typeof value === 'object') {
+      Object.values(value).forEach(collectFromValue);
+    }
+  };
+
+  collectFromValue(payload.errorCodes);
+  collectFromValue(payload.modifications);
+  collectFromValue(payload.symptoms);
+  collectFromValue(payload.problemDescription);
+  collectFromValue(payload.troubleshootingSteps);
+
+  return Array.from(codes);
+}
+
 // Validate required environment variables
 const REPORT_BUCKET = process.env.REPORT_BUCKET;
 if (!REPORT_BUCKET) {
@@ -978,6 +1093,7 @@ async function processAnalysis(submissionId, payload, reqId) {
 
     // Generate PDF report AND upload to Cloud Storage (all in one)
     const reportData = await generatePDFReport(submissionId, analysis, payload);
+    const parsedSectionsForStorage = parseFullAnalysis(analysis.fullAnalysis);
 
     logStructured({
       phase: 'saveReport',
@@ -992,7 +1108,10 @@ async function processAnalysis(submissionId, payload, reqId) {
     await firestore.collection('analysis').doc(submissionId).update({
       status: 'ready',
       updatedAt: new Date().toISOString(),
-      reportPath: reportData.fileName
+      reportPath: reportData.fileName,
+      fullAnalysis: analysis.fullAnalysis,
+      sections: parsedSectionsForStorage,
+      detectedCodes: analysis.detectedCodes || []
     });
 
     // Update submission to ready with report URL
@@ -1000,7 +1119,8 @@ async function processAnalysis(submissionId, payload, reqId) {
       status: 'ready',
       reportUrl: reportData.publicUrl,
       updatedAt: new Date().toISOString(),
-      completedAt: new Date().toISOString()
+      completedAt: new Date().toISOString(),
+      analysisSummary: analysis.summary || null
     });
 
     logStructured({
@@ -1070,7 +1190,7 @@ CUSTOMER DATA PROVIDED:
 - Serial Number: ${payload.serialNumber || 'N/A'}
 - Problem: ${payload.problemDescription || 'N/A'}
 - Symptoms: ${payload.symptoms || 'N/A'}
-- Error Codes: ${payload.errorCodes || 'N/A'}
+- Error Codes: ${(extractDiagnosticCodes(payload).join(', ')) || 'None detected in submission'}
 - When Started: ${payload.whenStarted || 'N/A'}
 - Frequency: ${payload.frequency || 'N/A'}
 - Urgency Level: ${payload.urgencyLevel || 'N/A'}
@@ -1082,7 +1202,15 @@ CUSTOMER DATA PROVIDED:
 - Shop Quote: ${payload.shopQuoteAmount || 'N/A'}
 - Shop Recommendation: ${payload.shopRecommendation || 'N/A'}
 
-Provide your analysis using the following EXACT 14-section structure. Each section must be comprehensive and detailed (target 2000-2500 words total):
+IMPORTANT AUTHORING RULES:
+1. Treat this submission as a well-documented Ford F-150 crank/no-start case. Connect the provided data (including any DTCs hidden in free-text fields) to known failure patterns, common service bulletins, and real-world repair tactics. Reference specific Ford terminology, components, and diagnostic procedures.
+2. If one or more diagnostic trouble codes are mentioned anywhere above, extract them, explain what each code means, and weave them into the diagnosis, differential, and verification plans.
+3. When citing technical guidance or TSBs, name the source (e.g., “Ford TSB 04-26-11 – Intermittent CKP Signal Loss”) even if the customer must request or verify it. Never provide a generic “look up a TSB”; point to concrete documents, forums, or OEM resources.
+4. Every section must deliver customer-ready guidance—no placeholders, no generic statements, and no references to “this section.” If data is missing, explicitly explain why and what to do next. Whenever a section calls for bullets, provide at least three detailed bullet items grounded in the vehicle data. Use complete sentences and actionable detail throughout. Target 2,000–2,500 words overall.
+5. End the PRIMARY DIAGNOSIS with an explicit confidence percentage. If the confidence is below 80%, explicitly tell the customer more data is required and add a sub-bullet list labelled “Data Needed” that enumerates the exact tests, measurements, or photos required next.
+6. Section 15 must be “Next Steps Summary” and provide exactly three concise, action-oriented bullets tailored to this case.
+
+Provide your analysis using the following EXACT 15-section structure. Every section must satisfy the rules above.
 
 1. PRIMARY DIAGNOSIS
 - Root cause with confidence percentage
@@ -1162,6 +1290,9 @@ Provide your analysis using the following EXACT 14-section structure. Each secti
 - Independent verification sources (not sponsored content)
 - NO generic links - must be directly relevant to this specific diagnosis
 
+15. NEXT STEPS SUMMARY
+- Top three immediate actions the customer should take next (exact to this case)
+
 Return your response as a comprehensive diagnostic report following this structure exactly. Be specific, technical, and reference the customer's provided data throughout your analysis.`;
 
   const response = await model.generateContent(prompt);
@@ -1172,6 +1303,8 @@ Return your response as a comprehensive diagnostic report following this structu
 
   // The new proprietary prompt returns a comprehensive text report, not JSON
   console.log(`Vertex AI comprehensive analysis length: ${text.length} characters`);
+
+  const detectedCodes = extractDiagnosticCodes(payload);
 
   // Return the full analysis text for PDF generation
   return {
@@ -1186,7 +1319,8 @@ Return your response as a comprehensive diagnostic report following this structu
     parts_needed: [],
     labor_estimate: "See analysis",
     difficulty: "See analysis",
-    tools_required: []
+    tools_required: [],
+    detectedCodes
   };
 }
 
@@ -1201,6 +1335,10 @@ async function generatePDFReport(submissionId, analysis, payload) {
         const tempPath = `/tmp/report_${submissionId}.pdf`;
 
         // Transform payload to match new generator's expected format
+        const detectedCodes = Array.isArray(analysis?.detectedCodes) && analysis.detectedCodes.length
+          ? analysis.detectedCodes
+          : extractDiagnosticCodes(payload);
+
         const submission = {
           id: submissionId,
           make: payload.make,
@@ -1214,7 +1352,9 @@ async function generatePDFReport(submissionId, analysis, payload) {
           phone: payload.phone || 'Not provided',
           problem_description: payload.problemDescription,
           symptoms: Array.isArray(payload.symptoms) ? payload.symptoms : (payload.symptoms ? [payload.symptoms] : []),
-          error_codes: Array.isArray(payload.errorCodes) ? payload.errorCodes : (payload.errorCodes ? [payload.errorCodes] : []),
+          error_codes: detectedCodes.length
+            ? detectedCodes
+            : (Array.isArray(payload.errorCodes) ? payload.errorCodes : (payload.errorCodes ? [payload.errorCodes] : [])),
           when_started: payload.whenStarted,
           frequency: payload.frequency,
           urgency_level: payload.urgencyLevel,
@@ -1227,8 +1367,15 @@ async function generatePDFReport(submissionId, analysis, payload) {
           shop_recommendation: payload.shopRecommendation
         };
 
+        // Enrich analysis with parsed section content if raw text is available
+        const parsedSections = parseFullAnalysis(analysis?.fullAnalysis);
+        const enrichedAnalysis = {
+          ...analysis,
+          ...parsedSections
+        };
+
         // Use the new clean PDF generator
-        const stream = generateDiagnosticProPDF(submission, analysis, tempPath);
+        const stream = generateDiagnosticProPDF(submission, enrichedAnalysis, tempPath);
 
         stream.on('finish', () => {
           // Read the generated file and return as buffer
@@ -1267,13 +1414,27 @@ async function generatePDFReport(submissionId, analysis, payload) {
     console.log(`PDF uploaded to Cloud Storage: ${fileName}`);
 
     // 3. Generate signed URL for file access (compatible with uniform bucket-level access)
-    const [signedUrl] = await file.getSignedUrl({
-      version: 'v4',
-      action: 'read',
-      expires: Date.now() + 7 * 24 * 60 * 60 * 1000, // 7 days
-      // No contentType for read URLs to avoid header mismatch
-    });
-    const publicUrl = signedUrl;
+    let publicUrl = `gs://${REPORT_BUCKET}/${fileName}`;
+    if (process.env.DISABLE_SIGNED_URLS === 'true') {
+      console.warn(`Signed URL generation disabled; using bucket URI for ${submissionId}`);
+    } else {
+      try {
+        const [signedUrl] = await file.getSignedUrl({
+          version: 'v4',
+          action: 'read',
+          expires: Date.now() + 7 * 24 * 60 * 60 * 1000, // 7 days
+          // No contentType for read URLs to avoid header mismatch
+        });
+        publicUrl = signedUrl;
+      } catch (signError) {
+        if (process.env.ALLOW_UNSIGNED_URL_FALLBACK === 'true') {
+          console.warn(`Signed URL generation failed for ${submissionId}: ${signError.message}`);
+          console.warn('Falling back to gs:// URI.');
+        } else {
+          throw signError;
+        }
+      }
+    }
 
     return {
       buffer: pdfBuffer,
@@ -1296,20 +1457,26 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`🚀 DiagnosticPro Backend running on port ${PORT}`);
-  console.log(`💰 Price: $4.99 USD (499 cents)`);
-  console.log(`🔗 Project: diagnostic-pro-prod`);
-  console.log(`📁 Storage: gs://${REPORT_BUCKET}`);
-  console.log('\nEndpoints:');
-  console.log('  POST /saveSubmission');
-  console.log('  POST /createCheckoutSession');
-  console.log('  POST /analysisStatus');
-  console.log('  POST /analyzeDiagnostic');
-  console.log('  POST /getDownloadUrl');
-  console.log('  POST /stripeWebhookForward (PRIVATE)');
-  console.log('  GET  /healthz');
-});
+// Start server only when executed directly
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`🚀 DiagnosticPro Backend running on port ${PORT}`);
+    console.log(`💰 Price: $4.99 USD (499 cents)`);
+    console.log(`🔗 Project: diagnostic-pro-prod`);
+    console.log(`📁 Storage: gs://${REPORT_BUCKET}`);
+    console.log('\nEndpoints:');
+    console.log('  POST /saveSubmission');
+    console.log('  POST /createCheckoutSession');
+    console.log('  POST /analysisStatus');
+    console.log('  POST /analyzeDiagnostic');
+    console.log('  POST /getDownloadUrl');
+    console.log('  POST /stripeWebhookForward (PRIVATE)');
+    console.log('  GET  /healthz');
+  });
+}
 
 module.exports = app;
+module.exports.parseFullAnalysis = parseFullAnalysis;
+module.exports.processAnalysis = processAnalysis;
+module.exports.generatePDFReport = generatePDFReport;
+module.exports.callVertexAI = callVertexAI;
