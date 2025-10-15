@@ -1,0 +1,155 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DiagnosticPro AI Report",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "submissionId": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "customer": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "email": {
+          "type": "string",
+          "maxLength": 240
+        },
+        "name": {
+          "type": ["string", "null"],
+          "maxLength": 160
+        }
+      },
+      "required": ["email"]
+    },
+    "equipment": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["vehicle", "generator", "hvac", "other"]
+        },
+        "make": { "type": ["string", "null"], "maxLength": 120 },
+        "model": { "type": ["string", "null"], "maxLength": 120 },
+        "year": { "type": ["string", "null"], "maxLength": 60 }
+      },
+      "required": ["type"]
+    },
+    "symptoms": { "type": "string", "maxLength": 1200 },
+    "codes": {
+      "type": "array",
+      "maxItems": 24,
+      "items": { "type": "string", "maxLength": 32 }
+    },
+    "root_cause_hypotheses": {
+      "type": "array",
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "hypothesis": { "type": "string", "maxLength": 220 },
+          "evidence": { "type": "string", "maxLength": 380 },
+          "likelihood": { "type": "string", "enum": ["low", "medium", "high"] }
+        },
+        "required": ["hypothesis", "evidence", "likelihood"]
+      }
+    },
+    "most_likely_cause": { "type": "string", "maxLength": 280 },
+    "recommended_actions": {
+      "type": "array",
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "step": { "type": "string", "maxLength": 200 },
+          "why": { "type": "string", "maxLength": 220 }
+        },
+        "required": ["step", "why"]
+      }
+    },
+    "tools_parts": {
+      "type": "array",
+      "maxItems": 12,
+      "items": { "type": "string", "maxLength": 120 }
+    },
+    "safety_notes": {
+      "type": "array",
+      "maxItems": 6,
+      "items": { "type": "string", "maxLength": 160 }
+    },
+    "estimated_cost_range_usd": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "low": { "type": "number" },
+        "high": { "type": "number" }
+      },
+      "required": ["low", "high"]
+    },
+    "estimated_time_hours": { "type": "number" },
+    "warranty_or_tsb_refs": {
+      "type": "array",
+      "maxItems": 8,
+      "items": { "type": "string", "maxLength": 140 }
+    },
+    "disclaimers": {
+      "type": "array",
+      "maxItems": 10,
+      "items": { "type": "string", "maxLength": 140 }
+    },
+    "confidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "score_pct": { "type": "number", "minimum": 0, "maximum": 100 },
+        "threshold_pct": { "type": "number", "minimum": 50, "maximum": 100 },
+        "assessment": { "type": "string", "maxLength": 200 }
+      },
+      "required": ["score_pct", "threshold_pct", "assessment"]
+    },
+    "confidence_uplift_requirements": {
+      "type": "array",
+      "maxItems": 8,
+      "items": { "type": "string", "maxLength": 180 }
+    },
+    "customer_readiness_check": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "verdict": {
+          "type": "string",
+          "enum": ["ready_for_customer", "needs_revision"]
+        },
+        "short_reason": { "type": "string", "maxLength": 220 }
+      },
+      "required": ["verdict", "short_reason"]
+    },
+    "meta": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "model": { "type": "string", "maxLength": 80 },
+        "version": { "type": "string", "maxLength": 40 },
+        "generated_at_iso": { "type": "string", "format": "date-time" }
+      }
+    }
+  },
+  "required": [
+    "submissionId",
+    "customer",
+    "equipment",
+    "symptoms",
+    "codes",
+    "root_cause_hypotheses",
+    "most_likely_cause",
+    "recommended_actions",
+    "tools_parts",
+    "safety_notes",
+    "estimated_cost_range_usd",
+    "estimated_time_hours",
+    "disclaimers",
+    "confidence",
+    "customer_readiness_check"
+  ]
+}

@@ -1,0 +1,20 @@
+Submission ID: {{submissionId}}
+
+Customer data (JSON):
+{{customer_json}}
+
+Equipment data (JSON):
+{{equipment_json}}
+
+Reported symptoms:
+{{symptoms_text}}
+
+Reported diagnostic codes (JSON):
+{{codes_json}}
+
+Additional notes:
+{{notes_text}}
+
+Confidence threshold: {{confidence_threshold_pct:=85}}
+
+Using the information above, return exactly one JSON object that validates against DIAGPRO.REPORT.schema.json. Adhere to all field caps, array limits, and confidence policies. No extra commentary.
