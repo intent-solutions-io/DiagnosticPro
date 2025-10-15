@@ -1,0 +1,41 @@
+Submission ID: {{submissionId}}
+
+Customer data (JSON):
+{{customer_json}}
+
+Equipment data (JSON):
+{{equipment_json}}
+
+Reported symptoms:
+{{symptoms_text}}
+
+Reported diagnostic codes (JSON):
+{{codes_json}}
+
+Additional notes:
+{{notes_text}}
+
+Confidence threshold: {{confidence_threshold_pct:=85}}
+
+Using the information above, return exactly one JSON object that validates against DIAGPRO.REPORT.schema.json. Use exact property names from the schema. Do not include keys outside the schema. Adhere to all field caps, array limits, and confidence policies. No extra commentary, no code fences.
+
+REQUIRED STRUCTURE:
+{
+  "submissionId": "{{submissionId}}",
+  "customer": { "email": "...", "name": "..." },
+  "equipment": { "type": "hvac|vehicle|generator|other", "make": "...", "model": "...", "year": "..." },
+  "symptoms": "single text string",
+  "codes": ["CODE1", "CODE2"],
+  "root_cause_hypotheses": [{ "hypothesis": "...", "evidence": "...", "likelihood": "low|medium|high" }],
+  "most_likely_cause": "single sentence",
+  "recommended_actions": [{ "step": "...", "why": "..." }],
+  "tools_parts": ["part1", "part2"],
+  "safety_notes": ["note1", "note2"],
+  "estimated_cost_range_usd": { "low": 100, "high": 500 },
+  "estimated_time_hours": 4.5,
+  "warranty_or_tsb_refs": [],
+  "disclaimers": [],
+  "confidence": { "score_pct": 85, "threshold_pct": 85, "assessment": "..." },
+  "confidence_uplift_requirements": [],
+  "customer_readiness_check": { "verdict": "ready_for_customer|needs_revision", "short_reason": "..." }
+}
