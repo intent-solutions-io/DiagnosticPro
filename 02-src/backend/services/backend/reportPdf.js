@@ -49,6 +49,9 @@ function generateDiagnosticProPDF(submission, analysis = {}, filePath = "/tmp/re
     const range = doc.bufferedPageRange(); // { start, count }
     for (let i = range.start; i < range.start + range.count; i++) {
       doc.switchToPage(i);
+      const prevX = doc.x;
+      const prevY = doc.y;
+      doc.save();
 
       // header
       doc.font("IBMMono").fontSize(9).fillColor("gray")
@@ -67,6 +70,10 @@ function generateDiagnosticProPDF(submission, analysis = {}, filePath = "/tmp/re
       const pageNum = i + 1;
       doc.font("IBMMono").fontSize(9).fillColor("gray")
         .text(`Page ${pageNum}`, 54, doc.page.height - 30, { align: "right" });
+
+      doc.restore();
+      doc.x = prevX;
+      doc.y = prevY;
     }
   };
 
@@ -319,6 +326,13 @@ function generateDiagnosticProPDF(submission, analysis = {}, filePath = "/tmp/re
       "Independent verification sources (not sponsored).",
       "No generic links — must be directly relevant."
     ]);
+  }
+
+  // NEXT STEPS SUMMARY (optional but preferred)
+  const nextSteps = ensureArray(analysis.nextStepsSummary);
+  if (nextSteps.length) {
+    h2("Next Steps Summary");
+    bullets(nextSteps);
   }
 
   // ---------- CUSTOMER DATA VARIABLES USED ----------
