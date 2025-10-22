@@ -1,0 +1,16 @@
+{
+  "submissionId": "diag_mock_G",
+  "customer": {
+    "email": "maker.space@example.com",
+    "name": "Makerspace Lead"
+  },
+  "equipment": {
+    "type": "other",
+    "make": null,
+    "model": null,
+    "year": null
+  },
+  "symptoms": "Custom CNC router occasionally stalls mid-job, no alarms, sometimes resumes after reboot.",
+  "codes": [],
+  "notes": "No detailed logs. Operators note humidity high. Controller fan noisy."
+}

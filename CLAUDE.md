@@ -2,9 +2,9 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## DiagnosticPro AI Platform v1.0.0
+## DiagnosticPro AI Platform v2.0.0
 
-✅ **PRODUCTION RELEASE COMPLETE** - DiagnosticPro AI diagnostic platform successfully launched with proprietary 14-section analysis framework
+✅ **PRODUCTION RELEASE COMPLETE** - DiagnosticPro AI diagnostic platform with proprietary 15-section analysis framework and production-grade PDF generation
 
 A professional equipment diagnostic platform leveraging proprietary AI analysis to provide comprehensive diagnostic reports for vehicles, machinery, and equipment. Customers submit diagnostic forms, make $4.99 payments via Stripe, and receive detailed 2000+ word PDF reports with conversation coaching and shop interrogation strategies.
 
@@ -39,8 +39,8 @@ A professional equipment diagnostic platform leveraging proprietary AI analysis 
 4. Comprehensive 2000+ word PDF report generated → **Cloud Storage** with signed URLs
 5. Customer downloads report with conversation coaching and shop interrogation strategies
 
-## Proprietary AI Framework (v1.3)
-### 14-Section Diagnostic Analysis:
+## Proprietary AI Framework (v2.0)
+### 15-Section Diagnostic Analysis:
 🎯 1. **PRIMARY DIAGNOSIS** - Root cause with confidence percentage
 🔍 2. **DIFFERENTIAL DIAGNOSIS** - Alternative causes ranked by likelihood
 ✅ 3. **DIAGNOSTIC VERIFICATION** - Exact tests shops must perform
@@ -55,6 +55,7 @@ A professional equipment diagnostic platform leveraging proprietary AI analysis 
 🔬 12. **LIKELY CAUSES** - Ranked confidence percentages
 📊 13. **RECOMMENDATIONS** - Immediate actions and maintenance
 🔗 14. **SOURCE VERIFICATION** - Authoritative links and TSB references
+🔬 15. **ROOT CAUSE ANALYSIS** - Critical diagnostic component (v2.0 addition)
 
 ## Commands
 
@@ -155,6 +156,40 @@ make safe-commit
 # NEVER commit directly to main
 # NEVER use --no-verify flag
 ```
+
+## PDF Generation Architecture (v2.0)
+
+### Production-Grade PDF System
+The PDF generation has been completely rebuilt with:
+
+1. **PDFValidationSystem Class**
+   - Validates all 15 sections are present
+   - Checks for Root Cause Analysis
+   - Detects and removes excessive whitespace
+   - Provides detailed error/warning reporting
+
+2. **TypographyManager Class**
+   - Professional bullet point rendering with hanging indents
+   - Orphan/widow control (no stranded lines)
+   - Controlled pagination (no auto-page sprawl)
+   - IBM Plex Mono font support
+
+3. **DiagnosticPDFGenerator Class**
+   - Controlled page creation with `autoFirstPage: false`
+   - Section validation before rendering
+   - Default content for missing sections
+   - Professional cover page and disclaimer
+
+4. **Key Technical Fixes**
+   - All text() calls use `continued: false` to prevent auto-pagination
+   - Page breaks are manually controlled
+   - Content is cleaned before rendering
+   - 2:1 page ratio bug eliminated
+
+### Files
+- `reportPdfProduction.js` - Production PDF generator (501 lines)
+- `reportPdf.js` - Legacy generator (deprecated)
+- `fonts/` - IBM Plex Mono TTF files
 
 ## Architecture
 

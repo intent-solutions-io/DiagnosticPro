@@ -1,0 +1,84 @@
+{
+  "submissionId": "diag_mock_B",
+  "customer": {
+    "email": "owner.b@example.com",
+    "name": "Jamie Chen"
+  },
+  "equipment": {
+    "type": "vehicle",
+    "make": "Honda",
+    "model": "Civic",
+    "year": "2009"
+  },
+  "symptoms": "Random crank-no-start events without warning lamps.",
+  "codes": [],
+  "root_cause_hypotheses": [
+    {
+      "hypothesis": "Weak fuel pump relay intermittently failing in humidity",
+      "evidence": "Starts after waiting, no codes, relay common failure in this generation.",
+      "likelihood": "medium"
+    },
+    {
+      "hypothesis": "Corroded ground at transmission case",
+      "evidence": "Moisture correlation, shared ground for PCM and starter circuit.",
+      "likelihood": "low"
+    },
+    {
+      "hypothesis": "Immobilizer key recognition fault",
+      "evidence": "Rain-related events and aging transceiver ring, no security light reported though.",
+      "likelihood": "low"
+    }
+  ],
+  "most_likely_cause": "Intermittent fuel pump relay dropout triggered by moisture.",
+  "recommended_actions": [
+    {
+      "step": "Monitor fuel pump command voltage during crank with test light",
+      "why": "Confirms relay output under fault condition."
+    },
+    {
+      "step": "Inspect main relay (PGM-FI) board for cracked solder joints",
+      "why": "Thermal cycling causes intermittent contact on older units."
+    },
+    {
+      "step": "Check PCM and engine grounds for corrosion and retorque",
+      "why": "Ensures consistent reference for starter and ignition circuits."
+    }
+  ],
+  "tools_parts": [
+    "12V test light",
+    "Replacement PGM-FI relay",
+    "Electrical contact cleaner"
+  ],
+  "safety_notes": [
+    "Disconnect battery before working on relay panel.",
+    "Avoid sparks around fuel tank area."
+  ],
+  "estimated_cost_range_usd": {
+    "low": 110,
+    "high": 320
+  },
+  "estimated_time_hours": 1.5,
+  "warranty_or_tsb_refs": [],
+  "disclaimers": [
+    "No diagnostic trouble codes present; additional data required to confirm root cause."
+  ],
+  "confidence": {
+    "score_pct": 62,
+    "threshold_pct": 85,
+    "assessment": "Insufficient evidence to confirm the relay fault without live data."
+  },
+  "confidence_uplift_requirements": [
+    "Fuel pump relay voltage measurement during a no-start",
+    "Immobilizer status data from scan tool",
+    "Starter draw amperage when symptom occurs"
+  ],
+  "customer_readiness_check": {
+    "verdict": "needs_revision",
+    "short_reason": "Report requires live electrical data to meet confidence target."
+  },
+  "meta": {
+    "model": "gemini-2.0-flash-exp",
+    "version": "v2-json",
+    "generated_at_iso": "2025-10-15T19:00:00Z"
+  }
+}

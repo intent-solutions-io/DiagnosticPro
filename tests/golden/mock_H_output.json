@@ -1,0 +1,89 @@
+{
+  "submissionId": "diag_mock_H",
+  "customer": {
+    "email": "diy.forum@example.com",
+    "name": "DIY Forum Poster"
+  },
+  "equipment": {
+    "type": "vehicle",
+    "make": "Subaru",
+    "model": "Outback",
+    "year": "2012"
+  },
+  "symptoms": "Intermittent stumble with long narrative of attempted repairs and environmental factors.",
+  "codes": ["P0420", "P0456"],
+  "root_cause_hypotheses": [
+    {
+      "hypothesis": "Minor EVAP leak at purge line or canister",
+      "evidence": "P0456 present, gas cap already replaced twice, rodent activity possible.",
+      "likelihood": "medium"
+    },
+    {
+      "hypothesis": "Catalyst efficiency degradation",
+      "evidence": "P0420 repeated, high mileage, exhaust smell at idle.",
+      "likelihood": "medium"
+    },
+    {
+      "hypothesis": "Intermittent ignition knock from carbon buildup",
+      "evidence": "Reports of spark knock on mountain climbs and original plugs just replaced.",
+      "likelihood": "low"
+    }
+  ],
+  "most_likely_cause": "Combination of small EVAP leak and aging catalytic converter affecting drivability.",
+  "recommended_actions": [
+    {
+      "step": "Perform EVAP smoke test focusing on purge and vent lines",
+      "why": "Locates leak causing P0456 and fuel odor."
+    },
+    {
+      "step": "Compare upstream/downstream O2 sensor waveforms during road test",
+      "why": "Confirms catalyst efficiency before replacement."
+    },
+    {
+      "step": "Inspect exhaust hangers and joints for leaks",
+      "why": "Addresses exhaust smell and potential false catalyst readings."
+    },
+    {
+      "step": "Reset fuel trims after repairs and monitor freeze-frame data",
+      "why": "Ensures drivability improvements are captured."
+    }
+  ],
+  "tools_parts": [
+    "EVAP smoke machine",
+    "Scan tool with graphing capability",
+    "Replacement purge line seals",
+    "Exhaust backpressure gauge"
+  ],
+  "safety_notes": [
+    "Work in ventilated area when testing exhaust components.",
+    "Support vehicle securely before inspecting underbody."
+  ],
+  "estimated_cost_range_usd": {
+    "low": 650,
+    "high": 1450
+  },
+  "estimated_time_hours": 4.2,
+  "warranty_or_tsb_refs": [],
+  "disclaimers": [
+    "Owner narrative condensed; further data logs may refine diagnosis."
+  ],
+  "confidence": {
+    "score_pct": 70,
+    "threshold_pct": 85,
+    "assessment": "Mixed symptoms and numerous prior repairs reduce certainty."
+  },
+  "confidence_uplift_requirements": [
+    "EVAP smoke test results with leak location",
+    "O2 sensor waveform capture during cruise",
+    "Freeze-frame data for P0420 event"
+  ],
+  "customer_readiness_check": {
+    "verdict": "needs_revision",
+    "short_reason": "Pending EVAP and catalyst tests before final quoting."
+  },
+  "meta": {
+    "model": "gemini-2.0-flash-exp",
+    "version": "v2-json",
+    "generated_at_iso": "2025-10-15T19:00:00Z"
+  }
+}

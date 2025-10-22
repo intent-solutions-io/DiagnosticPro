@@ -1,13 +1,14 @@
-# DiagnosticPro v1.0.0
+# DiagnosticPro v2.0.0
 
-**Professional AI-powered equipment diagnostics with proprietary 14-section analysis framework.**
+**Professional AI-powered equipment diagnostics with proprietary 15-section analysis framework.**
 
 ✅ **LIVE AT [diagnosticpro.io](https://diagnosticpro.io)** — Production ready since September 2025
 
 From vehicles to heavy machinery to electronics, get comprehensive diagnostic analysis with conversation coaching, shop interrogation strategies, and scam protection for just $4.99.
 
 ## What you get
-- **Comprehensive 2000+ word diagnostic analysis** using proprietary 14-section framework
+- **Comprehensive 2000+ word diagnostic analysis** using proprietary 15-section framework
+- **Root Cause Analysis** - Critical diagnostic component (v2.0 addition)
 - **Conversation scripts** for professional shop interactions
 - **Technical questions** to expose mechanic incompetence
 - **Ripoff detection** and scam protection strategies
@@ -43,10 +44,18 @@ flowchart LR
 
 ## Current Status
 
-✅ **Production**: v1.0.0 fully operational at https://diagnosticpro.io
-⏸️ **In Development**: Photo upload system (on branch `feature/photo-upload-identity-system`)
+✅ **Production**: v2.0.0 fully operational at https://diagnosticpro.io
+🎯 **Major Fix**: PDF generation completely rebuilt (2025-10-20)
 
-### Recent Changes (2025-10-14)
+### v2.0.0 Release (2025-10-20)
+- **🐛 Fixed**: Eliminated 24 blank pages issue (was adding 2 blank pages per content page)
+- **✨ Added**: Root Cause Analysis section (15th critical section)
+- **🎨 Improved**: Professional typography with proper bullet indentation
+- **🛡️ Added**: Comprehensive PDF validation system
+- **🚀 Performance**: Reduced PDF size from 36 pages to 12-15 pages
+- **📊 Quality**: Production-grade error handling and monitoring
+
+### Previous Changes (2025-10-14)
 - **Infrastructure Deployed**: GCS buckets, Pub/Sub topics, BigQuery tables added (unused, $0 cost)
 - **Code Development**: Complete photo upload system (~5,000 lines) on feature branch
 - **Status**: Rolled back - payment flow needs design before deployment

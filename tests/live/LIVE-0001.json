@@ -1,0 +1,16 @@
+{
+  "submissionId": "LIVE-0001-F150-MISFIRE",
+  "customer": {
+    "email": "marshall@example.com",
+    "name": "Marshall Thompson"
+  },
+  "equipment": {
+    "type": "vehicle",
+    "make": "Ford",
+    "model": "F-150",
+    "year": "2006"
+  },
+  "symptoms": "Truck starts rough and shakes at idle. Check engine light is on solid. Sometimes feels like it's going to stall at stop lights. Losing power when accelerating on highway. Gas mileage has dropped significantly over last few weeks. Rough idle is worst when engine is cold, improves slightly when warmed up but still noticeable.",
+  "codes": ["P0301", "P0174"],
+  "confidence_threshold_pct": 85
+}

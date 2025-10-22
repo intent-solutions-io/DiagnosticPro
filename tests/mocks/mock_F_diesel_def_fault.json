@@ -1,0 +1,16 @@
+{
+  "submissionId": "diag_mock_F",
+  "customer": {
+    "email": "logistics@example.com",
+    "name": "Logistics Dispatch"
+  },
+  "equipment": {
+    "type": "vehicle",
+    "make": "Freightliner",
+    "model": "Cascadia",
+    "year": "2017"
+  },
+  "symptoms": "DEF warning countdown active, limited to 55 mph, exhaust smells acrid.",
+  "codes": ["SPN3364 FMI17", "SPN3556 FMI18"],
+  "notes": "DEF level 60%. Tank recently topped with bulk fluid. Ambient temps near freezing overnight."
+}

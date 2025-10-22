@@ -1,0 +1,83 @@
+{
+  "submissionId": "diag_mock_F",
+  "customer": {
+    "email": "logistics@example.com",
+    "name": "Logistics Dispatch"
+  },
+  "equipment": {
+    "type": "vehicle",
+    "make": "Freightliner",
+    "model": "Cascadia",
+    "year": "2017"
+  },
+  "symptoms": "DEF warning countdown active, limited speed, acrid exhaust odor.",
+  "codes": ["SPN3364 FMI17", "SPN3556 FMI18"],
+  "root_cause_hypotheses": [
+    {
+      "hypothesis": "Contaminated DEF causing SCR efficiency drop",
+      "evidence": "Bulk DEF fill near freezing, immediate countdown, common for contaminated fluid.",
+      "likelihood": "high"
+    },
+    {
+      "hypothesis": "Failed NOx sensor upstream of catalyst",
+      "evidence": "SPN3364 often paired with aging sensors on DD15.",
+      "likelihood": "medium"
+    },
+    {
+      "hypothesis": "Crystallized DEF dosing valve",
+      "evidence": "Freezing temps and poor DEF quality encourage deposit buildup.",
+      "likelihood": "medium"
+    }
+  ],
+  "most_likely_cause": "Contaminated DEF reducing SCR conversion efficiency.",
+  "recommended_actions": [
+    {
+      "step": "Test DEF quality with refractometer and replace if outside spec",
+      "why": "Confirms contamination and resets countdown cause."
+    },
+    {
+      "step": "Perform forced regeneration after DEF replacement",
+      "why": "Burns off deposits and resets SCR efficiency monitors."
+    },
+    {
+      "step": "Verify NOx sensor outputs with diagnostic tool",
+      "why": "Ensures sensors respond correctly post-fluid change."
+    }
+  ],
+  "tools_parts": [
+    "DEF refractometer",
+    "OEM-spec DEF fluid",
+    "Diagnostic laptop with Detroit Diesel software",
+    "Replacement NOx sensor (if readings fail)"
+  ],
+  "safety_notes": [
+    "Wear gloves and eye protection when handling DEF.",
+    "Perform regeneration outdoors or with exhaust extraction."
+  ],
+  "estimated_cost_range_usd": {
+    "low": 450,
+    "high": 1200
+  },
+  "estimated_time_hours": 4.5,
+  "warranty_or_tsb_refs": [
+    "Detroit Diesel SF-17-60: DEF contamination diagnostics"
+  ],
+  "disclaimers": [
+    "SCR countdown may require dealer reset if fault persists after repairs."
+  ],
+  "confidence": {
+    "score_pct": 86,
+    "threshold_pct": 85,
+    "assessment": "DEF quality plus cold soak aligns with current countdown fault."
+  },
+  "confidence_uplift_requirements": [],
+  "customer_readiness_check": {
+    "verdict": "ready_for_customer",
+    "short_reason": "Plan provides tests, safety, and estimates for fleet maintenance."
+  },
+  "meta": {
+    "model": "gemini-2.0-flash-exp",
+    "version": "v2-json",
+    "generated_at_iso": "2025-10-15T19:00:00Z"
+  }
+}

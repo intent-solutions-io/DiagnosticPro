@@ -1,0 +1,16 @@
+{
+  "submissionId": "diag_mock_B",
+  "customer": {
+    "email": "owner.b@example.com",
+    "name": "Jamie Chen"
+  },
+  "equipment": {
+    "type": "vehicle",
+    "make": "Honda",
+    "model": "Civic",
+    "year": "2009"
+  },
+  "symptoms": "Occasional crank-no-start, but runs fine once started. No warning lamps.",
+  "codes": [],
+  "notes": "Customer states battery and starter new, but alternator test inconclusive. Weather related? happens randomly in rain."
+}

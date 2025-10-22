@@ -1,0 +1,16 @@
+{
+  "submissionId": "diag_mock_H",
+  "customer": {
+    "email": "diy.forum@example.com",
+    "name": "DIY Forum Poster"
+  },
+  "equipment": {
+    "type": "vehicle",
+    "make": "Subaru",
+    "model": "Outback",
+    "year": "2012"
+  },
+  "symptoms": "Owner wrote a multi-paragraph forum post about intermittent stumble, random CEL, weird noises.",
+  "codes": ["P0420", "P0456"],
+  "notes": "Long narrative: swapped plugs, cleaned throttle body, replaced gas cap twice, different fuel brands, log after log describing ambient temps, trips to mountains, mentions possible rodent damage, includes copy-pasted advice from other users about O2 sensors, catalytic converter, evap leaks, smell of exhaust when parked, references to unrelated suspension clunks, includes vehicle history of minor accident, battery replaced last winter, more speculation about spark knock, question about ECU reflash. Overall extremely verbose."
+}
