@@ -1,0 +1,17 @@
+{
+  "submissionId": "LIVE-0002-HVAC-COMPRESSOR",
+  "customer": {
+    "email": "sarah.mitchell@example.com",
+    "name": "Sarah Mitchell"
+  },
+  "equipment": {
+    "type": "hvac",
+    "make": "Carrier",
+    "model": "Infinity 18",
+    "year": "2019"
+  },
+  "symptoms": "Central AC not cooling properly. Unit runs continuously but house temperature won't drop below 78°F even when set to 72°F. Outside condenser unit is running but doesn't seem as loud as usual. No ice buildup on lines. System was serviced 6 months ago with refrigerant top-off. Energy bills have increased 30% over last 2 months despite no usage changes.",
+  "codes": ["E1", "COMP_FAULT"],
+  "notes": "Technician last visit said refrigerant was 'a bit low' but didn't explain why. No visible leaks found. Filter replaced monthly.",
+  "confidence_threshold_pct": 85
+}

@@ -1,0 +1,84 @@
+{
+  "submissionId": "diag_mock_A",
+  "customer": {
+    "email": "driver.a@example.com",
+    "name": "Alex Rivera"
+  },
+  "equipment": {
+    "type": "vehicle",
+    "make": "Toyota",
+    "model": "Camry",
+    "year": "2018"
+  },
+  "symptoms": "MIL on with reduced power and rough idle after cold start.",
+  "codes": ["P0301", "P0171"],
+  "root_cause_hypotheses": [
+    {
+      "hypothesis": "Cylinder 1 ignition coil weak under load",
+      "evidence": "Repeat misfire code on cyl 1 and lean trim spike after cold soak.",
+      "likelihood": "high"
+    },
+    {
+      "hypothesis": "Vacuum leak near intake manifold gasket",
+      "evidence": "Lean bank readings, whistle noise on snap throttle.",
+      "likelihood": "medium"
+    },
+    {
+      "hypothesis": "Low fuel pressure from aging pump",
+      "evidence": "Lean on both banks at WOT, pump original.",
+      "likelihood": "low"
+    }
+  ],
+  "most_likely_cause": "Failing cylinder 1 coil causing misfire and lean adaptation.",
+  "recommended_actions": [
+    {
+      "step": "Scope primary and secondary patterns on cylinder 1 coil",
+      "why": "Confirms coil saturation and spark duration before parts replacement."
+    },
+    {
+      "step": "Swap cylinder 1 coil with cylinder 2 and road test",
+      "why": "Verifies if misfire follows the component."
+    },
+    {
+      "step": "Inspect intake manifold gasket for leaks with smoke",
+      "why": "Rules out unmetered air contributing to lean codes."
+    }
+  ],
+  "tools_parts": [
+    "Oscilloscope with ignition probe",
+    "Toyota coil assembly 90919-02258",
+    "Smoke machine",
+    "Intake manifold gasket kit"
+  ],
+  "safety_notes": [
+    "Disconnect battery before coil removal to avoid secondary arc.",
+    "Use fume extraction when performing smoke test."
+  ],
+  "estimated_cost_range_usd": {
+    "low": 320,
+    "high": 520
+  },
+  "estimated_time_hours": 2.5,
+  "warranty_or_tsb_refs": [
+    "Toyota TSB-0094-18 (cold start misfire on A25A engines)"
+  ],
+  "disclaimers": [
+    "Costs are estimates; confirm with a licensed technician.",
+    "Further testing may revise the repair plan."
+  ],
+  "confidence": {
+    "score_pct": 88,
+    "threshold_pct": 85,
+    "assessment": "Data aligns with ignition failure pattern; coil testing should verify."
+  },
+  "confidence_uplift_requirements": [],
+  "customer_readiness_check": {
+    "verdict": "ready_for_customer",
+    "short_reason": "Plan is actionable with safety guidance and clear tests."
+  },
+  "meta": {
+    "model": "gemini-2.0-flash-exp",
+    "version": "v2-json",
+    "generated_at_iso": "2025-10-15T19:00:00Z"
+  }
+}

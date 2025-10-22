@@ -1,0 +1,16 @@
+{
+  "submissionId": "diag_mock_C",
+  "customer": {
+    "email": "facility.ops@example.com",
+    "name": "Facility Ops"
+  },
+  "equipment": {
+    "type": "generator",
+    "make": "Cummins",
+    "model": "RS20A",
+    "year": "2016"
+  },
+  "symptoms": "Runs 15 minutes then stalls under load; restarts after cooling for 30 minutes.",
+  "codes": ["ECU-1425"],
+  "notes": "Oil level correct. Cooling vents clear. Fuel filter changed last season. Occurs during summer peak tests."
+}

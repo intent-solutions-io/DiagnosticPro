@@ -1,0 +1,83 @@
+{
+  "submissionId": "diag_mock_G",
+  "customer": {
+    "email": "maker.space@example.com",
+    "name": "Makerspace Lead"
+  },
+  "equipment": {
+    "type": "other",
+    "make": null,
+    "model": null,
+    "year": null
+  },
+  "symptoms": "CNC router stalls mid-job without alarms and resumes after reboot.",
+  "codes": [],
+  "root_cause_hypotheses": [
+    {
+      "hypothesis": "Controller overheating due to failed cooling fan",
+      "evidence": "Operators mention noisy fan and humidity, typical for fan failure.",
+      "likelihood": "medium"
+    },
+    {
+      "hypothesis": "Stepper driver firmware hang",
+      "evidence": "Reboot clears issue; lack of logs prevents confirmation.",
+      "likelihood": "low"
+    },
+    {
+      "hypothesis": "Line voltage sag during heavy cuts",
+      "evidence": "Shared circuits in workshop could drop voltage; needs measurement.",
+      "likelihood": "low"
+    }
+  ],
+  "most_likely_cause": "Controller thermal shutdown from degraded cooling fan.",
+  "recommended_actions": [
+    {
+      "step": "Measure controller enclosure temperature during 30-minute job",
+      "why": "Verifies overheating condition causing shutdown."
+    },
+    {
+      "step": "Replace or service controller cooling fan and clean vents",
+      "why": "Restores airflow and reduces thermal stress."
+    },
+    {
+      "step": "Install data logging for spindle load and line voltage",
+      "why": "Captures evidence if stalls persist."
+    }
+  ],
+  "tools_parts": [
+    "IR thermometer",
+    "Replacement 120mm cooling fan",
+    "Compressed air and brush kit"
+  ],
+  "safety_notes": [
+    "Disconnect mains power before servicing control cabinet."
+  ],
+  "estimated_cost_range_usd": {
+    "low": 90,
+    "high": 260
+  },
+  "estimated_time_hours": 1.8,
+  "warranty_or_tsb_refs": [],
+  "disclaimers": [
+    "Insufficient logs; implement monitoring to confirm root cause."
+  ],
+  "confidence": {
+    "score_pct": 58,
+    "threshold_pct": 85,
+    "assessment": "Hypothesis fits but lacks temperature or voltage data."
+  },
+  "confidence_uplift_requirements": [
+    "Controller temperature reading at stall",
+    "Line voltage log during operation",
+    "Fan RPM measurement"
+  ],
+  "customer_readiness_check": {
+    "verdict": "needs_revision",
+    "short_reason": "Monitoring data required before final recommendation."
+  },
+  "meta": {
+    "model": "gemini-2.0-flash-exp",
+    "version": "v2-json",
+    "generated_at_iso": "2025-10-15T19:00:00Z"
+  }
+}

@@ -1,0 +1,84 @@
+{
+  "submissionId": "diag_mock_D",
+  "customer": {
+    "email": "tenant.services@example.com",
+    "name": "Tenant Services"
+  },
+  "equipment": {
+    "type": "hvac",
+    "make": "Daikin",
+    "model": "SkyAir",
+    "year": "2019"
+  },
+  "symptoms": "Supply air only 5°F below return and compressor short cycling in high ambient conditions.",
+  "codes": ["CH21"],
+  "root_cause_hypotheses": [
+    {
+      "hypothesis": "Low refrigerant charge from small leak",
+      "evidence": "CH21 indicates low pressure, poor delta-T, dusty outdoor coil exacerbating.",
+      "likelihood": "high"
+    },
+    {
+      "hypothesis": "Restricted metering device",
+      "evidence": "Noisy expansion valve reported, can mimic low charge symptoms.",
+      "likelihood": "medium"
+    },
+    {
+      "hypothesis": "Faulty indoor fan speed control",
+      "evidence": "Excess airflow reduces coil contact, but not confirmed.",
+      "likelihood": "low"
+    }
+  ],
+  "most_likely_cause": "Refrigerant charge loss causing low suction pressure and short cycling.",
+  "recommended_actions": [
+    {
+      "step": "Recover refrigerant, weigh charge, and leak-check with nitrogen",
+      "why": "Confirms low charge and identifies leak source."
+    },
+    {
+      "step": "Clean outdoor coil with manufacturer-approved solution",
+      "why": "Restores heat exchange and reduces head pressure."
+    },
+    {
+      "step": "Charge to factory weight and verify superheat/subcool values",
+      "why": "Ensures system performance within spec after repairs."
+    }
+  ],
+  "tools_parts": [
+    "Recovery machine and cylinder",
+    "Nitrogen regulator",
+    "Electronic leak detector",
+    "Daikin-approved coil cleaner",
+    "R-410A refrigerant"
+  ],
+  "safety_notes": [
+    "Wear eye protection and gloves when handling refrigerant.",
+    "Ventilate area during coil cleaning."
+  ],
+  "estimated_cost_range_usd": {
+    "low": 650,
+    "high": 1150
+  },
+  "estimated_time_hours": 4.0,
+  "warranty_or_tsb_refs": [
+    "Daikin Service Bulletin SB-DAI-CH21-2020"
+  ],
+  "disclaimers": [
+    "EPA Section 608 certification required for refrigerant handling."
+  ],
+  "confidence": {
+    "score_pct": 87,
+    "threshold_pct": 85,
+    "assessment": "Symptoms align with low charge; leak verification pending."
+  },
+  "confidence_uplift_requirements": [],
+  "customer_readiness_check": {
+    "verdict": "ready_for_customer",
+    "short_reason": "Action plan and safety steps are clear for HVAC technician."
+  },
+  "meta": {
+    "model": "gemini-2.0-flash-exp",
+    "version": "v2-json",
+    "generated_at_iso": "2025-10-15T19:00:00Z"
+  }
+}

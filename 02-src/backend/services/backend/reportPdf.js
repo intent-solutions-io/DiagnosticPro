@@ -9,6 +9,11 @@ const fs = require("fs");
  * @param {string} filePath    // output path (e.g., "/tmp/report.pdf")
  */
 function generateDiagnosticProPDF(submission, analysis = {}, filePath = "/tmp/report.pdf") {
+  // DEBUG: Log analysis structure to identify blank page source
+  const analysisSections = Object.keys(analysis).filter(k => k !== 'fullAnalysis' && k !== 'detectedCodes');
+  console.log(`🔍 Analysis sections provided: ${analysisSections.length}`);
+  console.log(`   Sections: ${analysisSections.join(', ')}`);
+
   const doc = new PDFDocument({
     margin: 54,
     size: "LETTER",
@@ -16,6 +21,22 @@ function generateDiagnosticProPDF(submission, analysis = {}, filePath = "/tmp/re
   });
   const stream = fs.createWriteStream(filePath);
   doc.pipe(stream);
+
+  // CRITICAL DEBUG: Track EVERY page addition
+  let pageAddCounter = 0;
+  const pageTracking = [];
+  const originalAddPage = doc.addPage.bind(doc);
+  doc.addPage = function(options) {
+    pageAddCounter++;
+    const stack = new Error().stack.split('\n')[2]; // Get caller
+    pageTracking.push({
+      pageNum: pageAddCounter,
+      caller: stack.trim(),
+      timestamp: Date.now()
+    });
+    console.log(`📄 Page ${pageAddCounter} added by: ${stack.trim()}`);
+    return originalAddPage(options);
+  };
 
   // ---------- REGISTER MONOSPACE FONTS ----------
   // Use relative paths from current script location
@@ -28,8 +49,9 @@ function generateDiagnosticProPDF(submission, analysis = {}, filePath = "/tmp/re
   // ---------- HELPERS ----------
   const today = new Date().toLocaleDateString();
 
-  const h1 = (t) => {
-    doc.addPage();
+  const h1 = (t, addPage = true) => {
+    if (addPage) doc.addPage();
+    else doc.moveDown(2);
     doc.font("IBMMonoBold").fontSize(18).fillColor("black").text(t, { align: "center" });
     doc.moveDown(1);
     doc.font("IBMMono");
@@ -40,8 +62,41 @@ function generateDiagnosticProPDF(submission, analysis = {}, filePath = "/tmp/re
     doc.moveDown(0.3);
     doc.font("IBMMono");
   };
-  const p  = (t) => { if (t) doc.fontSize(11).fillColor("black").text(t, { align: "left", paragraphGap: 8 }); };
-  const bullets = (arr) => { if (arr?.length) doc.fontSize(11).list(arr, { bulletRadius: 2 }).moveDown(0.4); };
+  const p  = (t) => {
+    if (!t) return;
+    // Clean up excessive newlines (replace multiple newlines with max 2)
+    const cleaned = String(t).replace(/\n{3,}/g, '\n\n').trim();
+    if (cleaned) {
+      const pagesBefore = doc.bufferedPageRange().count;
+      doc.fontSize(11).fillColor("black").text(cleaned, {
+        align: "left",
+        paragraphGap: 4,
+        continued: false // IMPORTANT: Don't continue on new pages automatically
+      });
+      const pagesAfter = doc.bufferedPageRange().count;
+      if (pagesAfter > pagesBefore) {
+        console.log(`⚠️ Auto-pagination: p() created ${pagesAfter - pagesBefore} extra pages for text: ${cleaned.substring(0, 50)}...`);
+      }
+    }
+  };
+  const bullets = (arr) => {
+    if (!arr?.length) return;
+    // Clean each bullet item of excessive whitespace
+    const cleaned = arr.map(item => String(item).replace(/\n{2,}/g, '\n').trim()).filter(Boolean);
+    if (cleaned.length) {
+      const pagesBefore = doc.bufferedPageRange().count;
+      doc.fontSize(11).list(cleaned, {
+        bulletRadius: 2,
+        bulletIndent: 10,
+        textIndent: 15,
+        continued: false // IMPORTANT: Don't auto-continue on new pages
+      }).moveDown(0.3);
+      const pagesAfter = doc.bufferedPageRange().count;
+      if (pagesAfter > pagesBefore) {
+        console.log(`⚠️ Auto-pagination: bullets() created ${pagesAfter - pagesBefore} extra pages for ${cleaned.length} items`);
+      }
+    }
+  };
   const ensureArray = (v) => Array.isArray(v) ? v : (v ? [String(v)] : []);
 
   // ---------- HEADER + FOOTER STAMP ----------
@@ -78,19 +133,75 @@ function generateDiagnosticProPDF(submission, analysis = {}, filePath = "/tmp/re
   };
 
   // ---------- TITLE PAGE ----------
-  doc.font("IBMMonoBold").fontSize(22).text("DiagnosticPro AI Analysis Report", { align: "center" });
-  doc.moveDown(2);
-  doc.font("IBMMono").fontSize(14).text(`Date: ${today}`, { align: "center" });
-  doc.moveDown(4);
-  doc.fontSize(11).text(
-    "Proprietary 14-Section Analysis Framework v1.3\n\n" +
-    "This report is generated using DiagnosticPro's AI system. It equips customers with professional-grade insights, " +
-    "shop interrogation tactics, and fraud-protection strategies. The structure below is preserved verbatim; formatting only.",
-    { align: "center", width: 430 }
-  );
+  // Calculate vertical centering (page height is 792 points for LETTER)
+  const pageHeight = doc.page.height;
+  const pageWidth = doc.page.width;
+  const margin = 54;
+  const contentWidth = pageWidth - (margin * 2);
+  const startY = (pageHeight / 2) - 120; // Center vertically
+
+  doc.y = startY;
+
+  // Title - large, bold, centered
+  doc.font("IBMMonoBold").fontSize(26)
+    .text("DiagnosticPro AI Analysis Report", margin, doc.y, {
+      width: contentWidth,
+      align: "center"
+    });
+
+  doc.moveDown(2.5);
+
+  // Date - centered
+  doc.font("IBMMono").fontSize(14)
+    .text(`Date: ${today}`, margin, doc.y, {
+      width: contentWidth,
+      align: "center"
+    });
+
+  doc.moveDown(0.8);
+
+  // Report ID - centered
+  doc.fontSize(12)
+    .text("Report ID: " + (submission?.id || "N/A"), margin, doc.y, {
+      width: contentWidth,
+      align: "center"
+    });
+
+  doc.moveDown(3);
+
+  // Description block - split into centered lines for clean presentation
+  doc.fontSize(11)
+    .text(
+      "Proprietary 15-Section Analysis Framework v1.3",
+      margin,
+      doc.y,
+      {
+        width: contentWidth,
+        align: "center"
+      }
+    );
+
+  doc.moveDown(1.5);
+
+  // Split description into shorter lines that center cleanly
+  doc.fontSize(10);
+  doc.text("This report is generated using DiagnosticPro's AI system.", margin, doc.y, {
+    width: contentWidth,
+    align: "center"
+  });
+  doc.moveDown(0.5);
+  doc.text("It equips customers with professional-grade insights,", margin, doc.y, {
+    width: contentWidth,
+    align: "center"
+  });
+  doc.moveDown(0.5);
+  doc.text("shop interrogation tactics, and fraud-protection strategies.", margin, doc.y, {
+    width: contentWidth,
+    align: "center"
+  });
 
   // ---------- VEHICLE + CUSTOMER INFO ----------
-  h1("Submission Summary");
+  h1("Submission Summary", true); // New page for submission summary
   h2("Vehicle Information");
   bullets([
     `Make: ${submission?.make ?? "N/A"}`,
@@ -120,7 +231,7 @@ function generateDiagnosticProPDF(submission, analysis = {}, filePath = "/tmp/re
   else p("No error codes provided.");
 
   // ---------- 14-SECTION FRAMEWORK ----------
-  h1("Comprehensive AI Diagnostic Analysis");
+  h1("Comprehensive AI Diagnostic Analysis", false); // Continue on same page, just add spacing
 
   // 1. PRIMARY DIAGNOSIS
   h2("1. PRIMARY DIAGNOSIS");
@@ -336,7 +447,7 @@ function generateDiagnosticProPDF(submission, analysis = {}, filePath = "/tmp/re
   }
 
   // ---------- CUSTOMER DATA VARIABLES USED ----------
-  h1("Customer Data Variables Used");
+  h1("Customer Data Variables Used", true); // New page for data summary
   doc.fontSize(10).text(
     [
       `Vehicle: ${[submission?.make, submission?.model, submission?.year].filter(Boolean).join(" ") || "N/A"}`,
@@ -361,7 +472,7 @@ function generateDiagnosticProPDF(submission, analysis = {}, filePath = "/tmp/re
   );
 
   // ---------- DISCLAIMER PAGE ----------
-  h1("Disclaimer & Legal Notice");
+  h1("Disclaimer & Legal Notice", true); // New page for legal disclaimer
   doc.fontSize(10).text(
 `This report is generated by the DiagnosticPro AI platform, built by intent solutions io.
 It is intended strictly for informational purposes and consumer protection guidance.
@@ -381,6 +492,31 @@ Contact & Support:
 
   // ---------- FINALIZE ----------
   addHeaderFooter();
+
+  // DEBUG: Log page count before finalizing
+  const pageCount = doc.bufferedPageRange().count;
+  console.log(`\n🔴 CRITICAL PDF METRICS 🔴`);
+  console.log(`📄 Total pages in PDF: ${pageCount}`);
+  console.log(`📄 Manual addPage() calls: ${pageAddCounter}`);
+  console.log(`📄 Auto-created pages: ${pageCount - pageAddCounter}`);
+
+  if (pageCount > 20) {
+    console.log(`\n⚠️  EXCESSIVE PAGES DETECTED! Expected ~12-15, got ${pageCount}`);
+    console.log(`🔍 Page addition trace:`);
+    pageTracking.forEach(p => {
+      console.log(`   Page ${p.pageNum}: ${p.caller}`);
+    });
+  }
+
+  // Check for 2:1 ratio bug
+  const expectedPages = 12; // Approximate expected
+  if (pageCount >= expectedPages * 2) {
+    console.log(`\n🚨 2:1 RATIO BUG DETECTED!`);
+    console.log(`   Expected: ~${expectedPages} pages`);
+    console.log(`   Actual: ${pageCount} pages`);
+    console.log(`   Ratio: ${(pageCount / expectedPages).toFixed(1)}:1`);
+  }
+
   doc.end();
   return stream; // listen for 'finish' on the caller side
 }

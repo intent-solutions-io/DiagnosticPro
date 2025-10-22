@@ -6,7 +6,8 @@ const { GoogleAuth } = require('google-auth-library');
 const stripe = require('stripe');
 const crypto = require('crypto');
 const PDFDocument = require('pdfkit');
-const { generateDiagnosticProPDF } = require('./reportPdf.js');
+// Using production-grade PDF generator with validation and proper pagination
+const { generateDiagnosticProPDF } = require('./reportPdfProduction.js');
 
 // Structured logging function
 function logStructured(data) {

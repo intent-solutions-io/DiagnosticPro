@@ -1,0 +1,16 @@
+{
+  "submissionId": "diag_regress_oversize",
+  "customer": {
+    "email": "stress@example.com",
+    "name": "Stress Case"
+  },
+  "equipment": {
+    "type": "vehicle",
+    "make": "Ford",
+    "model": "F-150",
+    "year": "2011"
+  },
+  "symptoms": "Customer pasted extremely long history and expects concise summary. See notes for volume.",
+  "codes": ["P0300", "P0171", "P0174"],
+  "notes": "This is a deliberately lengthy narrative intended to mimic the 33-page overflow case. The customer describes every maintenance event, ambient temperature, mechanic opinion, road trip, and personal theory about the intermittent misfire. They list spark plugs changed three times, coils swapped between cylinders, fuel injector cleaner brands, and multiple forum quotes. They mention sea level trips, mountain passes, towing a trailer, swapping tires, and smelling fuel in the cabin. They also paste screenshots of freeze-frame data, a partial shop invoice, and commentary about unrelated suspension noises. The narrative continues with extended paragraphs about weather patterns, fuel station quality, oil change intervals, and smartphone OBD logs. They debate catalytic converter efficiency, evap leaks, ECU reflash rumors, and battery voltage graphs. This text continues solely to stress pagination limits without adding new diagnostic value. "
+}

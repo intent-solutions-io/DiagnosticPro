@@ -1,4 +1,40 @@
-# [Unreleased] - Photo Upload System (Feature Branch)
+# Changelog
+
+All notable changes to DiagnosticPro will be documented in this file.
+
+## [2.0.0] - 2025-10-20
+
+### 🎯 Major PDF Generation Overhaul
+
+This release completely rebuilds the PDF generation system to fix critical issues affecting every customer report.
+
+### Added
+- **Root Cause Analysis Section** - Added as 15th critical section in diagnostic framework
+- **PDF Validation System** - Comprehensive validation before customer delivery
+  - Section presence validation
+  - Content quality checks
+  - Blank page detection
+  - Excessive whitespace removal
+- **Typography Manager** - Professional document formatting
+  - Proper bullet point indentation with hanging text
+  - Orphan/widow control
+  - Controlled pagination
+- **Diagnostic Report Contract** - Formal specification for AI responses
+
+### Fixed
+- **Critical: 2:1 Page Ratio Bug** - Reports were generating 36 pages instead of 12
+  - Root cause: PDFKit auto-pagination was creating 2 blank pages per content page
+  - Solution: Disabled auto-pagination with `continued: false` on all text calls
+- **Missing Root Cause Analysis** - Section was not being generated or included
+- **Typography Issues** - Improper bullet formatting and text wrapping
+- **Excessive Blank Pages** - Eliminated 24 blank pages at end of reports
+
+### Changed
+- PDF generator moved from `reportPdf.js` to `reportPdfProduction.js`
+- Implemented controlled page creation with `autoFirstPage: false`
+- Reduced average PDF size from 36 pages to 12-15 pages
+
+## [Unreleased] - Photo Upload System (Feature Branch)
 
 **Branch**: `feature/photo-upload-identity-system`
 **Status**: ⏸️ PAUSED - Infrastructure deployed, code rolled back

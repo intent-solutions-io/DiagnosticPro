@@ -1,0 +1,87 @@
+{
+  "submissionId": "diag_mock_E",
+  "customer": {
+    "email": "fleet.safety@example.com",
+    "name": "Fleet Safety Desk"
+  },
+  "equipment": {
+    "type": "vehicle",
+    "make": "Ford",
+    "model": "Transit",
+    "year": "2021"
+  },
+  "symptoms": "Dash cluster and warning lamps flicker with electrical smell near steering column.",
+  "codes": ["U0100", "B1234"],
+  "root_cause_hypotheses": [
+    {
+      "hypothesis": "Aftermarket dash camera tapping improper fuse causing harness overheating",
+      "evidence": "Odor and flicker aligned with accessory install on shuttle fleet.",
+      "likelihood": "high"
+    },
+    {
+      "hypothesis": "Loose ground at body control module",
+      "evidence": "U0100 communication losses often linked to body grounds.",
+      "likelihood": "medium"
+    },
+    {
+      "hypothesis": "Failing steering column clockspring shorting circuits",
+      "evidence": "Airbag lamp flash plus steering column smell, but symptoms intermittent.",
+      "likelihood": "medium"
+    }
+  ],
+  "most_likely_cause": "Improper accessory wiring overheating BCM feed circuit.",
+  "recommended_actions": [
+    {
+      "step": "Disconnect aftermarket accessories and inspect fuse tap wiring",
+      "why": "Removes added load and reveals heat damage."
+    },
+    {
+      "step": "Perform voltage drop test on BCM grounds under load",
+      "why": "Confirms integrity of critical grounds causing U0100."
+    },
+    {
+      "step": "Inspect clockspring and column harness for melted insulation",
+      "why": "Addresses safety-critical airbag wiring."
+    }
+  ],
+  "tools_parts": [
+    "Infrared thermometer",
+    "Wiring repair kit",
+    "OEM clockspring assembly",
+    "Digital multimeter"
+  ],
+  "safety_notes": [
+    "Disconnect battery and wait 3 minutes before touching airbag circuits.",
+    "Do not operate vehicle until short is resolved."
+  ],
+  "estimated_cost_range_usd": {
+    "low": 380,
+    "high": 940
+  },
+  "estimated_time_hours": 3.0,
+  "warranty_or_tsb_refs": [
+    "Ford SSM 50115 (accessory wiring causing BCM faults)"
+  ],
+  "disclaimers": [
+    "Vehicle should remain out of service until wiring passes insulation test."
+  ],
+  "confidence": {
+    "score_pct": 74,
+    "threshold_pct": 85,
+    "assessment": "Electrical data incomplete; accessory wiring highly suspect."
+  },
+  "confidence_uplift_requirements": [
+    "Thermal image of fuse panel during symptom",
+    "Voltage drop readings on BCM grounds",
+    "Airbag circuit resistance check"
+  ],
+  "customer_readiness_check": {
+    "verdict": "needs_revision",
+    "short_reason": "Must gather electrical measurements before clearance."
+  },
+  "meta": {
+    "model": "gemini-2.0-flash-exp",
+    "version": "v2-json",
+    "generated_at_iso": "2025-10-15T19:00:00Z"
+  }
+}

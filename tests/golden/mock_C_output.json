@@ -1,0 +1,85 @@
+{
+  "submissionId": "diag_mock_C",
+  "customer": {
+    "email": "facility.ops@example.com",
+    "name": "Facility Ops"
+  },
+  "equipment": {
+    "type": "generator",
+    "make": "Cummins",
+    "model": "RS20A",
+    "year": "2016"
+  },
+  "symptoms": "Generator stalls after 15 minutes under load, restarts after cooling period.",
+  "codes": ["ECU-1425"],
+  "root_cause_hypotheses": [
+    {
+      "hypothesis": "Fuel vapor lock from failed electric lift pump",
+      "evidence": "Heat soak timing, known issue on RS20A with pump overheating.",
+      "likelihood": "medium"
+    },
+    {
+      "hypothesis": "Overheating inverter module triggering protective shutdown",
+      "evidence": "Occurs during summer load tests, airflow marginal.",
+      "likelihood": "medium"
+    },
+    {
+      "hypothesis": "Faulty coolant temperature sensor reporting false high reading",
+      "evidence": "Sensor shares harness with ECU-1425 code, would explain restart after cool-down.",
+      "likelihood": "low"
+    }
+  ],
+  "most_likely_cause": "Lift pump overheating and losing pressure during extended run.",
+  "recommended_actions": [
+    {
+      "step": "Monitor fuel pressure at rail during 20-minute load test",
+      "why": "Confirms loss of pressure coinciding with stall."
+    },
+    {
+      "step": "Infrared scan of inverter cabinet and coolant routing",
+      "why": "Identifies localized overheating or blocked airflow."
+    },
+    {
+      "step": "Inspect lift pump wiring and replace with updated Cummins kit if pressure drops",
+      "why": "Known corrective action for ECU-1425 on this model."
+    }
+  ],
+  "tools_parts": [
+    "Fuel pressure gauge with T-fitting",
+    "Infrared thermometer",
+    "Cummins lift pump retrofit kit"
+  ],
+  "safety_notes": [
+    "Lockout/tagout generator before disassembly.",
+    "Use fire extinguisher nearby when working on fuel system."
+  ],
+  "estimated_cost_range_usd": {
+    "low": 450,
+    "high": 980
+  },
+  "estimated_time_hours": 3.5,
+  "warranty_or_tsb_refs": [
+    "Cummins RS20A Field Campaign FC-19-07"
+  ],
+  "disclaimers": [
+    "Run tests with facility load bank to replicate failure safely."
+  ],
+  "confidence": {
+    "score_pct": 78,
+    "threshold_pct": 85,
+    "assessment": "Pattern fits lift pump heat failure but needs live fuel data."
+  },
+  "confidence_uplift_requirements": [
+    "Fuel pressure trace during shutdown event",
+    "Inverter temperature reading at time of stall"
+  ],
+  "customer_readiness_check": {
+    "verdict": "needs_revision",
+    "short_reason": "Provide fuel pressure log to finalize repair direction."
+  },
+  "meta": {
+    "model": "gemini-2.0-flash-exp",
+    "version": "v2-json",
+    "generated_at_iso": "2025-10-15T19:00:00Z"
+  }
+}
