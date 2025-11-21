@@ -4,10 +4,11 @@ const axios = require('axios');
 
 const firestore = new Firestore();
 
-module.exports = async (req, res) => {
+module.exports = async (req, res, secrets = {}) => {
   try {
     const sig = req.headers['stripe-signature'];
-    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+    // Use secrets parameter first, fallback to environment variable
+    const webhookSecret = secrets.STRIPE_WEBHOOK_SECRET || process.env.STRIPE_WEBHOOK_SECRET;
 
     if (!webhookSecret) {
       throw new Error('STRIPE_WEBHOOK_SECRET not configured');

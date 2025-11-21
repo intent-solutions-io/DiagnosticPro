@@ -8,6 +8,8 @@ const crypto = require('crypto');
 const PDFDocument = require('pdfkit');
 // Using production-grade PDF generator with validation and proper pagination
 const { generateDiagnosticProPDF } = require('./reportPdfProduction.js');
+// Google Secret Manager integration
+const { loadSecrets } = require('./config/secrets.js');
 
 // Structured logging function
 function logStructured(data) {
@@ -174,11 +176,12 @@ if (!REPORT_BUCKET) {
   throw new Error('REPORT_BUCKET environment variable is required');
 }
 
-// Initialize services
+// Initialize services (will be updated with secrets after loadSecrets())
 const firestore = new Firestore();
 const storage = new Storage();
 const reportsBucket = storage.bucket(REPORT_BUCKET);
-const stripeClient = stripe(process.env.STRIPE_SECRET_KEY);
+let stripeClient; // Will be initialized after loading secrets
+let secrets = {}; // Global secrets object
 
 // Middleware
 app.use(cors({
@@ -1460,20 +1463,50 @@ app.use((err, req, res, next) => {
 
 // Start server only when executed directly
 if (require.main === module) {
-  app.listen(PORT, () => {
-    console.log(`🚀 DiagnosticPro Backend running on port ${PORT}`);
-    console.log(`💰 Price: $4.99 USD (499 cents)`);
-    console.log(`🔗 Project: diagnostic-pro-prod`);
-    console.log(`📁 Storage: gs://${REPORT_BUCKET}`);
-    console.log('\nEndpoints:');
-    console.log('  POST /saveSubmission');
-    console.log('  POST /createCheckoutSession');
-    console.log('  POST /analysisStatus');
-    console.log('  POST /analyzeDiagnostic');
-    console.log('  POST /getDownloadUrl');
-    console.log('  POST /stripeWebhookForward (PRIVATE)');
-    console.log('  GET  /healthz');
-  });
+  // Load secrets from Secret Manager before starting server
+  (async () => {
+    try {
+      console.log('🔐 Loading secrets from Google Secret Manager...');
+      secrets = await loadSecrets();
+
+      // Initialize Stripe with secret from Secret Manager
+      stripeClient = stripe(secrets.STRIPE_SECRET_KEY);
+
+      console.log('✅ Secrets loaded successfully');
+
+      app.listen(PORT, () => {
+        console.log(`🚀 DiagnosticPro Backend running on port ${PORT}`);
+        console.log(`💰 Price: $4.99 USD (499 cents)`);
+        console.log(`🔗 Project: diagnostic-pro-prod`);
+        console.log(`📁 Storage: gs://${REPORT_BUCKET}`);
+        console.log('🔒 Using Google Secret Manager for sensitive credentials');
+        console.log('\nEndpoints:');
+        console.log('  POST /saveSubmission');
+        console.log('  POST /createCheckoutSession');
+        console.log('  POST /analysisStatus');
+        console.log('  POST /analyzeDiagnostic');
+        console.log('  POST /getDownloadUrl');
+        console.log('  POST /stripeWebhookForward (PRIVATE)');
+        console.log('  GET  /healthz');
+      });
+    } catch (error) {
+      console.error('❌ Failed to load secrets:', error);
+      console.error('Falling back to environment variables');
+
+      // Fallback to environment variables
+      stripeClient = stripe(process.env.STRIPE_SECRET_KEY);
+      secrets = {
+        STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
+        STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
+        FIREBASE_API_KEY: process.env.FIREBASE_API_KEY || process.env.VITE_FIREBASE_API_KEY,
+        API_GATEWAY_KEY: process.env.API_GATEWAY_KEY || process.env.VITE_API_KEY
+      };
+
+      app.listen(PORT, () => {
+        console.log(`🚀 DiagnosticPro Backend running on port ${PORT} (using env vars)`);
+      });
+    }
+  })();
 }
 
 module.exports = app;
