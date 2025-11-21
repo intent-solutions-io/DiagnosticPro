@@ -23,12 +23,17 @@ dist-ssr
 *.sln
 *.sw?
 
-# Environment variables
+# Environment variables - NEVER commit real values!
 .env
+.env.*
+*.env
+!.env.example
+!.env.template
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
+.env.production
 
 # Firebase
 .firebase/
@@ -41,10 +46,42 @@ ui-debug.log
 # Supabase
 .supabase/
 
-# Secrets and API keys
-**/config/firebase.ts
+# Google Cloud Credentials (NEVER commit these)
+*.json
+!package.json
+!package-lock.json
+!tsconfig.json
+!firebase.json
+!.firebaserc
+!**/config/*.json
+*.key
+*.pem
+*.p12
+*-key.json
+*-deployer-key.json
+service-account*.json
+gcp-*.json
+
+# Secrets and API keys - Comprehensive blocking
+**/secrets.js
+**/secrets.ts
 **/secrets.json
-**/service-account.json
+**/*secret*
+**/*credential*
+**/*token*
+!**/node_modules/**
+credentials.json
+auth.json
+
+# Terraform state (contains secrets)
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+
+# Temporary/archive folders with potential secrets
+claudes-shit/
+archive/backups-*/
 
 # Exclude diagnostic-platform directory (separate project)
 diagnostic-platform/

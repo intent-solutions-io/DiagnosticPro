@@ -133,15 +133,15 @@ gcloud ai endpoints list                 # List AI endpoints
 
 ### Environment Configuration
 ```bash
-# Firebase Configuration (Production - LIVE)
-VITE_FIREBASE_PROJECT_ID="diagnostic-pro-prod"
-VITE_FIREBASE_API_KEY="AIzaSyBmuntVKosh_EGz5yxQLlIoNXlxwYE6tMg"
-VITE_FIREBASE_AUTH_DOMAIN="diagnostic-pro-prod.firebaseapp.com"
-VITE_FIREBASE_STORAGE_BUCKET="diagnostic-pro-prod.firebasestorage.app"
+# Firebase Configuration (See .env.example for setup)
+VITE_FIREBASE_PROJECT_ID="your-project-id"
+VITE_FIREBASE_API_KEY="YOUR_FIREBASE_API_KEY"
+VITE_FIREBASE_AUTH_DOMAIN="your-project.firebaseapp.com"
+VITE_FIREBASE_STORAGE_BUCKET="your-project.firebasestorage.app"
 
-# API Configuration (Currently disabled until Cloud Functions deploy)
-VITE_API_BASE=""
-VITE_DISABLE_API="true"
+# API Configuration
+VITE_API_BASE="https://your-api-gateway.uc.gateway.dev"
+VITE_USE_NEW_API="true"
 ```
 
 ### Git Workflow (ENFORCED)
