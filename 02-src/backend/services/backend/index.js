@@ -1331,7 +1331,7 @@ async function generatePDFReport(submissionId, analysis, payload) {
 
   // This function will now buffer the PDF in memory using the new generator
   const generatePdfBuffer = () => {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       try {
         const tempPath = `/tmp/report_${submissionId}.pdf`;
 
@@ -1375,8 +1375,8 @@ async function generatePDFReport(submissionId, analysis, payload) {
           ...parsedSections
         };
 
-        // Use the new clean PDF generator
-        const stream = generateDiagnosticProPDF(submission, enrichedAnalysis, tempPath);
+        // Use the new clean PDF generator (async function returns a stream)
+        const stream = await generateDiagnosticProPDF(submission, enrichedAnalysis, tempPath);
 
         stream.on('finish', () => {
           // Read the generated file and return as buffer
