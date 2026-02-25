@@ -12,6 +12,7 @@ export default {
     '^.+\\.tsx?$': ['ts-jest', {
       tsconfig: {
         jsx: 'react-jsx',
+        module: 'esnext',
         esModuleInterop: true,
         allowSyntheticDefaultImports: true,
         strict: false,
