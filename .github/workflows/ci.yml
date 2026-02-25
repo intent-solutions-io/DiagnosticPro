@@ -40,7 +40,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Verify PDF generator
-        run: node -e "const {generateDiagnosticProPDF} = require('./reportPdf.js'); console.log('PDF generator loaded successfully');"
+        run: node -e "const {generateDiagnosticProPDF} = require('./reportPdfProduction.js'); console.log('PDF generator loaded successfully');"
 
   firebase-functions-test:
     runs-on: ubuntu-latest
