@@ -172,13 +172,7 @@ DiagnosticForm → DiagnosticReview (saves to Firestore via client SDK)
 
 The Cloud Run backend and Firebase Cloud Functions both implement Stripe webhooks and Vertex AI analysis. They are alternative paths, not complementary:
 - **Cloud Run** (`index.js`) — The primary production system with full endpoint set.
-- **Functions** (`functions/src/index.ts`) — Has its own `stripeWebhook` export plus a separate `functions/src/stripe-webhook.ts` with different region config.
-
-### Legacy Code Still Present
-
-- `@supabase/supabase-js` in `package.json` and `src/src/integrations/supabase/` — Dead code from pre-Firebase migration.
-- `src/src/services/cloud-run-client.ts` — Deprecated.
-- `02-src/backend/services/backend/handlers/` — 6 handler files not imported by `index.js`.
+- **Functions** (`functions/src/index.ts`) — Has its own `stripeWebhook` export.
 
 ## CI/CD
 
