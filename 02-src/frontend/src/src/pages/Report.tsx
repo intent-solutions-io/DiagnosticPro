@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { Download, CheckCircle, FileText, AlertCircle, RefreshCw, Clock } from "lucide-react";
+import { Download, CheckCircle, FileText, AlertCircle, RefreshCw, Clock, Share2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -14,6 +14,44 @@ const Report = () => {
   const [isPolling, setIsPolling] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const { toast } = useToast();
+
+  // Save report link to localStorage for easy access later
+  useEffect(() => {
+    if (reportId) {
+      try {
+        const savedReports = JSON.parse(localStorage.getItem('diagnosticpro_reports') || '[]');
+        const exists = savedReports.some((r: { id: string }) => r.id === reportId);
+        if (!exists) {
+          savedReports.unshift({ id: reportId, url: window.location.href, savedAt: new Date().toISOString() });
+          // Keep only last 10 reports
+          localStorage.setItem('diagnosticpro_reports', JSON.stringify(savedReports.slice(0, 10)));
+        }
+      } catch {
+        // localStorage not available, skip
+      }
+    }
+  }, [reportId]);
+
+  const handleShareWithMechanic = async () => {
+    const shareUrl = window.location.href;
+    const shareText = `DiagnosticPro Report — AI diagnostic analysis for your review. View report: ${shareUrl}`;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: 'DiagnosticPro Report', text: shareText, url: shareUrl });
+      } catch {
+        // User cancelled share
+      }
+    } else {
+      // Fallback: copy to clipboard
+      try {
+        await navigator.clipboard.writeText(shareText);
+        toast({ title: "Link Copied", description: "Report link copied to clipboard. Share it with your mechanic." });
+      } catch {
+        toast({ title: "Copy Failed", description: "Unable to copy link. Please copy the URL from your browser.", variant: "destructive" });
+      }
+    }
+  };
 
   useEffect(() => {
     const fetchDiagnosticStatus = async () => {
@@ -263,7 +301,7 @@ const Report = () => {
           </CardContent>
         </Card>
 
-        <div className="flex gap-3 justify-center">
+        <div className="flex flex-wrap gap-3 justify-center">
           <Button
             onClick={handleRefreshStatus}
             variant="outline"
@@ -275,15 +313,26 @@ const Report = () => {
           </Button>
 
           {statusInfo.canDownload && (
-            <Button
-              onClick={handleDownload}
-              size="lg"
-              disabled={isDownloading}
-              className="bg-green-600 hover:bg-green-700"
-            >
-              <Download className="h-4 w-4 mr-2" />
-              {isDownloading ? 'Downloading...' : 'Download Report'}
-            </Button>
+            <>
+              <Button
+                onClick={handleDownload}
+                size="lg"
+                disabled={isDownloading}
+                className="bg-green-600 hover:bg-green-700"
+              >
+                <Download className="h-4 w-4 mr-2" />
+                {isDownloading ? 'Downloading...' : 'Download Report'}
+              </Button>
+
+              <Button
+                onClick={handleShareWithMechanic}
+                variant="outline"
+                size="lg"
+              >
+                <Share2 className="h-4 w-4 mr-2" />
+                Share with Mechanic
+              </Button>
+            </>
           )}
 
           <Button

@@ -35,18 +35,17 @@ const Hero = () => {
 
           {/* Main Headline */}
           <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-4">
-            Stop Expensive Guessing
+            Know What's Wrong
             <span className="block text-transparent bg-gradient-to-r from-trust to-savings bg-clip-text">
-              Pro Power, Your Control
+              Before You Authorize Repairs
             </span>
-            The New Standard
           </h1>
 
           {/* Subheadline */}
           <p className="text-lg md:text-xl text-muted-foreground mb-6 max-w-3xl mx-auto leading-relaxed">
-            Before you pay for repairs, know what's actually wrong. Pro level diagnostics now in
-            your hands, empowering you to set expectations with professional power and customer
-            control.
+            AI diagnostic second opinion for $4.99. Get a 2,000+ word report with root cause analysis,
+            fair pricing estimates, and word-for-word scripts to use at the shop.
+            Cars, trucks, boats, HVAC, farm equipment, and more.
           </p>
 
           {/* Value Props */}
@@ -85,23 +84,23 @@ const Hero = () => {
             </Button>
           </div>
 
-          {/* Social Proof */}
+          {/* Value Summary */}
           <div className="pt-6 border-t border-border/50">
             <p className="text-sm text-muted-foreground mb-3">
-              Trusted by repair shops nationwide • Used by professionals daily
+              AI-powered diagnostic second opinion — know what's wrong before you authorize repairs
             </p>
             <div className="flex flex-wrap justify-center gap-6 text-xs text-muted-foreground">
               <div className="text-center">
-                <div className="text-lg font-bold text-savings">Pro-Grade</div>
-                <div>Shop-quality diagnostics</div>
+                <div className="text-lg font-bold text-savings">2,000+ Words</div>
+                <div>Detailed diagnostic report</div>
               </div>
               <div className="text-center">
-                <div className="text-lg font-bold text-trust">Universal</div>
-                <div>All equipment types</div>
+                <div className="text-lg font-bold text-trust">15 Sections</div>
+                <div>From diagnosis to negotiation</div>
               </div>
               <div className="text-center">
                 <div className="text-lg font-bold text-primary">$4.99</div>
-                <div>Direct access</div>
+                <div>Less than a coffee</div>
               </div>
             </div>
           </div>

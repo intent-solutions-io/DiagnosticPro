@@ -1,8 +1,64 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { AlertTriangle, TrendingUp, Users, Wrench } from "lucide-react";
+import { AlertTriangle, Wrench, Ship, Thermometer } from "lucide-react";
 
 const ProblemSection = () => {
+  const scenarios = [
+    {
+      title: "Rough Idle Problem",
+      subtitle: 'How "parts throwing" turns a $30 fix into a $1,430 nightmare',
+      icon: Wrench,
+      shopSteps: [
+        { label: "Replace spark plugs", cost: "$200" },
+        { label: "Replace ignition coils", cost: "$400" },
+        { label: "Replace fuel injectors", cost: "$800" },
+        { label: "Finally find vacuum hose", cost: "$30", highlight: true },
+      ],
+      shopTotal: "$1,430",
+      ourSteps: [
+        { label: "AI diagnosis fee", cost: "$4.99" },
+        { label: "Finds vacuum hose leak immediately", cost: "$30", highlight: true },
+      ],
+      ourTotal: "$34.99",
+      saved: "$1,395",
+    },
+    {
+      title: "Boat Won't Start",
+      subtitle: 'Marina quotes full fuel system replacement — it was a $15 fuel filter',
+      icon: Ship,
+      shopSteps: [
+        { label: "Replace fuel pump", cost: "$450" },
+        { label: "Replace fuel lines", cost: "$320" },
+        { label: "Replace fuel injectors", cost: "$600" },
+        { label: "Issue was clogged fuel filter", cost: "$15", highlight: true },
+      ],
+      shopTotal: "$1,385",
+      ourSteps: [
+        { label: "AI diagnosis fee", cost: "$4.99" },
+        { label: "Identifies fuel filter as likely cause", cost: "$15", highlight: true },
+      ],
+      ourTotal: "$19.99",
+      saved: "$1,365",
+    },
+    {
+      title: "AC Not Cooling",
+      subtitle: 'HVAC company quotes new compressor — it was a $40 capacitor',
+      icon: Thermometer,
+      shopSteps: [
+        { label: "Replace compressor", cost: "$1,400" },
+        { label: "Replace refrigerant lines", cost: "$350" },
+        { label: "Recharge refrigerant", cost: "$250" },
+        { label: "Issue was a failed capacitor", cost: "$40", highlight: true },
+      ],
+      shopTotal: "$2,040",
+      ourSteps: [
+        { label: "AI diagnosis fee", cost: "$4.99" },
+        { label: "Identifies capacitor failure pattern", cost: "$40", highlight: true },
+      ],
+      ourTotal: "$44.99",
+      saved: "$1,995",
+    },
+  ];
+
   return (
     <section className="py-12 bg-muted/30">
       <div className="container mx-auto px-4">
@@ -13,133 +69,96 @@ const ProblemSection = () => {
               Stop Expensive Guessing
             </Badge>
             <h2 className="text-3xl md:text-5xl font-bold mb-6">
-              Professional Power, Customer Control
-              <span className="block text-primary">The New Standard</span>
+              How Misdiagnosis Costs You Money
+              <span className="block text-primary">See the Difference</span>
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Before you pay for repairs, know what's actually wrong. Pro level diagnostics now in
-              your hands, empowering you to set expectations with professional power and customer
-              control.
+              Shops often replace parts until something works. Here's how knowing the root cause
+              first changes the math — across cars, boats, HVAC, and more.
             </p>
           </div>
 
-          {/* Example Scenario */}
-          <div className="bg-background rounded-2xl p-8 shadow-lg mb-12">
-            <div className="text-center mb-8">
-              <h3 className="text-2xl font-bold mb-2">Real Example: Rough Idle Problem</h3>
-              <p className="text-muted-foreground">
-                How "parts throwing" turns a $30 fix into a $1,430 nightmare
-              </p>
-            </div>
+          <div className="space-y-12">
+            {scenarios.map((scenario, idx) => {
+              const Icon = scenario.icon;
+              return (
+                <div key={idx} className="bg-background rounded-2xl p-8 shadow-lg">
+                  <div className="text-center mb-8">
+                    <div className="flex items-center justify-center gap-2 mb-2">
+                      <Icon className="h-6 w-6 text-primary" />
+                      <h3 className="text-2xl font-bold">{scenario.title}</h3>
+                    </div>
+                    <p className="text-muted-foreground">{scenario.subtitle}</p>
+                  </div>
 
-            <div className="grid md:grid-cols-2 gap-8">
-              {/* Bad Shop Approach */}
-              <div className="space-y-4">
-                <h4 className="text-lg font-semibold text-ripoff flex items-center">
-                  <Wrench className="h-5 w-5 mr-2" />
-                  Shop Markup Method
-                </h4>
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center p-3 bg-ripoff/10 rounded-lg">
-                    <span>Replace spark plugs</span>
-                    <span className="font-semibold text-ripoff">$200</span>
-                  </div>
-                  <div className="flex justify-between items-center p-3 bg-ripoff/10 rounded-lg">
-                    <span>Replace ignition coils</span>
-                    <span className="font-semibold text-ripoff">$400</span>
-                  </div>
-                  <div className="flex justify-between items-center p-3 bg-ripoff/10 rounded-lg">
-                    <span>Replace fuel injectors</span>
-                    <span className="font-semibold text-ripoff">$800</span>
-                  </div>
-                  <div className="flex justify-between items-center p-3 bg-ripoff/20 rounded-lg border-2 border-ripoff/30">
-                    <span className="font-semibold">Finally find vacuum hose</span>
-                    <span className="font-semibold text-ripoff">$30</span>
-                  </div>
-                  <div className="border-t pt-3">
-                    <div className="flex justify-between items-center font-bold text-lg">
-                      <span>Total Cost</span>
-                      <span className="text-ripoff">$1,430</span>
+                  <div className="grid md:grid-cols-2 gap-8">
+                    <div className="space-y-4">
+                      <h4 className="text-lg font-semibold text-ripoff flex items-center">
+                        <Wrench className="h-5 w-5 mr-2" />
+                        Parts-Throwing Approach
+                      </h4>
+                      <div className="space-y-3">
+                        {scenario.shopSteps.map((step, i) => (
+                          <div
+                            key={i}
+                            className={`flex justify-between items-center p-3 rounded-lg ${
+                              step.highlight
+                                ? "bg-ripoff/20 border-2 border-ripoff/30"
+                                : "bg-ripoff/10"
+                            }`}
+                          >
+                            <span className={step.highlight ? "font-semibold" : ""}>{step.label}</span>
+                            <span className="font-semibold text-ripoff">{step.cost}</span>
+                          </div>
+                        ))}
+                        <div className="border-t pt-3">
+                          <div className="flex justify-between items-center font-bold text-lg">
+                            <span>Total Cost</span>
+                            <span className="text-ripoff">{scenario.shopTotal}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <h4 className="text-lg font-semibold text-savings flex items-center">
+                        <AlertTriangle className="h-5 w-5 mr-2" />
+                        DiagnosticPro Approach
+                      </h4>
+                      <div className="space-y-3">
+                        {scenario.ourSteps.map((step, i) => (
+                          <div
+                            key={i}
+                            className={`flex justify-between items-center p-3 rounded-lg ${
+                              step.highlight
+                                ? "bg-savings/20 border-2 border-savings/30"
+                                : "bg-savings/10"
+                            }`}
+                          >
+                            <span className={step.highlight ? "font-semibold" : ""}>{step.label}</span>
+                            <span className="font-semibold text-savings">{step.cost}</span>
+                          </div>
+                        ))}
+                        <div className="border-t pt-3">
+                          <div className="flex justify-between items-center font-bold text-lg">
+                            <span>Total Cost</span>
+                            <span className="text-savings">{scenario.ourTotal}</span>
+                          </div>
+                          <div className="text-right mt-2">
+                            <span className="text-2xl font-bold text-savings">{scenario.saved} Saved</span>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-
-              {/* Our Approach */}
-              <div className="space-y-4">
-                <h4 className="text-lg font-semibold text-savings flex items-center">
-                  <AlertTriangle className="h-5 w-5 mr-2" />
-                  Direct Pro Tool Access
-                </h4>
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center p-3 bg-savings/10 rounded-lg">
-                    <span>AI diagnosis fee</span>
-                    <span className="font-semibold text-savings">$4.99</span>
-                  </div>
-                  <div className="flex justify-between items-center p-3 bg-savings/20 rounded-lg border-2 border-savings/30">
-                    <span className="font-semibold">Finds vacuum hose leak immediately</span>
-                    <span className="font-semibold text-savings">$30</span>
-                  </div>
-                  <div className="border-t pt-3">
-                    <div className="flex justify-between items-center font-bold text-lg">
-                      <span>Total Cost</span>
-                      <span className="text-savings">$34.99</span>
-                    </div>
-                    <div className="text-right mt-2">
-                      <span className="text-2xl font-bold text-savings">$1,395.01 Saved!</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+              );
+            })}
           </div>
 
-          {/* Problem Stats */}
-          <div className="grid md:grid-cols-4 gap-6">
-            <Card className="text-center">
-              <CardHeader className="pb-3">
-                <TrendingUp className="h-8 w-8 text-ripoff mx-auto" />
-                <CardTitle className="text-2xl text-ripoff">$600B</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  Wasted annually on unnecessary repairs
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="text-center">
-              <CardHeader className="pb-3">
-                <Users className="h-8 w-8 text-ripoff mx-auto" />
-                <CardTitle className="text-2xl text-ripoff">73%</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  Of customers overcharged by repair shops
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="text-center">
-              <CardHeader className="pb-3">
-                <AlertTriangle className="h-8 w-8 text-ripoff mx-auto" />
-                <CardTitle className="text-2xl text-ripoff">3.2x</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">Average markup on parts throwing</p>
-              </CardContent>
-            </Card>
-
-            <Card className="text-center">
-              <CardHeader className="pb-3">
-                <Wrench className="h-8 w-8 text-ripoff mx-auto" />
-                <CardTitle className="text-2xl text-ripoff">$1,200</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">Average customer loses per year</p>
-              </CardContent>
-            </Card>
-          </div>
+          <p className="text-center text-sm text-muted-foreground mt-8">
+            These scenarios illustrate how misdiagnosis typically inflates repair costs. Your actual savings depend on your specific situation.
+          </p>
         </div>
       </div>
     </section>
