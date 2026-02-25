@@ -1119,7 +1119,7 @@ export const EQUIPMENT_CONFIGS: Record<string, EquipmentConfig> = {
       "Charging problems",
     ],
     errorCodeHint: "e.g. Windows BSOD stop code, Apple error -50, Android error code",
-    identifierLabel: "IMEI",
+    identifierLabel: "Serial / IMEI",
     usageMetricLabel: "Age (years)",
     usageMetricPlaceholder: "e.g. 2 years old",
     locationOptions: [

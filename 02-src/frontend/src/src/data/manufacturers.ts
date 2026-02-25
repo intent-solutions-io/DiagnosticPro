@@ -477,7 +477,6 @@ export const manufacturerData = {
       "Challenger",
       "Pursuit",
       "FTR 1200",
-      "Super Meteor 650",
     ],
     "Royal Enfield": [
       "Classic 350",

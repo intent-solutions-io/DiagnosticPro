@@ -127,13 +127,13 @@ const DIAGNOSTIC_REPORT_CONTRACT = {
       format: { type: "bullet_list" }
     },
     {
-      id: "root_cause_analysis",
-      title: "15. ROOT CAUSE ANALYSIS",
+      id: "next_steps_summary",
+      title: "15. NEXT STEPS SUMMARY",
       required: true,
-      critical: true, // THIS WAS MISSING!
+      critical: true,
       minWords: 200,
       maxWords: 800,
-      format: { type: "analytical" }
+      format: { type: "bullet_list" }
     }
   ],
   formatting: {
@@ -470,7 +470,8 @@ class PDFValidationSystem {
   cleanSectionContent(content) {
     if (!content) return '';
 
-    let cleaned = String(content);
+    // Preserve arrays (bullet lists) — join with newlines before cleaning
+    let cleaned = Array.isArray(content) ? content.join('\n') : String(content);
 
     // Remove excessive newlines
     cleaned = cleaned.replace(/\n{3,}/g, '\n\n');
