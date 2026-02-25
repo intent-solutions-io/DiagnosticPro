@@ -66,7 +66,8 @@ async function loadSecrets() {
       getSecret('STRIPE_WEBHOOK_SECRET'),
       getSecret('FIREBASE_API_KEY'),
       getSecret('API_GATEWAY_KEY'),
-      getSecret('WHOP_API_KEY').catch(() => null)
+      getSecret('WHOP_API_KEY').catch(() => null),
+      getSecret('WHOP_WEBHOOK_SECRET').catch(() => null)
     ]);
 
     return {
@@ -74,7 +75,8 @@ async function loadSecrets() {
       STRIPE_WEBHOOK_SECRET: secrets[1],
       FIREBASE_API_KEY: secrets[2],
       API_GATEWAY_KEY: secrets[3],
-      WHOP_API_KEY: secrets[4]
+      WHOP_API_KEY: secrets[4],
+      WHOP_WEBHOOK_SECRET: secrets[5]
     };
   } catch (error) {
     console.error('Failed to load secrets:', error);

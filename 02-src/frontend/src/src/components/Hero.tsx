@@ -114,8 +114,8 @@ const Hero = () => {
             )}
           </div>
 
-          {/* Whop Login — shown for non-members */}
-          {!auth && (
+          {/* Whop Login — shown when not logged in OR logged-in non-members */}
+          {(!auth || !auth.isMember) && (
             <div className="flex justify-center mb-6">
               <WhopLoginButton className="text-sm" />
             </div>

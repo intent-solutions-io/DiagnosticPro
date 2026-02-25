@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Brain, Edit, CreditCard, CheckCircle } from "lucide-react";
+import { Brain, Edit, CheckCircle } from "lucide-react";
 import { startAnalysis } from "@/services/diagnostics";
 import { doc, setDoc } from "firebase/firestore";
 import { db } from "@/config/firebase";
@@ -72,12 +72,7 @@ const DiagnosticReview = ({ formData, onEdit, onPaymentSuccess }: DiagnosticRevi
         description: "Your diagnostic report is being generated. Redirecting...",
       });
 
-      // Update Firestore status
-      await setDoc(doc(db, 'diagnosticSubmissions', submissionId), {
-        paymentStatus: 'member_bypass',
-        analysisStatus: 'processing',
-      }, { merge: true });
-
+      // Backend already updates Firestore status — no duplicate write needed
       onPaymentSuccess();
     } catch (error) {
       console.error("Member analysis error:", error);

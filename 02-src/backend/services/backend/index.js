@@ -216,7 +216,7 @@ app.use(cors({
   origin: ['https://diagnosticpro.io', 'https://diagnostic-pro-prod.web.app', 'https://diagpro-gw-3tbssksx.uc.gateway.dev'],
   credentials: true,
   methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'x-api-key', 'x-dp-reqid', 'Authorization']
+  allowedHeaders: ['Content-Type', 'x-api-key', 'x-dp-reqid', 'Authorization', 'x-whop-token']
 }));
 
 // Handle preflight requests
@@ -1597,8 +1597,35 @@ async function generatePDFReport(submissionId, analysis, payload) {
 // Whop OAuth + Membership Integration
 // ──────────────────────────────────────────
 
-// Middleware: check x-whop-token header for membership status
-async function requireWhopMember(req, res, next) {
+// Fetch with timeout (15s default) to prevent hanging on Whop API
+function fetchWithTimeout(url, options = {}, timeoutMs = 15000) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  return fetch(url, { ...options, signal: controller.signal }).finally(() => clearTimeout(timer));
+}
+
+// Verify Whop webhook signature using HMAC-SHA256
+function verifyWhopWebhookSignature(rawBody, signatureHeader) {
+  const webhookSecret = secrets.WHOP_WEBHOOK_SECRET || process.env.WHOP_WEBHOOK_SECRET;
+  if (!webhookSecret) {
+    logStructured({ phase: 'whopWebhook', status: 'warn', message: 'WHOP_WEBHOOK_SECRET not configured, skipping verification' });
+    return false;
+  }
+  if (!signatureHeader) return false;
+
+  const expectedSig = crypto
+    .createHmac('sha256', webhookSecret)
+    .update(typeof rawBody === 'string' ? rawBody : JSON.stringify(rawBody))
+    .digest('base64');
+
+  return crypto.timingSafeEqual(
+    Buffer.from(signatureHeader),
+    Buffer.from(expectedSig)
+  );
+}
+
+// Middleware: optionally attach Whop membership status to request
+async function checkWhopMember(req, res, next) {
   const whopToken = req.headers['x-whop-token'];
   if (!whopToken) {
     // No Whop token — fall through to normal Stripe pay-per-use flow
@@ -1608,7 +1635,7 @@ async function requireWhopMember(req, res, next) {
 
   try {
     // Verify membership via Whop API
-    const membershipRes = await fetch(
+    const membershipRes = await fetchWithTimeout(
       `https://api.whop.com/api/v5/me/memberships?product_id=${WHOP_PRODUCT_ID}&valid=true`,
       { headers: { Authorization: `Bearer ${whopToken}` } }
     );
@@ -1624,7 +1651,7 @@ async function requireWhopMember(req, res, next) {
 
     // Fetch user info for logging
     if (req.isWhopMember) {
-      const userRes = await fetch('https://api.whop.com/api/v5/me', {
+      const userRes = await fetchWithTimeout('https://api.whop.com/api/v5/me', {
         headers: { Authorization: `Bearer ${whopToken}` }
       });
       if (userRes.ok) {
@@ -1649,14 +1676,14 @@ app.post('/api/auth/whop-exchange', async (req, res) => {
   const phase = 'whopExchange';
 
   try {
-    const { code, code_verifier } = req.body;
+    const { code, code_verifier, state } = req.body;
 
     if (!code || !code_verifier) {
       return res.status(400).json({ error: 'Missing code or code_verifier' });
     }
 
     // Exchange authorization code for access token
-    const tokenRes = await fetch('https://data.whop.com/oauth/token', {
+    const tokenRes = await fetchWithTimeout('https://data.whop.com/oauth/token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -1671,25 +1698,25 @@ app.post('/api/auth/whop-exchange', async (req, res) => {
     if (!tokenRes.ok) {
       const errText = await tokenRes.text();
       logStructured({ phase, status: 'error', reqId: req.reqId, error: { code: 'TOKEN_EXCHANGE_FAILED', message: errText } });
-      return res.status(401).json({ error: 'Token exchange failed', details: errText });
+      return res.status(401).json({ error: 'Authentication failed' });
     }
 
     const tokenData = await tokenRes.json();
     const accessToken = tokenData.access_token;
 
     // Fetch user info
-    const userRes = await fetch('https://api.whop.com/api/v5/me', {
+    const userRes = await fetchWithTimeout('https://api.whop.com/api/v5/me', {
       headers: { Authorization: `Bearer ${accessToken}` }
     });
 
     if (!userRes.ok) {
-      return res.status(401).json({ error: 'Failed to fetch user info' });
+      return res.status(401).json({ error: 'Authentication failed' });
     }
 
     const user = await userRes.json();
 
     // Check active membership
-    const membershipRes = await fetch(
+    const membershipRes = await fetchWithTimeout(
       `https://api.whop.com/api/v5/me/memberships?product_id=${WHOP_PRODUCT_ID}&valid=true`,
       { headers: { Authorization: `Bearer ${accessToken}` } }
     );
@@ -1705,7 +1732,7 @@ app.post('/api/auth/whop-exchange', async (req, res) => {
       membershipPlanId = isMember ? membershipData.data[0].plan_id : null;
     }
 
-    // Upsert to Firestore whopUsers collection
+    // Upsert to Firestore whopUsers collection (no raw tokens stored)
     const whopUserId = user.id;
     const whopUserDoc = {
       whopId: whopUserId,
@@ -1715,8 +1742,6 @@ app.post('/api/auth/whop-exchange', async (req, res) => {
       isMember,
       membershipId,
       membershipStatus: isMember ? 'active' : null,
-      accessToken: accessToken,
-      refreshToken: tokenData.refresh_token || null,
       lastVerified: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
@@ -1756,7 +1781,7 @@ app.post('/api/auth/whop-exchange', async (req, res) => {
       reqId: req.reqId,
       error: { code: 'WHOP_EXCHANGE_ERROR', message: error.message }
     });
-    res.status(500).json({ error: 'Whop authentication failed' });
+    res.status(500).json({ error: 'Authentication failed' });
   }
 });
 
@@ -1768,7 +1793,7 @@ app.get('/api/auth/whop-verify', async (req, res) => {
   }
 
   try {
-    const memberRes = await fetch(
+    const memberRes = await fetchWithTimeout(
       `https://api.whop.com/api/v5/me/memberships?product_id=${WHOP_PRODUCT_ID}&valid=true`,
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -1778,7 +1803,8 @@ app.get('/api/auth/whop-verify', async (req, res) => {
     const memberships = await memberRes.json();
     const isMember = Array.isArray(memberships.data) && memberships.data.length > 0;
     res.json({ isMember });
-  } catch {
+  } catch (error) {
+    logStructured({ phase: 'whopVerify', status: 'error', error: { message: error.message } });
     res.json({ isMember: false });
   }
 });
@@ -1788,6 +1814,13 @@ app.post('/api/webhooks/whop', async (req, res) => {
   const phase = 'whopWebhook';
 
   try {
+    // Verify webhook signature
+    const signature = req.headers['whop-signature'] || req.headers['x-whop-signature'];
+    if (!verifyWhopWebhookSignature(req.body, signature)) {
+      logStructured({ phase, status: 'rejected', reason: 'Invalid or missing webhook signature' });
+      return res.status(401).json({ error: 'Invalid webhook signature' });
+    }
+
     const event = req.body;
     const { action, data } = event;
 
@@ -1797,8 +1830,8 @@ app.post('/api/webhooks/whop', async (req, res) => {
       const userId = data?.user_id;
       if (userId) {
         const docRef = firestore.collection('whopUsers').doc(userId);
-        const doc = await docRef.get();
-        if (doc.exists) {
+        const whopDoc = await docRef.get();
+        if (whopDoc.exists) {
           await docRef.update({
             isMember: action === 'membership.went_valid',
             lastVerified: new Date().toISOString(),
@@ -1820,7 +1853,7 @@ app.post('/api/webhooks/whop', async (req, res) => {
 });
 
 // ENDPOINT: Whop member submits diagnostic (skips Stripe payment)
-app.post('/api/whop/analyze', requireWhopMember, async (req, res) => {
+app.post('/api/whop/analyze', checkWhopMember, async (req, res) => {
   const phase = 'whopAnalyze';
 
   try {
@@ -1842,6 +1875,12 @@ app.post('/api/whop/analyze', requireWhopMember, async (req, res) => {
     }
 
     const submissionData = submissionDoc.data();
+
+    // Verify this submission belongs to the requesting member (match email)
+    if (req.whopUser?.email && submissionData.payload?.email &&
+        req.whopUser.email.toLowerCase() !== submissionData.payload.email.toLowerCase()) {
+      return res.status(403).json({ error: 'Submission does not belong to this user' });
+    }
 
     // Check if already processing or ready
     if (submissionData.status === 'processing' || submissionData.status === 'ready') {
@@ -1865,7 +1904,7 @@ app.post('/api/whop/analyze', requireWhopMember, async (req, res) => {
     await firestore.collection('analysis').doc(submissionId).set({
       updatedAt: new Date().toISOString(),
       status: 'queued',
-      model: 'gemini-1.5-flash-002',
+      model: 'gemini-2.0-flash-exp',
       reqId: req.reqId,
       paidVia: 'whop_membership'
     });
@@ -1878,16 +1917,18 @@ app.post('/api/whop/analyze', requireWhopMember, async (req, res) => {
       whopUserId: req.whopUser?.id
     });
 
-    // Start analysis async
-    processAnalysis(submissionId, submissionData.payload, req.reqId).catch(error => {
-      logStructured({
-        phase: 'whopAnalyzeQueue',
-        status: 'error',
-        reqId: req.reqId,
-        submissionId,
-        error: { code: 'ANALYSIS_QUEUE_ERROR', message: error.message }
+    // Start analysis async (guard against missing payload)
+    if (submissionData.payload) {
+      processAnalysis(submissionId, submissionData.payload, req.reqId).catch(error => {
+        logStructured({
+          phase: 'whopAnalyzeQueue',
+          status: 'error',
+          reqId: req.reqId,
+          submissionId,
+          error: { code: 'ANALYSIS_QUEUE_ERROR', message: error.message }
+        });
       });
-    });
+    }
 
     res.json({ status: 'processing', message: 'Analysis started (membership)' });
 

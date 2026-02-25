@@ -10,13 +10,14 @@ const AuthCallback = () => {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const code = params.get("code");
+    const state = params.get("state") ?? undefined;
 
     if (!code) {
       setError("No authorization code received from Whop.");
       return;
     }
 
-    handleWhopCallback(code)
+    handleWhopCallback(code, state)
       .then((auth) => {
         if (auth.isMember) {
           navigate("/?whop=member", { replace: true });

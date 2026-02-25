@@ -20,12 +20,14 @@ const WhopLoginButton = ({ className = "" }: WhopLoginButtonProps) => {
             PRO MEMBER
           </span>
         )}
-        <button
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={() => { logoutWhop(); window.location.reload(); }}
-          className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+          className="text-xs text-muted-foreground hover:text-foreground h-auto py-1 px-2"
         >
           Logout
-        </button>
+        </Button>
       </div>
     );
   }

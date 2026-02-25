@@ -50,6 +50,12 @@ export async function loginWithWhop(): Promise<void> {
   const challenge = await generateCodeChallenge(verifier);
   sessionStorage.setItem('whop_code_verifier', verifier);
 
+  // Generate random state for CSRF protection
+  const stateArray = new Uint8Array(16);
+  crypto.getRandomValues(stateArray);
+  const state = Array.from(stateArray, (b) => b.toString(16).padStart(2, '0')).join('');
+  sessionStorage.setItem('whop_oauth_state', state);
+
   const params = new URLSearchParams({
     client_id: WHOP_APP_ID,
     redirect_uri: REDIRECT_URI,
@@ -57,16 +63,25 @@ export async function loginWithWhop(): Promise<void> {
     scope: 'openid profile email',
     code_challenge: challenge,
     code_challenge_method: 'S256',
+    state,
   });
 
   window.location.href = `https://whop.com/oauth?${params.toString()}`;
 }
 
 /** Exchange authorization code for token via backend */
-export async function handleWhopCallback(code: string): Promise<WhopAuthState> {
+export async function handleWhopCallback(code: string, returnedState?: string): Promise<WhopAuthState> {
   const codeVerifier = sessionStorage.getItem('whop_code_verifier');
   if (!codeVerifier) {
     throw new Error('Missing PKCE code verifier');
+  }
+
+  // Verify OAuth state to prevent CSRF
+  const expectedState = sessionStorage.getItem('whop_oauth_state');
+  if (!expectedState || expectedState !== returnedState) {
+    sessionStorage.removeItem('whop_code_verifier');
+    sessionStorage.removeItem('whop_oauth_state');
+    throw new Error('OAuth state mismatch — possible CSRF attack');
   }
 
   const res = await fetch(`${API_BASE}/api/auth/whop-exchange`, {
@@ -82,6 +97,7 @@ export async function handleWhopCallback(code: string): Promise<WhopAuthState> {
 
   const data = await res.json();
   sessionStorage.removeItem('whop_code_verifier');
+  sessionStorage.removeItem('whop_oauth_state');
 
   // Persist auth state
   localStorage.setItem('whop_token', data.token);

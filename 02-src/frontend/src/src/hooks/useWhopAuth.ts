@@ -28,11 +28,17 @@ export function useWhopAuth(): WhopAuthState {
       const storedIsMember = localStorage.getItem("whop_is_member");
 
       if (storedToken && storedUser) {
+        const parsed = JSON.parse(storedUser);
+        // Only set state if parse succeeded — avoid partial state
         setToken(storedToken);
-        setUser(JSON.parse(storedUser));
+        setUser(parsed);
         setIsMember(storedIsMember === "true");
       }
     } catch (err) {
+      // Clear corrupted auth state to prevent partial hydration
+      localStorage.removeItem("whop_token");
+      localStorage.removeItem("whop_user");
+      localStorage.removeItem("whop_is_member");
       console.error("Error reading Whop auth state:", err);
     } finally {
       setIsLoading(false);
