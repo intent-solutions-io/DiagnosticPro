@@ -33,7 +33,7 @@ const Pricing = () => {
                 </li>
                 <li className="flex items-start text-sm">
                   <CheckCircle className="h-4 w-4 mr-3 mt-0.5 flex-shrink-0 text-trust" />
-                  <span>Equipment compatibility (cellphones to spaceships)</span>
+                  <span>Cars, trucks, boats, HVAC, farm equipment, and more</span>
                 </li>
                 <li className="flex items-start text-sm">
                   <CheckCircle className="h-4 w-4 mr-3 mt-0.5 flex-shrink-0 text-trust" />

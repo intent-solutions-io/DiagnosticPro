@@ -127,13 +127,13 @@ const DIAGNOSTIC_REPORT_CONTRACT = {
       format: { type: "bullet_list" }
     },
     {
-      id: "root_cause_analysis",
-      title: "15. ROOT CAUSE ANALYSIS",
+      id: "next_steps_summary",
+      title: "15. NEXT STEPS SUMMARY",
       required: true,
-      critical: true, // THIS WAS MISSING!
+      critical: true,
       minWords: 200,
       maxWords: 800,
-      format: { type: "analytical" }
+      format: { type: "bullet_list" }
     }
   ],
   formatting: {
@@ -417,7 +417,7 @@ class PDFValidationSystem {
       'likelyCausesRanked': 'likely_causes',
       'recommendations': 'recommendations',
       'sourceVerification': 'source_verification',
-      'rootCauseAnalysis': 'root_cause_analysis'
+      'nextStepsSummary': 'next_steps_summary'
     };
 
     // Check for critical sections
@@ -470,7 +470,8 @@ class PDFValidationSystem {
   cleanSectionContent(content) {
     if (!content) return '';
 
-    let cleaned = String(content);
+    // Preserve arrays (bullet lists) — join with newlines before cleaning
+    let cleaned = Array.isArray(content) ? content.join('\n') : String(content);
 
     // Remove excessive newlines
     cleaned = cleaned.replace(/\n{3,}/g, '\n\n');
@@ -673,7 +674,7 @@ class DiagnosticPDFGenerator {
         'likelyCausesRanked',
         'recommendations',
         'sourceVerification',
-        'rootCauseAnalysis'
+        'nextStepsSummary'
       ];
 
       const sectionTitles = {
@@ -691,7 +692,7 @@ class DiagnosticPDFGenerator {
         'likelyCausesRanked': '12. LIKELY CAUSES (RANKED)',
         'recommendations': '13. RECOMMENDATIONS',
         'sourceVerification': '14. SOURCE VERIFICATION',
-        'rootCauseAnalysis': '15. ROOT CAUSE ANALYSIS'
+        'nextStepsSummary': '15. NEXT STEPS SUMMARY'
       };
 
       let renderedSections = 0;
@@ -700,7 +701,7 @@ class DiagnosticPDFGenerator {
         const content = analysis[key];
         const title = sectionTitles[key];
 
-        if (content || key === 'rootCauseAnalysis') {
+        if (content || key === 'nextStepsSummary') {
           // Clean the content
           const cleanedContent = this.validator.cleanSectionContent(content);
 
@@ -822,10 +823,11 @@ class DiagnosticPDFGenerator {
 
   getDefaultContent(key) {
     const defaults = {
-      'rootCauseAnalysis':
-        'Root cause analysis is a critical diagnostic step. Based on the symptoms and error codes provided, ' +
-        'the most likely root cause involves component failure or systematic degradation. Further diagnostic ' +
-        'testing is required to confirm the specific failure point and underlying causal factors.',
+      'nextStepsSummary': [
+        'Review the primary diagnosis and schedule the recommended diagnostic verification tests',
+        'Get a second quote using the cost breakdown and negotiation tactics provided in this report',
+        'Contact support@diagnosticpro.io if you need further assistance with your diagnosis'
+      ],
       'primaryDiagnosis':
         'Primary diagnosis pending detailed analysis of symptoms and error codes.',
       'differentialDiagnosis': [

@@ -19,14 +19,22 @@ import {
   Smartphone,
   Car,
   Ship,
-  Plane,
   Wrench,
   AlertCircle,
   Truck,
   Home,
   Drill,
+  Bike,
+  Tractor,
+  TreePine,
+  Thermometer,
+  Zap,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import { getManufacturers, getModels } from "@/data/manufacturers";
+import { getEquipmentConfig } from "@/data/equipment-configs";
+import type { EquipmentField } from "@/data/equipment-configs";
 
 export interface FormData {
   equipmentType: string;
@@ -51,21 +59,24 @@ export interface FormData {
   fullName: string;
   email: string;
   phone: string;
+  // Dynamic equipment-specific fields stored here
+  [key: string]: string | string[];
 }
 
 interface DiagnosticFormProps {
   onFormSubmit: (formData: FormData) => void;
+  initialEquipmentType?: string;
 }
 
-const DiagnosticForm = ({ onFormSubmit }: DiagnosticFormProps) => {
-  const [equipmentType, setEquipmentType] = useState("");
+const DiagnosticForm = ({ onFormSubmit, initialEquipmentType }: DiagnosticFormProps) => {
+  const [equipmentType, setEquipmentType] = useState(initialEquipmentType || "");
   const [selectedMake, setSelectedMake] = useState("");
   const [symptoms, setSymptoms] = useState<string[]>([]);
   const [showFlashingBorder, setShowFlashingBorder] = useState(false);
+  const [showDetails, setShowDetails] = useState(false);
 
-  // Form state for all fields
-  const [formData, setFormData] = useState({
-    equipmentType: "",
+  const [formData, setFormData] = useState<FormData>({
+    equipmentType: initialEquipmentType || "",
     make: "",
     model: "",
     year: "",
@@ -90,33 +101,46 @@ const DiagnosticForm = ({ onFormSubmit }: DiagnosticFormProps) => {
   });
 
   const equipmentTypes = [
-    { value: "automotive", label: "Automotive", icon: Car },
-    { value: "marine", label: "Marine", icon: Ship },
-    { value: "aerospace", label: "Aerospace", icon: Plane },
-    { value: "electronics", label: "Electronics", icon: Smartphone },
-    { value: "industrial", label: "Industrial", icon: Wrench },
-    { value: "other", label: "Other Equipment", icon: AlertCircle },
+    { value: "automotive", label: "Cars & SUVs", icon: Car },
+    { value: "gas-trucks", label: "Gas Trucks", icon: Truck },
+    { value: "diesel-trucks", label: "Diesel Trucks", icon: Truck },
     { value: "semi-trucks", label: "Semi Trucks", icon: Truck },
-    { value: "appliances", label: "Appliances", icon: Home },
+    { value: "motorcycles", label: "Motorcycles", icon: Bike },
+    { value: "atvs-utvs", label: "ATVs / UTVs", icon: Bike },
+    { value: "rvs", label: "RVs", icon: Car },
+    { value: "marine", label: "Marine", icon: Ship },
+    { value: "farm-ag", label: "Farm & Ag", icon: Tractor },
+    { value: "compact-equipment", label: "Compact Equipment", icon: Wrench },
+    { value: "lawn-garden", label: "Lawn & Garden", icon: TreePine },
     { value: "power-tools", label: "Power Tools", icon: Drill },
+    { value: "hvac", label: "HVAC", icon: Thermometer },
+    { value: "golf-carts", label: "Golf Carts", icon: Zap },
+    { value: "electronics", label: "Electronics", icon: Smartphone },
   ];
 
-  const commonSymptoms = [
-    "Won't start",
-    "Strange noises",
-    "Overheating",
-    "Power loss",
-    "Electrical issues",
-    "Leaking fluids",
-    "Performance problems",
-    "Error messages",
-    "Intermittent operation",
-    "Complete failure",
+  // Get equipment-specific config
+  const equipmentConfig = equipmentType ? getEquipmentConfig(equipmentType) : undefined;
+
+  // Dynamic labels based on equipment type
+  const identifierLabel = equipmentConfig?.identifierLabel || "VIN / Serial Number";
+  const usageMetricLabel = equipmentConfig?.usageMetricLabel || "Mileage / Hours";
+  const usageMetricPlaceholder = equipmentConfig?.usageMetricPlaceholder || "e.g., 50,000 miles or 1,200 hours";
+  const errorCodeHint = equipmentConfig?.errorCodeHint || "P0171, B1234, etc.";
+  const currentSymptoms = equipmentConfig?.symptoms || [
+    "Won't start", "Strange noises", "Overheating", "Power loss",
+    "Electrical issues", "Leaking fluids", "Performance problems",
+    "Error messages", "Intermittent operation", "Complete failure",
+  ];
+  const locationOptions = equipmentConfig?.locationOptions || [
+    { value: "city", label: "City/Urban" },
+    { value: "highway", label: "Highway/Road" },
+    { value: "indoor", label: "Indoor" },
+    { value: "outdoor", label: "Outdoor/Field" },
+    { value: "other", label: "Other" },
   ];
 
   const handleSymptomChange = (symptom: string, checked: boolean) => {
     const newSymptoms = checked ? [...symptoms, symptom] : symptoms.filter((s) => s !== symptom);
-
     setSymptoms(newSymptoms);
     setFormData((prev) => ({ ...prev, symptoms: newSymptoms }));
   };
@@ -124,24 +148,37 @@ const DiagnosticForm = ({ onFormSubmit }: DiagnosticFormProps) => {
   const handleInputChange = (field: string, value: string | string[]) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
 
-    // Update local state for equipment type and make
     if (field === "equipmentType" && typeof value === "string") {
       setEquipmentType(value);
-      setSelectedMake(""); // Reset make when equipment type changes
-      setFormData((prev) => ({ ...prev, make: "", model: "" }));
+      setSelectedMake("");
+      setSymptoms([]);
+      // Reset to base fields only — clear any equipment-specific dynamic fields
+      setFormData({
+        equipmentType: value,
+        make: "",
+        model: "",
+        year: formData.year,
+        symptoms: [],
+        problemDescription: formData.problemDescription,
+        errorCodes: "",
+        identifier: "",
+        usageMetric: "",
+        urgency: formData.urgency,
+        fullName: formData.fullName,
+        email: formData.email,
+        phone: formData.phone,
+      });
     } else if (field === "make" && typeof value === "string") {
       setSelectedMake(value);
-      setFormData((prev) => ({ ...prev, model: "" })); // Reset model when make changes
+      setFormData((prev) => ({ ...prev, model: "" }));
     }
   };
 
   const handleSubmit = () => {
-    // Validate required fields
     if (!formData.fullName || !formData.email) {
       alert("Please fill in your name and email address.");
       return;
     }
-
     onFormSubmit(formData);
   };
 
@@ -149,19 +186,83 @@ const DiagnosticForm = ({ onFormSubmit }: DiagnosticFormProps) => {
   useEffect(() => {
     const handleFlashTrigger = () => {
       if (window.location.hash === '#diagnostic-form-flash') {
-        // Clear the hash to avoid repeated triggers
-        window.history.replaceState(null, null, '#diagnostic-form');
-        
-        // Start flashing border
+        window.history.replaceState(null, null as unknown as string, '#diagnostic-form');
         setShowFlashingBorder(true);
       }
     };
-
     handleFlashTrigger();
     window.addEventListener('hashchange', handleFlashTrigger);
-    
     return () => window.removeEventListener('hashchange', handleFlashTrigger);
   }, []);
+
+  // Render a dynamic equipment-specific field
+  const renderEquipmentField = (field: EquipmentField) => {
+    if (field.type === 'select' && field.options) {
+      return (
+        <div key={field.id} className="space-y-2">
+          <Label htmlFor={field.id}>{field.label}</Label>
+          <Select
+            onValueChange={(value) => handleInputChange(field.id, value)}
+            value={(formData[field.id] as string) || ""}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder={field.placeholder || `Select ${field.label.toLowerCase()}`} />
+            </SelectTrigger>
+            <SelectContent>
+              {field.options.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      );
+    }
+
+    if (field.type === 'checkbox' && field.options) {
+      return (
+        <div key={field.id} className="space-y-2">
+          <Label>{field.label}</Label>
+          <div className="grid grid-cols-2 gap-2">
+            {field.options.map((opt) => {
+              const currentValues = (formData[field.id] as string[] | undefined) || [];
+              return (
+                <div key={opt.value} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={`${field.id}-${opt.value}`}
+                    checked={currentValues.includes(opt.value)}
+                    onCheckedChange={(checked) => {
+                      const newValues = checked
+                        ? [...currentValues, opt.value]
+                        : currentValues.filter((v) => v !== opt.value);
+                      handleInputChange(field.id, newValues);
+                    }}
+                  />
+                  <Label htmlFor={`${field.id}-${opt.value}`} className="text-sm">
+                    {opt.label}
+                  </Label>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      );
+    }
+
+    // Default: text input
+    return (
+      <div key={field.id} className="space-y-2">
+        <Label htmlFor={field.id}>{field.label}</Label>
+        <Input
+          id={field.id}
+          placeholder={field.placeholder || ""}
+          value={(formData[field.id] as string) || ""}
+          onChange={(e) => handleInputChange(field.id, e.target.value)}
+        />
+      </div>
+    );
+  };
 
   return (
     <section className="py-12 bg-muted/30" id="diagnostic-form">
@@ -174,18 +275,17 @@ const DiagnosticForm = ({ onFormSubmit }: DiagnosticFormProps) => {
             </Badge>
             <h2 className="text-3xl md:text-5xl font-bold mb-6">
               Equipment Diagnostic Input
-              <span className="block text-primary">Cellphones to Spaceships</span>
+              <span className="block text-primary">Any Equipment, Any Problem</span>
             </h2>
-            <p 
+            <p
               className={`text-xl text-muted-foreground max-w-3xl mx-auto rounded-lg px-6 py-4 transition-all duration-300 border-2 ${
-                showFlashingBorder 
-                  ? 'animate-flash-border bg-primary/10 text-primary font-semibold' 
+                showFlashingBorder
+                  ? 'animate-flash-border bg-primary/10 text-primary font-semibold'
                   : 'border-transparent'
               }`}
             >
-              Maximum data input = maximum diagnostic accuracy. The more comprehensive your
-              equipment details, the higher probability our AI achieves in identifying the precise
-              root cause.
+              Tell us what's wrong and we'll generate a comprehensive diagnostic report.
+              More details = more accurate diagnosis.
             </p>
           </div>
 
@@ -193,36 +293,36 @@ const DiagnosticForm = ({ onFormSubmit }: DiagnosticFormProps) => {
             showFlashingBorder ? 'border-primary/50 border-2' : ''
           }`}>
             <CardHeader>
-              <CardTitle className="text-2xl">Diagnostic Information Form</CardTitle>
+              <CardTitle className="text-2xl">Step 1: Basic Information</CardTitle>
             </CardHeader>
             <CardContent className="space-y-8">
-              {/* Equipment Type */}
+              {/* Equipment Type Grid */}
               <div className="space-y-4">
-                <Label className="text-lg font-semibold">Equipment Type</Label>
-                <div className="grid grid-cols-3 gap-3">
+                <Label className="text-lg font-semibold">What type of equipment?</Label>
+                <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
                   {equipmentTypes.map((type) => {
                     const Icon = type.icon;
                     return (
                       <div
                         key={type.value}
                         onClick={() => handleInputChange("equipmentType", type.value)}
-                        className={`p-4 border rounded-lg cursor-pointer transition-all hover:bg-primary/5 ${
+                        className={`p-3 border rounded-lg cursor-pointer transition-all hover:bg-primary/5 ${
                           equipmentType === type.value
                             ? "border-primary bg-primary/10"
                             : "border-border"
                         }`}
                       >
-                        <Icon className="h-6 w-6 mx-auto mb-2" />
-                        <p className="text-sm font-medium text-center">{type.label}</p>
+                        <Icon className="h-5 w-5 mx-auto mb-1" />
+                        <p className="text-xs font-medium text-center">{type.label}</p>
                       </div>
                     );
                   })}
                 </div>
               </div>
 
-              {/* Equipment Details */}
-              <div className="grid md:grid-cols-2 gap-6">
-                <div className="space-y-4">
+              {/* Make / Model / Year */}
+              <div className="grid md:grid-cols-3 gap-4">
+                <div className="space-y-2">
                   <Label htmlFor="make">Make</Label>
                   <Select
                     onValueChange={(value) => handleInputChange("make", value)}
@@ -242,7 +342,7 @@ const DiagnosticForm = ({ onFormSubmit }: DiagnosticFormProps) => {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="space-y-4">
+                <div className="space-y-2">
                   <Label htmlFor="model">Model</Label>
                   <Select
                     onValueChange={(value) => handleInputChange("model", value)}
@@ -263,7 +363,7 @@ const DiagnosticForm = ({ onFormSubmit }: DiagnosticFormProps) => {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="space-y-4">
+                <div className="space-y-2">
                   <Label htmlFor="year">Year</Label>
                   <Select
                     onValueChange={(value) => handleInputChange("year", value)}
@@ -273,302 +373,331 @@ const DiagnosticForm = ({ onFormSubmit }: DiagnosticFormProps) => {
                       <SelectValue placeholder="Select year" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="2024">2024</SelectItem>
-                      <SelectItem value="2023">2023</SelectItem>
-                      <SelectItem value="2022">2022</SelectItem>
-                      <SelectItem value="2021">2021</SelectItem>
-                      <SelectItem value="2020">2020</SelectItem>
-                      <SelectItem value="2019">2019</SelectItem>
-                      <SelectItem value="2018">2018</SelectItem>
-                      <SelectItem value="2017">2017</SelectItem>
-                      <SelectItem value="2016">2016</SelectItem>
-                      <SelectItem value="2015">2015</SelectItem>
+                      {Array.from({ length: 12 }, (_, i) => 2026 - i).map((year) => (
+                        <SelectItem key={year} value={String(year)}>
+                          {year}
+                        </SelectItem>
+                      ))}
                       <SelectItem value="older">2014 or older</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="space-y-4">
-                  <Label htmlFor="mileage">Mileage/Hours</Label>
-                  <Input
-                    id="mileage"
-                    placeholder="e.g., 50,000 miles or 1,200 hours"
-                    value={formData.mileageHours}
-                    onChange={(e) => handleInputChange("mileageHours", e.target.value)}
-                  />
-                </div>
               </div>
 
-              <div className="space-y-4">
-                <Label htmlFor="serial">VIN / Hull / Serial Number</Label>
-                <Input
-                  id="serial"
-                  placeholder="Equipment identification number"
-                  value={formData.serialNumber}
-                  onChange={(e) => handleInputChange("serialNumber", e.target.value)}
+              {/* Problem Description */}
+              <div className="space-y-2">
+                <Label htmlFor="description">What's the problem?</Label>
+                <Textarea
+                  id="description"
+                  placeholder="Describe the problem in detail — sounds, behaviors, conditions when it happens, etc."
+                  className="min-h-[100px]"
+                  value={formData.problemDescription}
+                  onChange={(e) => handleInputChange("problemDescription", e.target.value)}
                 />
               </div>
 
-              {/* Diagnostic Details */}
-              <div className="space-y-6">
-                <h3 className="text-lg font-semibold">Diagnostic Details</h3>
-
-                <div className="space-y-4">
-                  <Label htmlFor="error-codes">Error Codes</Label>
+              {/* Contact Info */}
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="full-name">Full Name *</Label>
                   <Input
-                    id="error-codes"
-                    placeholder="P0171, B1234, etc."
-                    value={formData.errorCodes}
-                    onChange={(e) => handleInputChange("errorCodes", e.target.value)}
+                    id="full-name"
+                    placeholder="Your full name"
+                    value={formData.fullName}
+                    onChange={(e) => handleInputChange("fullName", e.target.value)}
+                    required
                   />
                 </div>
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email Address *</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="your.email@example.com"
+                    value={formData.email}
+                    onChange={(e) => handleInputChange("email", e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
 
-                <div className="space-y-4">
-                  <Label>Common Symptoms (select all that apply)</Label>
-                  <div className="grid grid-cols-2 gap-3">
-                    {commonSymptoms.map((symptom) => (
-                      <div key={symptom} className="flex items-center space-x-2">
-                        <Checkbox
-                          id={symptom}
-                          checked={symptoms.includes(symptom)}
-                          onCheckedChange={(checked) =>
-                            handleSymptomChange(symptom, checked as boolean)
-                          }
-                        />
-                        <Label htmlFor={symptom} className="text-sm">
-                          {symptom}
-                        </Label>
+              {/* Expandable Details Section */}
+              <div className="border-t pt-6">
+                <button
+                  type="button"
+                  onClick={() => setShowDetails(!showDetails)}
+                  className="flex items-center gap-2 text-primary hover:text-primary/80 font-medium transition-colors w-full justify-center"
+                >
+                  {showDetails ? (
+                    <>
+                      <ChevronUp className="h-4 w-4" />
+                      Hide Additional Details
+                    </>
+                  ) : (
+                    <>
+                      <ChevronDown className="h-4 w-4" />
+                      Add Details for Better Results
+                    </>
+                  )}
+                </button>
+
+                {showDetails && (
+                  <div className="mt-6 space-y-8">
+                    <CardTitle className="text-xl">Step 2: Detailed Information</CardTitle>
+
+                    {/* Equipment-Specific Fields */}
+                    {equipmentConfig && equipmentConfig.fields.length > 0 && (
+                      <div className="space-y-4">
+                        <h3 className="text-lg font-semibold">{equipmentConfig.displayName} Details</h3>
+                        <div className="grid md:grid-cols-2 gap-4">
+                          {equipmentConfig.fields.map(renderEquipmentField)}
+                        </div>
                       </div>
-                    ))}
-                  </div>
-                </div>
+                    )}
 
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div className="space-y-4">
-                    <Label htmlFor="when-started">When did this start?</Label>
-                    <Select
-                      onValueChange={(value) => handleInputChange("whenStarted", value)}
-                      value={formData.whenStarted}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select timeframe" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="today">Today</SelectItem>
-                        <SelectItem value="week">This week</SelectItem>
-                        <SelectItem value="month">This month</SelectItem>
-                        <SelectItem value="gradual">Gradual over time</SelectItem>
-                        <SelectItem value="sudden">Sudden onset</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-4">
-                    <Label htmlFor="frequency">How often does it occur?</Label>
-                    <Select
-                      onValueChange={(value) => handleInputChange("frequency", value)}
-                      value={formData.frequency}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select frequency" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="always">Always</SelectItem>
-                        <SelectItem value="often">Often</SelectItem>
-                        <SelectItem value="sometimes">Sometimes</SelectItem>
-                        <SelectItem value="rarely">Rarely</SelectItem>
-                        <SelectItem value="once">Only once</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
+                    {/* Identifier & Usage */}
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="serial">{identifierLabel}</Label>
+                        <Input
+                          id="serial"
+                          placeholder={`Enter ${identifierLabel.toLowerCase()}`}
+                          value={formData.serialNumber}
+                          onChange={(e) => handleInputChange("serialNumber", e.target.value)}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="mileage">{usageMetricLabel}</Label>
+                        <Input
+                          id="mileage"
+                          placeholder={usageMetricPlaceholder}
+                          value={formData.mileageHours}
+                          onChange={(e) => handleInputChange("mileageHours", e.target.value)}
+                        />
+                      </div>
+                    </div>
 
-                <div className="space-y-4">
-                  <Label>Urgency Level</Label>
-                  <RadioGroup
-                    value={formData.urgencyLevel}
-                    onValueChange={(value) => handleInputChange("urgencyLevel", value)}
-                  >
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="low" id="low" />
-                      <Label htmlFor="low">Low - Can wait</Label>
+                    {/* Error Codes */}
+                    <div className="space-y-2">
+                      <Label htmlFor="error-codes">Error Codes</Label>
+                      <Input
+                        id="error-codes"
+                        placeholder={errorCodeHint}
+                        value={formData.errorCodes}
+                        onChange={(e) => handleInputChange("errorCodes", e.target.value)}
+                      />
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="normal" id="normal" />
-                      <Label htmlFor="normal">Normal - Needs attention soon</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="high" id="high" />
-                      <Label htmlFor="high">High - Critical issue</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="emergency" id="emergency" />
-                      <Label htmlFor="emergency">Emergency - Safety concern</Label>
-                    </div>
-                  </RadioGroup>
-                </div>
 
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div className="space-y-4">
-                    <Label htmlFor="location">Primary Location/Environment</Label>
-                    <Select
-                      onValueChange={(value) => handleInputChange("locationEnvironment", value)}
-                      value={formData.locationEnvironment}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select environment" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="city">City/Urban</SelectItem>
-                        <SelectItem value="highway">Highway/Road</SelectItem>
-                        <SelectItem value="ocean">Ocean/Marine</SelectItem>
-                        <SelectItem value="indoor">Indoor Office</SelectItem>
-                        <SelectItem value="industrial">Industrial Site</SelectItem>
-                        <SelectItem value="home">Home Use</SelectItem>
-                        <SelectItem value="outdoor">Outdoor/Field</SelectItem>
-                        <SelectItem value="other">Other</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    {/* Symptoms */}
+                    <div className="space-y-2">
+                      <Label>Symptoms (select all that apply)</Label>
+                      <div className="grid grid-cols-2 gap-3">
+                        {currentSymptoms.map((symptom) => (
+                          <div key={symptom} className="flex items-center space-x-2">
+                            <Checkbox
+                              id={symptom}
+                              checked={symptoms.includes(symptom)}
+                              onCheckedChange={(checked) =>
+                                handleSymptomChange(symptom, checked as boolean)
+                              }
+                            />
+                            <Label htmlFor={symptom} className="text-sm">
+                              {symptom}
+                            </Label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Timing & Frequency */}
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="when-started">When did this start?</Label>
+                        <Select
+                          onValueChange={(value) => handleInputChange("whenStarted", value)}
+                          value={formData.whenStarted}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select timeframe" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="today">Today</SelectItem>
+                            <SelectItem value="week">This week</SelectItem>
+                            <SelectItem value="month">This month</SelectItem>
+                            <SelectItem value="gradual">Gradual over time</SelectItem>
+                            <SelectItem value="sudden">Sudden onset</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="frequency">How often does it occur?</Label>
+                        <Select
+                          onValueChange={(value) => handleInputChange("frequency", value)}
+                          value={formData.frequency}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select frequency" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="always">Always</SelectItem>
+                            <SelectItem value="often">Often</SelectItem>
+                            <SelectItem value="sometimes">Sometimes</SelectItem>
+                            <SelectItem value="rarely">Rarely</SelectItem>
+                            <SelectItem value="once">Only once</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    {/* Urgency */}
+                    <div className="space-y-2">
+                      <Label>Urgency Level</Label>
+                      <RadioGroup
+                        value={formData.urgencyLevel}
+                        onValueChange={(value) => handleInputChange("urgencyLevel", value)}
+                      >
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="low" id="low" />
+                          <Label htmlFor="low">Low - Can wait</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="normal" id="normal" />
+                          <Label htmlFor="normal">Normal - Needs attention soon</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="high" id="high" />
+                          <Label htmlFor="high">High - Critical issue</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="emergency" id="emergency" />
+                          <Label htmlFor="emergency">Emergency - Safety concern</Label>
+                        </div>
+                      </RadioGroup>
+                    </div>
+
+                    {/* Location & Usage */}
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="location">Primary Location/Environment</Label>
+                        <Select
+                          onValueChange={(value) => handleInputChange("locationEnvironment", value)}
+                          value={formData.locationEnvironment}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select environment" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {locationOptions.map((opt) => (
+                              <SelectItem key={opt.value} value={opt.value}>
+                                {opt.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="usage">Usage Pattern</Label>
+                        <Select
+                          onValueChange={(value) => handleInputChange("usagePattern", value)}
+                          value={formData.usagePattern}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select usage pattern" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="daily">Daily Use</SelectItem>
+                            <SelectItem value="weekly">Weekly Use</SelectItem>
+                            <SelectItem value="occasional">Occasional Use</SelectItem>
+                            <SelectItem value="heavy">Heavy Duty</SelectItem>
+                            <SelectItem value="light">Light Use</SelectItem>
+                            <SelectItem value="commercial">Commercial</SelectItem>
+                            <SelectItem value="recreational">Recreational</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    {/* Previous Repairs & Context */}
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="previous-repairs">Previous Repairs</Label>
+                        <Textarea
+                          id="previous-repairs"
+                          placeholder="List any previous repairs, parts replaced, or work done"
+                          className="min-h-[80px]"
+                          value={formData.previousRepairs}
+                          onChange={(e) => handleInputChange("previousRepairs", e.target.value)}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="modifications">Modifications or Upgrades</Label>
+                        <Textarea
+                          id="modifications"
+                          placeholder="Any modifications, upgrades, or aftermarket parts"
+                          className="min-h-[60px]"
+                          value={formData.modifications}
+                          onChange={(e) => handleInputChange("modifications", e.target.value)}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="troubleshooting">Steps Taken to Troubleshoot</Label>
+                        <Textarea
+                          id="troubleshooting"
+                          placeholder="What have you already tried to fix the problem?"
+                          className="min-h-[60px]"
+                          value={formData.troubleshootingSteps}
+                          onChange={(e) => handleInputChange("troubleshootingSteps", e.target.value)}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Shop Quote */}
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="quote-amount">Shop Quote Amount</Label>
+                        <Input
+                          id="quote-amount"
+                          placeholder="$0.00"
+                          type="number"
+                          value={formData.shopQuoteAmount}
+                          onChange={(e) => handleInputChange("shopQuoteAmount", e.target.value)}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="shop-recommendation">What the Shop Recommended</Label>
+                        <Input
+                          id="shop-recommendation"
+                          placeholder="Parts or services recommended"
+                          value={formData.shopRecommendation}
+                          onChange={(e) => handleInputChange("shopRecommendation", e.target.value)}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Phone */}
+                    <div className="space-y-2">
+                      <Label htmlFor="phone">Phone Number (optional)</Label>
+                      <Input
+                        id="phone"
+                        type="tel"
+                        placeholder="(555) 123-4567"
+                        value={formData.phone}
+                        onChange={(e) => handleInputChange("phone", e.target.value)}
+                      />
+                    </div>
                   </div>
-                  <div className="space-y-4">
-                    <Label htmlFor="usage">Usage Pattern</Label>
-                    <Select
-                      onValueChange={(value) => handleInputChange("usagePattern", value)}
-                      value={formData.usagePattern}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select usage pattern" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="daily">Daily Use</SelectItem>
-                        <SelectItem value="weekly">Weekly Use</SelectItem>
-                        <SelectItem value="occasional">Occasional Use</SelectItem>
-                        <SelectItem value="heavy">Heavy Duty</SelectItem>
-                        <SelectItem value="light">Light Use</SelectItem>
-                        <SelectItem value="commercial">Commercial</SelectItem>
-                        <SelectItem value="recreational">Recreational</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
+                )}
               </div>
 
-              {/* Problem Information */}
-              <div className="space-y-6">
-                <h3 className="text-lg font-semibold">Problem Information</h3>
-
-                <div className="space-y-4">
-                  <Label htmlFor="description">Problem Description</Label>
-                  <Textarea
-                    id="description"
-                    placeholder="Describe the problem in detail. Include sounds, behaviors, conditions when it happens, etc."
-                    className="min-h-[100px]"
-                    value={formData.problemDescription}
-                    onChange={(e) => handleInputChange("problemDescription", e.target.value)}
-                  />
-                </div>
-
-                <div className="space-y-4">
-                  <Label htmlFor="previous-repairs">Previous Repairs</Label>
-                  <Textarea
-                    id="previous-repairs"
-                    placeholder="List any previous repairs, parts replaced, or work done"
-                    className="min-h-[80px]"
-                    value={formData.previousRepairs}
-                    onChange={(e) => handleInputChange("previousRepairs", e.target.value)}
-                  />
-                </div>
-
-                <div className="space-y-4">
-                  <Label htmlFor="modifications">Modifications or Upgrades</Label>
-                  <Textarea
-                    id="modifications"
-                    placeholder="Any modifications, upgrades, or aftermarket parts"
-                    className="min-h-[80px]"
-                    value={formData.modifications}
-                    onChange={(e) => handleInputChange("modifications", e.target.value)}
-                  />
-                </div>
-
-                <div className="space-y-4">
-                  <Label htmlFor="troubleshooting">Steps Taken to Troubleshoot</Label>
-                  <Textarea
-                    id="troubleshooting"
-                    placeholder="What have you already tried to fix the problem?"
-                    className="min-h-[80px]"
-                    value={formData.troubleshootingSteps}
-                    onChange={(e) => handleInputChange("troubleshootingSteps", e.target.value)}
-                  />
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div className="space-y-4">
-                    <Label htmlFor="quote-amount">Shop Quote Amount</Label>
-                    <Input
-                      id="quote-amount"
-                      placeholder="$0.00"
-                      type="number"
-                      value={formData.shopQuoteAmount}
-                      onChange={(e) => handleInputChange("shopQuoteAmount", e.target.value)}
-                    />
-                  </div>
-                  <div className="space-y-4">
-                    <Label htmlFor="shop-recommendation">What the Shop/Dealer Recommended</Label>
-                    <Input
-                      id="shop-recommendation"
-                      placeholder="Parts or services recommended"
-                      value={formData.shopRecommendation}
-                      onChange={(e) => handleInputChange("shopRecommendation", e.target.value)}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Contact Information */}
-              <div className="space-y-6">
-                <h3 className="text-lg font-semibold">Contact Information</h3>
-
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div className="space-y-4">
-                    <Label htmlFor="full-name">Full Name</Label>
-                    <Input
-                      id="full-name"
-                      placeholder="Your full name"
-                      value={formData.fullName}
-                      onChange={(e) => handleInputChange("fullName", e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div className="space-y-4">
-                    <Label htmlFor="email">Email Address</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="your.email@example.com"
-                      value={formData.email}
-                      onChange={(e) => handleInputChange("email", e.target.value)}
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <Label htmlFor="phone">Phone Number</Label>
-                  <Input
-                    id="phone"
-                    type="tel"
-                    placeholder="(555) 123-4567"
-                    value={formData.phone}
-                    onChange={(e) => handleInputChange("phone", e.target.value)}
-                  />
-                </div>
-              </div>
-
+              {/* Submit */}
               <div className="pt-6 text-center">
                 <Button size="lg" className="min-w-48" onClick={handleSubmit}>
                   <Brain className="h-4 w-4 mr-2" />
                   Review
                 </Button>
                 <p className="text-sm text-muted-foreground mt-4">
-                  Review your information and proceed to payment for AI analysis ($4.99). After payment, you'll get instant access to download your report. Support available at support@diagnosticpro.io
+                  Review your information and proceed to payment for AI analysis ($4.99). After payment,
+                  you'll get instant access to download your report.
                 </p>
               </div>
             </CardContent>

@@ -14,6 +14,7 @@ const NotFound = React.lazy(() => import("./pages/NotFound"));
 const TestMonitor = React.lazy(() => import("./pages/TestMonitor"));
 const PaymentSuccess = React.lazy(() => import("./components/PaymentSuccess"));
 const Report = React.lazy(() => import("./pages/Report"));
+const EquipmentLanding = React.lazy(() => import("./pages/EquipmentLanding"));
 
 // Optimized QueryClient configuration
 const queryClient = new QueryClient({
@@ -49,6 +50,7 @@ const App = () => (
               <Route path="/success" element={<PaymentSuccess />} />
               <Route path="/payment-success" element={<PaymentSuccess />} />
               <Route path="/report/:reportId" element={<Report />} />
+              <Route path="/equipment/:equipmentSlug" element={<EquipmentLanding />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
