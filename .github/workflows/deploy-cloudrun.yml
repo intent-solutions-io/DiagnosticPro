@@ -35,7 +35,7 @@ jobs:
             --project diagnostic-pro-prod \
             --platform managed \
             --allow-unauthenticated \
-            --set-env-vars="GOOGLE_CLOUD_PROJECT=diagnostic-pro-prod,NODE_ENV=production" \
+            --set-env-vars="GOOGLE_CLOUD_PROJECT=diagnostic-pro-prod,NODE_ENV=production,REPORT_BUCKET=diagnostic-pro-prod-reports-us-central1,FIREBASE_STORAGE_BUCKET=diagnostic-pro-prod.firebasestorage.app" \
             --set-secrets="STRIPE_SECRET_KEY=STRIPE_SECRET_KEY:latest,STRIPE_WEBHOOK_SECRET=STRIPE_WEBHOOK_SECRET:latest,FIREBASE_API_KEY=FIREBASE_API_KEY:latest" \
             --min-instances 0 \
             --max-instances 10 \
