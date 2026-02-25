@@ -2,6 +2,51 @@
 
 All notable changes to DiagnosticPro will be documented in this file.
 
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [2.1.0] - 2026-02-25
+
+### Added
+- **Universal Equipment Support** - Expanded from automotive-only to 15 equipment categories:
+  - Cars & SUVs, Gas Trucks, Diesel Trucks, Semi Trucks, Motorcycles, ATVs/UTVs
+  - RVs, Marine/Boats, Farm & Ag, Compact Equipment, Lawn & Garden
+  - Power Tools, HVAC, Golf Carts, Electronics
+- **Equipment-Specific Form Fields** - Dynamic form rendering based on equipment type with type-specific fields, symptoms, and identifiers
+- **Equipment-Specific AI Prompts** - Custom diagnostic context for each equipment type (replaces hardcoded Ford F-150 framing)
+- **Expanded Error Code Extraction** - Support for J1939 SPN/FMI (semi trucks), manufacturer codes, and blink/flash codes
+- **Equipment Landing Pages** - SEO-friendly routes at `/equipment/:slug` for each equipment type
+- **Share with Mechanic** - One-click report sharing via Web Share API with clipboard fallback
+- **Report Persistence** - localStorage saves last 10 report links for easy access
+- **Google Secret Manager Integration** - Production secrets management with Workload Identity Federation
+- **HUSTLE Light Theme** - Professional clean UI theme
+
+### Fixed
+- **Critical: Ford F-150 Hardcoding** - AI prompt no longer assumes all submissions are Ford F-150 crank/no-start cases
+- **Section 15 Mismatch** - PDF generator now correctly uses `nextStepsSummary` matching prompt and parser
+- **PDF Array Rendering** - `cleanSectionContent()` now preserves bullet list formatting
+- **Stale Form Fields** - Equipment type changes now reset all dynamic fields
+- **Async PDF Generation** - Added missing async/await to PDF generation promise
+
+### Changed
+- **Marketing Integrity Cleanup** - Removed fabricated statistics and fake testimonials
+  - Replaced $600B/73%/3.2x stats with honest comparison scenarios
+  - Replaced fake testimonials with illustrative report examples
+  - Removed aerospace category and "cellphones to spaceships" claims
+- **2-Step Form Flow** - Simplified initial form with collapsible detailed information section
+- **Honest Value Proposition** - Hero section now accurately describes the $4.99 AI diagnostic service
+- **Manufacturer Data** - Expanded to 1,400+ lines covering all 15 equipment categories
+
+### Removed
+- ~1,800 lines of dead code across frontend, backend, and functions
+- Aerospace equipment category (not a realistic use case)
+- Fabricated social proof ("trusted by repair shops nationwide")
+
+### Security
+- Implemented Google Secret Manager for production credentials
+- Workload Identity Federation for secure GCP authentication
+- Repository prepared for public release with secrets audit
+
 ## [2.0.0] - 2025-10-20
 
 ### 🎯 Major PDF Generation Overhaul
