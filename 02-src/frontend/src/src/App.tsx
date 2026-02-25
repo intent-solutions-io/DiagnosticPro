@@ -6,6 +6,11 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import LoadingSpinner from "@/components/LoadingSpinner";
 
+import { setupWhopEmbed } from "@/lib/whop-embed";
+
+// Initialize Whop iframe detection
+setupWhopEmbed();
+
 // Lazy load all routes for better performance
 const Index = React.lazy(() => import("./pages/Index"));
 const Terms = React.lazy(() => import("./pages/Terms"));
@@ -15,6 +20,7 @@ const TestMonitor = React.lazy(() => import("./pages/TestMonitor"));
 const PaymentSuccess = React.lazy(() => import("./components/PaymentSuccess"));
 const Report = React.lazy(() => import("./pages/Report"));
 const EquipmentLanding = React.lazy(() => import("./pages/EquipmentLanding"));
+const AuthCallback = React.lazy(() => import("./pages/AuthCallback"));
 
 // Optimized QueryClient configuration
 const queryClient = new QueryClient({
@@ -51,6 +57,7 @@ const App = () => (
               <Route path="/payment-success" element={<PaymentSuccess />} />
               <Route path="/report/:reportId" element={<Report />} />
               <Route path="/equipment/:equipmentSlug" element={<EquipmentLanding />} />
+              <Route path="/auth/callback" element={<AuthCallback />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

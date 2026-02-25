@@ -16,10 +16,11 @@ describe("Hero Component", () => {
     expect(getByText(/AI diagnostic second opinion for \$4\.99/)).toBeInTheDocument();
   });
 
-  it("shows the call-to-action button", () => {
+  it("shows the call-to-action buttons", () => {
     const { getByText } = render(<Hero />);
 
     expect(getByText("Start Diagnosis - $4.99")).toBeInTheDocument();
+    expect(getByText(/Join the Community/)).toBeInTheDocument();
   });
 
   it("displays value summary stats", () => {
