@@ -153,21 +153,25 @@ const DiagnosticForm = ({ onFormSubmit, initialEquipmentType }: DiagnosticFormPr
       setSelectedMake("");
       setSymptoms([]);
       // Reset to base fields only — clear any equipment-specific dynamic fields
-      setFormData({
+      setFormData((prev) => ({
+        ...prev,
         equipmentType: value,
         make: "",
         model: "",
-        year: formData.year,
         symptoms: [],
-        problemDescription: formData.problemDescription,
         errorCodes: "",
-        identifier: "",
-        usageMetric: "",
-        urgency: formData.urgency,
-        fullName: formData.fullName,
-        email: formData.email,
-        phone: formData.phone,
-      });
+        mileageHours: "",
+        serialNumber: "",
+        whenStarted: "",
+        frequency: "",
+        locationEnvironment: "",
+        usagePattern: "",
+        previousRepairs: "",
+        modifications: "",
+        troubleshootingSteps: "",
+        shopQuoteAmount: "",
+        shopRecommendation: "",
+      }));
     } else if (field === "make" && typeof value === "string") {
       setSelectedMake(value);
       setFormData((prev) => ({ ...prev, model: "" }));

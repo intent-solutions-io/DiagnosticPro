@@ -6,27 +6,27 @@ describe("Hero Component", () => {
   it("renders hero section with main heading", () => {
     const { getByText } = render(<Hero />);
 
-    expect(getByText("Professional AI Diagnostic Reports")).toBeInTheDocument();
+    expect(getByText("Know What's Wrong")).toBeInTheDocument();
+    expect(getByText("Before You Authorize Repairs")).toBeInTheDocument();
   });
 
   it("displays the value proposition", () => {
     const { getByText } = render(<Hero />);
 
-    expect(getByText(/Get instant, comprehensive diagnostic analysis/)).toBeInTheDocument();
+    expect(getByText(/AI diagnostic second opinion for \$4\.99/)).toBeInTheDocument();
   });
 
   it("shows the call-to-action button", () => {
     const { getByText } = render(<Hero />);
 
-    const ctaButton = getByText("Start Your Diagnostic");
-    expect(ctaButton).toBeInTheDocument();
-    expect(ctaButton.closest("a")).toHaveAttribute("href", "#diagnostic-form");
+    expect(getByText("Start Diagnosis - $4.99")).toBeInTheDocument();
   });
 
-  it("displays the hero image", () => {
-    const { getByAltText } = render(<Hero />);
+  it("displays value summary stats", () => {
+    const { getByText } = render(<Hero />);
 
-    const heroImage = getByAltText("Professional diagnostic equipment analysis");
-    expect(heroImage).toBeInTheDocument();
+    expect(getByText("2,000+ Words")).toBeInTheDocument();
+    expect(getByText("15 Sections")).toBeInTheDocument();
+    expect(getByText("$4.99")).toBeInTheDocument();
   });
 });

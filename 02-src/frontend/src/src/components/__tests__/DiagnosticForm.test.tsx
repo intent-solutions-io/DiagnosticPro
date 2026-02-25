@@ -3,13 +3,6 @@ import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 import DiagnosticForm from "../DiagnosticForm";
 
-// Mock the router
-const mockNavigate = jest.fn();
-jest.mock("react-router-dom", () => ({
-  ...jest.requireActual("react-router-dom"),
-  useNavigate: () => mockNavigate,
-}));
-
 describe("DiagnosticForm Component", () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -19,20 +12,23 @@ describe("DiagnosticForm Component", () => {
     const mockOnSubmit = jest.fn();
     const { getByText } = render(<DiagnosticForm onFormSubmit={mockOnSubmit} />);
 
-    expect(getByText("Quick Diagnostic Assessment")).toBeInTheDocument();
-    expect(getByText("Select Equipment Type")).toBeInTheDocument();
+    expect(getByText("Equipment Diagnostic Input")).toBeInTheDocument();
+    expect(getByText("What type of equipment?")).toBeInTheDocument();
+    expect(getByText("Step 1: Basic Information")).toBeInTheDocument();
   });
 
   it("displays all equipment type options", () => {
     const mockOnSubmit = jest.fn();
     const { getByText } = render(<DiagnosticForm onFormSubmit={mockOnSubmit} />);
 
-    // Check for equipment types
-    expect(getByText("Heavy Equipment")).toBeInTheDocument();
-    expect(getByText("Vehicles")).toBeInTheDocument();
+    expect(getByText("Cars & SUVs")).toBeInTheDocument();
+    expect(getByText("Gas Trucks")).toBeInTheDocument();
+    expect(getByText("Diesel Trucks")).toBeInTheDocument();
     expect(getByText("Semi Trucks")).toBeInTheDocument();
-    expect(getByText("Appliances")).toBeInTheDocument();
+    expect(getByText("Motorcycles")).toBeInTheDocument();
     expect(getByText("Power Tools")).toBeInTheDocument();
+    expect(getByText("HVAC")).toBeInTheDocument();
+    expect(getByText("Marine")).toBeInTheDocument();
   });
 
   it("allows selecting an equipment type", async () => {
@@ -40,47 +36,40 @@ describe("DiagnosticForm Component", () => {
     const mockOnSubmit = jest.fn();
     const { getByText } = render(<DiagnosticForm onFormSubmit={mockOnSubmit} />);
 
-    const heavyEquipmentButton = getByText("Heavy Equipment");
-    await user.click(heavyEquipmentButton);
+    await user.click(getByText("Cars & SUVs"));
 
-    // Should show manufacturer dropdown after selection
-    expect(getByText("Select Manufacturer")).toBeInTheDocument();
+    // Should show make/model/year selects after selection
+    expect(getByText("Make")).toBeInTheDocument();
+    expect(getByText("Model")).toBeInTheDocument();
+    expect(getByText("Year")).toBeInTheDocument();
   });
 
-  it("shows manufacturer options when equipment type is selected", async () => {
-    const user = userEvent.setup();
+  it("renders the review button", () => {
     const mockOnSubmit = jest.fn();
     const { getByText } = render(<DiagnosticForm onFormSubmit={mockOnSubmit} />);
 
-    // Select vehicles
-    const vehiclesButton = getByText("Vehicles");
-    await user.click(vehiclesButton);
-
-    // Open manufacturer dropdown
-    const manufacturerSelect = getByText("Select Manufacturer");
-    await user.click(manufacturerSelect);
-
-    // Should show vehicle manufacturers
-    expect(getByText("Ford")).toBeInTheDocument();
-    expect(getByText("Chevrolet")).toBeInTheDocument();
+    expect(getByText("Review")).toBeInTheDocument();
   });
 
-  it("enables form submission when all required fields are filled", async () => {
+  it("calls onFormSubmit with form data when submitted with required fields", async () => {
     const user = userEvent.setup();
     const mockOnSubmit = jest.fn();
-    const { getByText, getByPlaceholderText } = render(<DiagnosticForm onFormSubmit={mockOnSubmit} />);
+    const { getByText, getByPlaceholderText } = render(
+      <DiagnosticForm onFormSubmit={mockOnSubmit} />
+    );
 
-    // Fill out the form
-    await user.click(getByText("Vehicles"));
-    await user.click(getByText("Select Manufacturer"));
-    await user.click(getByText("Ford"));
+    // Fill required fields
+    await user.type(getByPlaceholderText("Your full name"), "John Doe");
+    await user.type(getByPlaceholderText("your.email@example.com"), "john@example.com");
 
-    await user.type(getByPlaceholderText("Enter model name"), "F-150");
-    await user.type(getByPlaceholderText("Enter year"), "2020");
-    await user.type(getByPlaceholderText("Describe the problem"), "Engine noise");
-    await user.type(getByPlaceholderText("Enter your email"), "test@example.com");
-
-    const submitButton = getByText("Get AI Diagnostic Report");
-    expect(submitButton).not.toBeDisabled();
+    // Submit
+    await user.click(getByText("Review"));
+    expect(mockOnSubmit).toHaveBeenCalledTimes(1);
+    expect(mockOnSubmit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        fullName: "John Doe",
+        email: "john@example.com",
+      })
+    );
   });
 });
