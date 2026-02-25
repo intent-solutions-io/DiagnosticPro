@@ -143,16 +143,9 @@ function parseFullAnalysis(fullAnalysis = '') {
 
 function extractDiagnosticCodes(payload = {}) {
   const codes = new Set();
-  const rawErrorTexts = [];
 
   // OBD-II codes: P0171, B1234, C0035, U0100
   const obdRegex = /\b([PpBbCcUu][0-9A-Fa-f]{4})\b/g;
-  // J1939 SPN/FMI: SPN 520198 FMI 7, SPN520198/FMI7
-  const j1939Regex = /\bSPN\s*(\d{1,6})\s*[\/\s]*FMI\s*(\d{1,2})\b/gi;
-  // Marine/HVAC/manufacturer codes: E1, F5, ERR-42, Fault 123, Code 456
-  const genericCodeRegex = /\b(?:ERR|FAULT|CODE|ERROR|E|F|ALM)[-\s]?(\d{1,5})\b/gi;
-  // Blink/flash codes: "2 blinks then 5 blinks", "flash code 3-2"
-  const blinkRegex = /\b(?:blink|flash)\s*(?:code)?\s*(\d[\s\-,]*\d?)\b/gi;
 
   const collectFromValue = (value) => {
     if (!value) return;
@@ -161,26 +154,29 @@ function extractDiagnosticCodes(payload = {}) {
       return;
     }
     if (typeof value === 'string') {
-      // Collect raw text for AI context
-      rawErrorTexts.push(value);
       // OBD-II codes
       const obdMatches = value.match(obdRegex);
       if (obdMatches) {
         obdMatches.forEach(code => codes.add(code.toUpperCase()));
       }
-      // J1939 SPN/FMI codes
+      // J1939 SPN/FMI: SPN 520198 FMI 7, SPN520198/FMI7
+      // New regex per string to avoid lastIndex persistence with global flag
+      const j1939Re = /\bSPN\s*(\d{1,6})\s*[\/\s]*FMI\s*(\d{1,2})\b/gi;
       let j1939Match;
-      while ((j1939Match = j1939Regex.exec(value)) !== null) {
+      while ((j1939Match = j1939Re.exec(value)) !== null) {
         codes.add(`SPN${j1939Match[1]}/FMI${j1939Match[2]}`);
       }
-      // Generic equipment codes
-      let genericMatch;
-      while ((genericMatch = genericCodeRegex.exec(value)) !== null) {
-        codes.add(genericMatch[0].toUpperCase().replace(/\s+/g, ''));
+      // Equipment-specific codes: ERR-42, Fault 123, Code 456, ALM-7
+      // Require multi-char prefix or prefix+separator to avoid false positives from "E-mail", "F-150"
+      const equipCodeRe = /\b(?:ERR|FAULT|CODE|ERROR|ALM)[-\s]?(\d{1,5})\b/gi;
+      let equipMatch;
+      while ((equipMatch = equipCodeRe.exec(value)) !== null) {
+        codes.add(equipMatch[0].toUpperCase().replace(/\s+/g, ''));
       }
-      // Blink/flash codes
+      // Blink/flash codes: "2 blinks then 5 blinks", "flash code 3-2"
+      const blinkRe = /\b(?:blink|flash)\s*(?:code)?\s*(\d[\s\-,]*\d?)\b/gi;
       let blinkMatch;
-      while ((blinkMatch = blinkRegex.exec(value)) !== null) {
+      while ((blinkMatch = blinkRe.exec(value)) !== null) {
         codes.add(`FLASH:${blinkMatch[1].replace(/\s/g, '')}`);
       }
     } else if (typeof value === 'object') {
@@ -194,10 +190,7 @@ function extractDiagnosticCodes(payload = {}) {
   collectFromValue(payload.problemDescription);
   collectFromValue(payload.troubleshootingSteps);
 
-  const result = Array.from(codes);
-  // Attach raw error text so AI always gets the original text even when extraction misses formats
-  result.rawErrorText = rawErrorTexts.filter(Boolean).join(' | ');
-  return result;
+  return Array.from(codes);
 }
 
 // Validate required environment variables
