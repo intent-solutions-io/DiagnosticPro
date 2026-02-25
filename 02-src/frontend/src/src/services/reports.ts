@@ -1,12 +1,6 @@
 /**
  * Reports service - Direct download via GCS signed URLs
- * No email delivery - direct download only
  */
-import { api } from './api';
-
-export interface ReportDownloadData {
-  url: string;
-}
 
 export interface DiagnosticStatus {
   id: string;
@@ -17,18 +11,10 @@ export interface DiagnosticStatus {
 }
 
 /**
- * Get signed URL for report download (Cloud Run API)
- */
-export async function getReportUrl(id: string): Promise<{ url: string }> {
-  return api<{ url: string }>(`/api/reports/${id}/url`);
-}
-
-/**
  * Download report by getting signed URL from Firestore and navigating to it
  */
 export async function downloadReport(id: string): Promise<void> {
   try {
-    // Get download URL directly from Firestore
     const { db } = await import('../config/firebase');
     const { doc, getDoc } = await import('firebase/firestore');
 
@@ -45,7 +31,6 @@ export async function downloadReport(id: string): Promise<void> {
       throw new Error('Download URL not available - report may still be processing');
     }
 
-    // Navigate to signed URL to trigger download
     window.location.href = data.downloadUrl;
   } catch (error) {
     console.error('Error downloading report:', error);
@@ -58,7 +43,6 @@ export async function downloadReport(id: string): Promise<void> {
  */
 export async function getDiagnosticStatus(diagnosticId: string): Promise<{ data: DiagnosticStatus | null; status: number; error?: string }> {
   try {
-    // Use Firebase Firestore directly
     const { db } = await import('../config/firebase');
     const { doc, getDoc } = await import('firebase/firestore');
 
@@ -75,7 +59,6 @@ export async function getDiagnosticStatus(diagnosticId: string): Promise<{ data:
 
     const data = docSnap.data();
 
-    // Map Firestore fields to DiagnosticStatus format
     return {
       data: {
         id: diagnosticId,
@@ -121,7 +104,6 @@ export async function pollDiagnosticStatus(
         }
       }
 
-      // Wait before next poll
       await new Promise(resolve => setTimeout(resolve, intervalMs));
       attempts++;
     } catch (error) {
@@ -131,18 +113,5 @@ export async function pollDiagnosticStatus(
     }
   }
 
-  return null; // Timeout
-}
-
-/**
- * Renew signed URL (get fresh 15-minute URL)
- */
-export async function renewReportUrl(diagnosticId: string): Promise<ApiResponse<ReportDownloadData>> {
-  if (!apiClient.isUsingNewApi()) {
-    // Legacy fallback uses same URL generation
-    return getReportDownloadUrl(diagnosticId);
-  }
-
-  // Use FastAPI renew endpoint if available
-  return apiClient.get<ReportDownloadData>(`/reports/${diagnosticId}/renew-url`);
+  return null;
 }
