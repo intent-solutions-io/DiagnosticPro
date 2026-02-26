@@ -21,15 +21,15 @@ import {
   connectStorageEmulator
 } from 'firebase/storage';
 
-// Firebase config
+// Firebase config (fallbacks match config/firebase.ts — these are public client-side values)
 const firebaseConfig = {
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
-  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "diagnostic-pro-prod",
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyBmuntVKosh_EGz5yxQLlIoNXlxwYE6tMg",
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "diagnostic-pro-prod.firebaseapp.com",
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "diagnostic-pro-prod.firebasestorage.app",
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "298932670545",
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:298932670545:web:d710527356371228556870",
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || "G-VQW6LFYQPS",
 };
 
 // Initialize Firebase (singleton)
@@ -121,10 +121,7 @@ export function onAuthChange(callback: (user: User | null) => void): () => void 
  * Check if Firebase is configured
  */
 export function isFirebaseConfigured(): boolean {
-  const projectId = import.meta.env.VITE_FIREBASE_PROJECT_ID;
-  const apiKey = import.meta.env.VITE_FIREBASE_API_KEY;
-
-  return !!(projectId && apiKey && apiKey !== 'REPLACE_WITH_FIREBASE_KEY');
+  return !!(firebaseConfig.projectId && firebaseConfig.apiKey && firebaseConfig.apiKey !== 'REPLACE_WITH_FIREBASE_KEY');
 }
 
 // Export Firebase instances for direct use
